@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cyber-Eye Intelligence — Parallax Experiments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #050505;
+    --surface: #101013;
+    --surface-2: #18181B;
+    --line: #2A2A2D;
+    --line-soft: #1F1F22;
+    --mute: #A1A1AA;
+    --dim: #71717A;
+    --text: #E4E4E7;
+    --accent: #10B981;
+    --accent-deep: #0B7F5F;
+    --warn: #F59E0B;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--ink); color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body.lenis-disabled { scroll-behavior: auto; }
+  body.reduce { scroll-behavior: auto; }
+  ::selection { background: var(--accent); color: #000; }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .label .accent { color: var(--accent); }
+  .accent { color: var(--accent); }
+
+  /* ============ TOP CHROME ============ */
+  .chrome {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 28px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim);
+    background: linear-gradient(180deg, rgba(5,5,5,0.9), rgba(5,5,5,0));
+    pointer-events: none;
+  }
+  .chrome .left, .chrome .right { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+  .chrome .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  .chrome .progress-track { width: 140px; height: 2px; background: var(--line); position: relative; }
+  .chrome .progress-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); width: 0%; }
+
+  /* ============ JUMP DOTS ============ */
+  .nav-dots {
+    position: fixed; right: 28px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 14px; z-index: 90;
+  }
+  .nav-dot {
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    color: var(--dim); text-decoration: none;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em;
+    transition: color .2s;
+  }
+  .nav-dot:hover { color: var(--text); }
+  .nav-dot.is-active { color: var(--accent); }
+  .nav-dot .marker { width: 18px; height: 1px; background: currentColor; transition: width .2s; }
+  .nav-dot.is-active .marker { width: 36px; }
+  .nav-dot .name { opacity: 0; transition: opacity .2s; }
+  .nav-dot:hover .name, .nav-dot.is-active .name { opacity: 1; }
+
+  /* ============ EXP SECTION ============ */
+  .exp {
+    position: relative; min-height: 100vh; width: 100%;
+    border-bottom: 1px solid var(--line-soft);
+    /* NOTE: do NOT put overflow:hidden here — it breaks position:sticky on descendants.
+       Apply clipping only to specific stages (intro, #exp1, sticky stages) below. */
+  }
+  /* Sections that don't contain sticky elements clip their own decorative layers */
+  #intro, #exp1, #exp6 { overflow: hidden; }
+  .exp-tag {
+    position: absolute; top: 80px; left: 32px; z-index: 5;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .exp-tag .num { color: var(--accent); }
+  .exp-title-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 0 32px; max-width: 1280px; margin: 0 auto;
+  }
+
+  /* ============ INTRO (EXP 00) ============ */
+  #intro { display: grid; place-items: center; padding: 120px 32px 80px; }
+  #intro .wrap { max-width: 1100px; }
+  #intro h1 {
+    font-size: clamp(48px, 9vw, 112px); line-height: 0.98; font-weight: 500;
+    letter-spacing: -0.03em; margin: 24px 0 32px; color: #fff; text-wrap: balance;
+  }
+  #intro h1 em { font-style: normal; color: var(--accent); }
+  #intro .lede { color: var(--mute); font-size: 18px; line-height: 1.55; max-width: 640px; }
+  #intro .scroll-hint {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--dim);
+    text-transform: uppercase;
+    animation: bob 2.2s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+
+  /* Ambient grid in intro */
+  #intro .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%),
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 100%, 56px 56px, 56px 56px;
+    background-position: center;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* ============ EXP 01 — LAYERED DEPTH ============ */
+  #exp1 { min-height: 140vh; }
+  #exp1 .layer { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
+  #exp1 .layer-bg {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(16,185,129,0.18), transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(16,185,129,0.08), transparent 55%),
+      linear-gradient(180deg, #07120E 0%, #050505 80%);
+  }
+  #exp1 .layer-mid {
+    background-image:
+      linear-gradient(rgba(16,185,129,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16,185,129,0.07) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    -webkit-mask: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  }
+  #exp1 .hex-field {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.5;
+  }
+  #exp1 .hex-field span {
+    position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--accent); opacity: 0.4;
+  }
+  #exp1 .content {
+    position: relative; z-index: 5;
+    max-width: 1280px; margin: 0 auto; padding: 200px 32px 120px;
+  }
+  #exp1 h2 {
+    font-size: clamp(64px, 10vw, 144px); line-height: 0.95; font-weight: 500;
+    letter-spacing: -0.035em; margin: 0; color: #fff; text-wrap: balance;
+  }
+  #exp1 h2 .ghost { color: transparent; -webkit-text-stroke: 1px var(--accent); }
+  #exp1 .sub {
+    color: var(--mute); font-size: 18px; line-height: 1.55; max-width: 520px; margin: 32px 0 0;
+  }
+  #exp1 .badge-row { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+  #exp1 .badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
+    border: 1px solid var(--accent); padding: 6px 12px; border-radius: 999px; letter-spacing: 0.08em;
+  }
+  #exp1 .float-card {
+    position: absolute; right: 8%; top: 28%;
+    width: 320px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6);
+    will-change: transform;
+  }
+  #exp1 .float-card .label-tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  #exp1 .float-card h4 { margin: 0 0 8px; font-size: 16px; font-weight: 500; }
+  #exp1 .float-card p { margin: 0; font-size: 13px; color: var(--mute); line-height: 1.5; }
+  #exp1 .float-card .meter { margin-top: 16px; height: 4px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+  #exp1 .float-card .meter-fill { height: 100%; width: 67%; background: var(--accent); }
+  #exp1 .float-card-2 {
+    position: absolute; left: 8%; bottom: 18%;
+    width: 260px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: 0 18px 40px -15px rgba(0,0,0,0.5);
+    will-change: transform;
+  }
+  #exp1 .float-card-2 .num { font-size: 36px; font-weight: 500; letter-spacing: -0.02em; color: #fff; }
+  #exp1 .float-card-2 .num .suffix { color: var(--accent); font-size: 24px; }
+
+  /* ============ EXP 02 — STICKY STACK ============ */
+  #exp2 { min-height: 320vh; background: var(--ink); }
+  #exp2 .stack-stage {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+  }
+  #exp2 .panel {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    padding: 0 32px; will-change: transform, opacity;
+  }
+  #exp2 .panel .inner { max-width: 960px; text-align: left; }
+  #exp2 .panel h2 {
+    font-size: clamp(48px, 8vw, 96px); line-height: 1.02; font-weight: 500;
+    letter-spacing: -0.025em; margin: 16px 0 24px; color: #fff;
+  }
+  #exp2 .panel .lede { color: var(--mute); font-size: 18px; line-height: 1.55; max-width: 620px; }
+  #exp2 .panel-1 { background: linear-gradient(180deg, #050505, #08100C); }
+  #exp2 .panel-2 { background: linear-gradient(180deg, #07120E, #050D08); }
+  #exp2 .panel-3 { background: linear-gradient(180deg, #050505, #0A1A12); }
+  #exp2 .panel .marker {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
+    border: 1px solid var(--accent); padding: 4px 10px; border-radius: 4px; letter-spacing: 0.1em; display: inline-block;
+  }
+
+  /* ============ EXP 03 — PINNED SCRUB ============ */
+  #exp3 { min-height: 280vh; }
+  #exp3 .scrub-stage {
+    position: sticky; top: 0; height: 100vh; display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    padding: 0 48px; align-items: center; overflow: hidden;
+  }
+  #exp3 .scrub-left h2 {
+    font-size: clamp(40px, 5.5vw, 72px); line-height: 1.04; font-weight: 500;
+    letter-spacing: -0.02em; color: #fff; margin: 16px 0 24px;
+  }
+  #exp3 .scrub-left p { color: var(--mute); font-size: 17px; line-height: 1.55; max-width: 480px; }
+  #exp3 .steps { list-style: none; padding: 0; margin: 32px 0 0; }
+  #exp3 .steps li {
+    display: grid; grid-template-columns: 80px 1fr; gap: 16px; padding: 14px 0;
+    border-bottom: 1px solid var(--line-soft);
+    opacity: 0.35; transition: opacity .3s, color .3s;
+  }
+  #exp3 .steps li.is-active { opacity: 1; }
+  #exp3 .steps li.is-active .step-name { color: #fff; }
+  #exp3 .steps .step-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.1em; padding-top: 2px; }
+  #exp3 .steps .step-name { font-size: 16px; color: var(--mute); }
+  #exp3 .scrub-right {
+    position: relative; height: 78vh; border: 1px solid var(--line); border-radius: 12px;
+    background: var(--surface); overflow: hidden;
+  }
+  #exp3 .frame {
+    position: absolute; inset: 0; display: grid; place-items: center; padding: 32px;
+    opacity: 0; transition: opacity .35s ease;
+    will-change: opacity;
+  }
+  #exp3 .frame.is-on { opacity: 1; }
+  #exp3 .frame-inner {
+    width: 100%; height: 100%; border: 1px solid var(--line); border-radius: 8px;
+    display: grid; place-items: center; position: relative; overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(16,185,129,0.08), transparent 70%),
+      var(--surface-2);
+  }
+  #exp3 .frame-label {
+    position: absolute; top: 16px; left: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  #exp3 .frame-mono { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px; text-align: center; line-height: 1.7; }
+  #exp3 .device {
+    width: 220px; height: 360px; border: 1px solid var(--line); border-radius: 24px;
+    background: linear-gradient(180deg, #0a0a0a, #050505);
+    display: grid; place-items: center; position: relative;
+  }
+  #exp3 .device::before { content:''; position: absolute; top: 14px; width: 40px; height: 4px; background: var(--surface-2); border-radius: 999px; }
+  #exp3 .device .screen { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  /* ============ EXP 04 — CLIP-PATH REVEAL ============ */
+  #exp4 { min-height: 220vh; }
+  #exp4 .reveal-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+  #exp4 .reveal-bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(5,5,5,0.45), rgba(5,5,5,0.85)),
+      repeating-linear-gradient(45deg, rgba(16,185,129,0.06) 0 2px, transparent 2px 18px),
+      radial-gradient(ellipse at 30% 40%, #0B7F5F22, transparent 60%),
+      var(--surface);
+    will-change: clip-path;
+    clip-path: inset(40% 0 40% 0);
+  }
+  #exp4 .reveal-content {
+    position: relative; z-index: 2; height: 100%; max-width: 1280px; margin: 0 auto;
+    padding: 100px 32px; display: flex; flex-direction: column; justify-content: center;
+  }
+  #exp4 .reveal-content h2 {
+    font-size: clamp(48px, 8vw, 112px); line-height: 0.98; font-weight: 500;
+    letter-spacing: -0.03em; color: #fff; margin: 16px 0; text-wrap: balance;
+  }
+  #exp4 .reveal-content .sub { color: var(--mute); font-size: 18px; max-width: 580px; line-height: 1.55; }
+  #exp4 .frame-meta {
+    position: absolute; bottom: 32px; left: 32px; right: 32px;
+    display: flex; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  #exp4 .frame-corners::before, #exp4 .frame-corners::after {
+    content: ''; position: absolute; width: 24px; height: 24px;
+    border-color: var(--accent); border-style: solid;
+  }
+  #exp4 .frame-corners::before { top: 32px; left: 32px; border-width: 1px 0 0 1px; }
+  #exp4 .frame-corners::after { bottom: 32px; right: 32px; border-width: 0 1px 1px 0; }
+
+  /* ============ EXP 05 — HORIZONTAL PIN ============ */
+  #exp5 { height: 400vh; position: relative; }
+  #exp5 .h-stage {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  #exp5 .h-head {
+    padding: 0 48px 32px; max-width: 1280px; margin: 0 auto; width: 100%;
+  }
+  #exp5 .h-head h2 {
+    font-size: clamp(36px, 5vw, 56px); line-height: 1.04; font-weight: 500;
+    letter-spacing: -0.02em; color: #fff; margin: 12px 0 0;
+  }
+  #exp5 .h-track {
+    display: flex; gap: 24px; padding: 0 48px; will-change: transform;
+  }
+  #exp5 .h-card {
+    flex: 0 0 380px; height: 56vh;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 32px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  #exp5 .h-card::after {
+    content: ''; position: absolute; inset: auto -40% -40% auto; width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(16,185,129,0.16), transparent 65%);
+  }
+  #exp5 .h-card .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); letter-spacing: 0.1em;
+  }
+  #exp5 .h-card h4 { font-size: 28px; font-weight: 500; letter-spacing: -0.01em; margin: 16px 0 16px; line-height: 1.1; }
+  #exp5 .h-card p { color: var(--mute); font-size: 14px; line-height: 1.55; margin: 0; }
+  #exp5 .h-card .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ============ EXP 06 — SCROLL SCRUB STATS ============ */
+  #exp6 { min-height: 120vh; padding: 160px 0 120px; }
+  #exp6 .wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  #exp6 h2 {
+    font-size: clamp(40px, 5vw, 64px); line-height: 1.04; font-weight: 500;
+    letter-spacing: -0.02em; color: #fff; margin: 24px 0 56px; max-width: 720px; text-wrap: balance;
+  }
+  #exp6 .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+  #exp6 .stat { border-top: 1px solid var(--line); padding-top: 24px; position: relative; }
+  #exp6 .stat .bar { position: absolute; top: -1px; left: 0; height: 2px; background: var(--accent); width: 0%; transition: width .1s linear; }
+  #exp6 .stat .label-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  #exp6 .stat .num {
+    font-size: 64px; font-weight: 500; letter-spacing: -0.025em; color: #fff; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  #exp6 .stat .num .suffix { color: var(--accent); }
+  #exp6 .stat .desc { font-size: 14px; color: var(--mute); margin-top: 14px; line-height: 1.5; }
+
+  /* ============ FOOTER ============ */
+  .foot {
+    padding: 80px 32px 60px; background: var(--ink);
+    display: flex; justify-content: space-between; align-items: end;
+    border-top: 1px solid var(--line);
+  }
+  .foot h3 { font-size: 28px; font-weight: 500; letter-spacing: -0.015em; margin: 0 0 8px; max-width: 480px; }
+  .foot .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; text-align: right; }
+
+  /* ============ TWEAKS PANEL ============ */
+  .tweaks {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    width: 280px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px; font-size: 13px; color: var(--text);
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6);
+    transition: opacity .2s, transform .2s;
+  }
+  .tweaks.is-hidden { opacity: 0; transform: translateY(8px); pointer-events: none; }
+  .tweaks .head {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .tweaks .head .close { cursor: pointer; color: var(--dim); }
+  .tweaks .head .close:hover { color: var(--text); }
+  .tweaks .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+  .tweaks .row:first-of-type { border-top: 0; }
+  .tweaks .row label { font-size: 12px; color: var(--mute); }
+  .tweaks .row .val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+  .tweaks input[type=range] {
+    width: 100%; margin-top: 4px; accent-color: var(--accent);
+  }
+  .tweaks .slider-row { display: block; padding: 10px 0; border-top: 1px solid var(--line-soft); }
+  .tweaks .slider-row .top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .tweaks .toggle {
+    position: relative; width: 30px; height: 16px; background: var(--line); border-radius: 999px; cursor: pointer;
+    transition: background .15s;
+  }
+  .tweaks .toggle::after {
+    content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; background: var(--text);
+    border-radius: 999px; transition: transform .15s, background .15s;
+  }
+  .tweaks .toggle.is-on { background: var(--accent); }
+  .tweaks .toggle.is-on::after { transform: translateX(14px); background: #000; }
+
+  /* ============ REDUCE MOTION ============ */
+  body.reduce [data-parallax],
+  body.reduce .layer,
+  body.reduce .grid-bg { transform: none !important; }
+  body.reduce #exp4 .reveal-bg { clip-path: inset(0 0 0 0) !important; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .nav-dots { display: none; }
+    #exp1 .float-card, #exp1 .float-card-2 { display: none; }
+    #exp3 .scrub-stage { grid-template-columns: 1fr; padding: 80px 24px; gap: 16px; }
+    #exp3 .scrub-right { display: none; }
+    #exp5 .h-card { flex-basis: 280px; }
+    #exp6 .stat-row { grid-template-columns: repeat(2, 1fr); }
+    #exp6 .stat .num { font-size: 48px; }
+    .tweaks { width: 240px; bottom: 16px; right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top chrome -->
+  <div class="chrome">
+    <div class="left">
+      <span class="dot"></span>
+      <span>Cyber-Eye / Parallax Lab</span>
+    </div>
+    <div class="right">
+      <span>Scroll progress</span>
+      <span class="progress-track"><span class="progress-fill" id="progressFill"></span></span>
+    </div>
+  </div>
+
+  <!-- Right-side jump dots -->
+  <nav class="nav-dots" id="navDots">
+    <a class="nav-dot" href="#intro" data-target="intro"><span class="marker"></span><span class="name">00 · Intro</span></a>
+    <a class="nav-dot" href="#exp1" data-target="exp1"><span class="marker"></span><span class="name">01 · Layered depth</span></a>
+    <a class="nav-dot" href="#exp2" data-target="exp2"><span class="marker"></span><span class="name">02 · Sticky stack</span></a>
+    <a class="nav-dot" href="#exp3" data-target="exp3"><span class="marker"></span><span class="name">03 · Pinned scrub</span></a>
+    <a class="nav-dot" href="#exp4" data-target="exp4"><span class="marker"></span><span class="name">04 · Clip reveal</span></a>
+    <a class="nav-dot" href="#exp5" data-target="exp5"><span class="marker"></span><span class="name">05 · Horizontal</span></a>
+    <a class="nav-dot" href="#exp6" data-target="exp6"><span class="marker"></span><span class="name">06 · Stat scrub</span></a>
+  </nav>
+
+  <!-- ============== INTRO ============== -->
+  <section class="exp" id="intro">
+    <div class="grid-bg" data-parallax data-speed="0.15"></div>
+    <div class="wrap" style="position:relative; z-index:2;">
+      <div class="label"><span class="accent">[ Parallax · Lab ]</span> &nbsp; Six techniques · scroll to compare</div>
+      <h1>Motion that <em>investigates,</em><br/>not motion that decorates.</h1>
+      <p class="lede">Six scroll behaviours auditioned against the Cyber-Eye visual language. Each section labels itself, runs full-bleed, and is dialable via the Tweaks panel. Forensic firms can earn motion, but it has to feel disciplined — never theatrical. Pick the ones that pass.</p>
+    </div>
+    <div class="scroll-hint">↓ &nbsp; Scroll to begin</div>
+  </section>
+
+  <!-- ============== EXP 01 — LAYERED DEPTH ============== -->
+  <section class="exp" id="exp1">
+    <div class="layer layer-bg" data-parallax data-speed="0.15"></div>
+    <div class="layer layer-mid" data-parallax data-speed="0.35"></div>
+    <div class="hex-field" id="hexField"></div>
+
+    <div class="exp-tag"><span class="num">EXP / 01</span> &nbsp;·&nbsp; Layered depth · multi-rate translate</div>
+
+    <div class="content" data-parallax data-speed="0.55">
+      <div class="label">[ Hero treatment ]</div>
+      <h2>Evidence<br/>doesn't <span class="ghost">forget.</span></h2>
+      <p class="sub">Three depth planes — atmosphere, lattice, and copy — translate at independent rates. The result reads as <em>volume</em>, not motion. Background drifts slowest; foreground UI floats fastest.</p>
+      <div class="badge-row">
+        <span class="badge">§ 65B ready</span>
+        <span class="badge">Chain of custody</span>
+        <span class="badge">Court-admissible</span>
+      </div>
+    </div>
+
+    <div class="float-card" data-parallax data-speed="0.85">
+      <div class="label-tag">→ Live case · CE/2026/041</div>
+      <h4>Mobile triage — iPhone 15</h4>
+      <p>Full file-system extraction underway. Hashes captured at seizure; chain of custody intact.</p>
+      <div class="meter"><div class="meter-fill"></div></div>
+    </div>
+
+    <div class="float-card-2" data-parallax data-speed="0.7">
+      <div class="label" style="margin-bottom: 12px;">Cases closed</div>
+      <div class="num">600<span class="suffix">+</span></div>
+    </div>
+  </section>
+
+  <!-- ============== EXP 02 — STICKY STACK ============== -->
+  <section class="exp" id="exp2">
+    <div class="exp-tag" style="z-index: 20;"><span class="num">EXP / 02</span> &nbsp;·&nbsp; Sticky stack · panels overlap on scroll</div>
+    <div class="stack-stage">
+      <div class="panel panel-1" data-panel="0">
+        <div class="inner">
+          <span class="marker">Step 01</span>
+          <h2>Seize.</h2>
+          <p class="lede">The device leaves the scene with hashes captured, faraday isolation, and a chain-of-custody envelope signed at the boundary.</p>
+        </div>
+      </div>
+      <div class="panel panel-2" data-panel="1">
+        <div class="inner">
+          <span class="marker">Step 02</span>
+          <h2>Image.</h2>
+          <p class="lede">Bit-for-bit acquisition on a write-blocker. SHA-256 attestation. The original is never touched again.</p>
+        </div>
+      </div>
+      <div class="panel panel-3" data-panel="2">
+        <div class="inner">
+          <span class="marker">Step 03</span>
+          <h2>Examine.</h2>
+          <p class="lede">Two examiners working independent timelines. Findings reconcile or the matter doesn't ship.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== EXP 03 — PINNED SCRUB ============== -->
+  <section class="exp" id="exp3">
+    <div class="exp-tag" style="z-index: 20;"><span class="num">EXP / 03</span> &nbsp;·&nbsp; Pinned scrub · left list drives right frame</div>
+    <div class="scrub-stage">
+      <div class="scrub-left">
+        <div class="label">[ Mobile forensics ]</div>
+        <h2>Six stages, one chain of custody.</h2>
+        <p>Scroll drives the workflow. The right pane updates as each stage activates — no clicks, no loading states.</p>
+        <ul class="steps" id="scrubSteps">
+          <li><span class="step-num">01</span><span class="step-name">Field seizure &amp; faraday</span></li>
+          <li><span class="step-num">02</span><span class="step-name">Acquisition · write-blocked</span></li>
+          <li><span class="step-num">03</span><span class="step-name">Hash &amp; chain-of-custody</span></li>
+          <li><span class="step-num">04</span><span class="step-name">Logical &amp; physical extraction</span></li>
+          <li><span class="step-num">05</span><span class="step-name">Timeline reconstruction</span></li>
+          <li><span class="step-num">06</span><span class="step-name">§ 65B certificate &amp; report</span></li>
+        </ul>
+      </div>
+      <div class="scrub-right">
+        <div class="frame" data-frame="0">
+          <span class="frame-label">FRAME / 01</span>
+          <div class="frame-inner">
+            <div class="device"><span class="screen">⊙ ISOLATED</span></div>
+          </div>
+        </div>
+        <div class="frame" data-frame="1">
+          <span class="frame-label">FRAME / 02</span>
+          <div class="frame-inner">
+            <div class="frame-mono">acquire --image evidence.dd<br/><span style="color: var(--dim)">[████████░░] 81% · 1.4 GB/s</span></div>
+          </div>
+        </div>
+        <div class="frame" data-frame="2">
+          <span class="frame-label">FRAME / 03</span>
+          <div class="frame-inner">
+            <div class="frame-mono">sha256 · evidence.dd<br/><span style="color: var(--accent)">a3f9c0…d18b ✓</span></div>
+          </div>
+        </div>
+        <div class="frame" data-frame="3">
+          <span class="frame-label">FRAME / 04</span>
+          <div class="frame-inner">
+            <div class="frame-mono">extract --apfs --keychain<br/><span style="color: var(--dim)">2,143 artefacts recovered</span></div>
+          </div>
+        </div>
+        <div class="frame" data-frame="4">
+          <span class="frame-label">FRAME / 05</span>
+          <div class="frame-inner">
+            <div class="frame-mono">timeline · ±48h window<br/><span style="color: var(--accent)">17 events correlated</span></div>
+          </div>
+        </div>
+        <div class="frame" data-frame="5">
+          <span class="frame-label">FRAME / 06</span>
+          <div class="frame-inner">
+            <div class="frame-mono" style="text-align:center;">§ 65B<br/><span style="color: var(--accent); font-size: 24px;">CERTIFIED</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== EXP 04 — CLIP REVEAL ============== -->
+  <section class="exp" id="exp4">
+    <div class="exp-tag" style="z-index: 20;"><span class="num">EXP / 04</span> &nbsp;·&nbsp; Clip-path reveal · evidence opens vertically</div>
+    <div class="reveal-stage">
+      <div class="reveal-bg" id="revealBg"></div>
+      <div class="reveal-content frame-corners">
+        <div class="label">[ Open file ]</div>
+        <h2>Recovered 14 deleted chats<br/>from a wiped iPhone.</h2>
+        <p class="sub">CE/2025/014 · 2.4 TB examined · § 65B admitted at Mumbai sessions. Conviction in nine months.</p>
+      </div>
+      <div class="frame-meta">
+        <span>FILE · CE/2025/014</span>
+        <span>SHA · a3f9c0…d18b</span>
+        <span>STATE · ADMITTED</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== EXP 05 — HORIZONTAL PIN ============== -->
+  <section class="exp" id="exp5">
+    <div class="exp-tag" style="z-index: 20;"><span class="num">EXP / 05</span> &nbsp;·&nbsp; Horizontal pin · vertical scroll drives sideways track</div>
+    <div class="h-stage">
+      <div class="h-head">
+        <div class="label">[ Services ]</div>
+        <h2>Seven disciplines.<br/>One forensics standard.</h2>
+      </div>
+      <div class="h-track" id="hTrack">
+        <div class="h-card"><div><span class="num">SVC / 01</span><h4>Mobile Forensics</h4><p>iOS · Android · feature phones · SIM · IMEI tracing. Locked &amp; damaged devices.</p></div><div class="tag">Cellebrite UFED · MSAB XRY</div></div>
+        <div class="h-card"><div><span class="num">SVC / 02</span><h4>Cloud Forensics</h4><p>Google Workspace · M365 · AWS · Dropbox. Audit logs, mailbox dumps, CloudTrail.</p></div><div class="tag">M365 · Audit logs</div></div>
+        <div class="h-card"><div><span class="num">SVC / 03</span><h4>Insider Investigation</h4><p>Data exfiltration · IP theft · misconduct · ghost employees. USB telemetry forensics.</p></div><div class="tag">UAM · Discretion</div></div>
+        <div class="h-card"><div><span class="num">SVC / 04</span><h4>Malware &amp; Intrusion</h4><p>Triage · scoping · attribution · remediation. Indicators of compromise.</p></div><div class="tag">DFIR · YARA</div></div>
+        <div class="h-card"><div><span class="num">SVC / 05</span><h4>Email Authentication</h4><p>Header analysis · spoof detection · BEC · phishing chains. SPF / DKIM / DMARC.</p></div><div class="tag">SPF · DKIM · DMARC</div></div>
+        <div class="h-card"><div><span class="num">SVC / 06</span><h4>Fraud Investigation</h4><p>Financial · identity · claims · KYC · UPI / wire fraud. Forensic accounting.</p></div><div class="tag">AML · UPI trace</div></div>
+        <div class="h-card"><div><span class="num">SVC / 07</span><h4>Disk &amp; Computer</h4><p>Imaging · deleted-file recovery · timeline reconstruction · RAM analysis.</p></div><div class="tag">EnCase · FTK · X-Ways</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== EXP 06 — STAT SCRUB ============== -->
+  <section class="exp" id="exp6">
+    <div class="exp-tag"><span class="num">EXP / 06</span> &nbsp;·&nbsp; Stat scrub · numbers count up on entry</div>
+    <div class="wrap">
+      <div class="label">[ By the numbers ]</div>
+      <h2>Quiet competence,<br/>plotted against a vertical timeline.</h2>
+      <div class="stat-row">
+        <div class="stat" data-stat>
+          <div class="bar"></div>
+          <div class="label-tag">Cases closed</div>
+          <div class="num" data-value="600" data-suffix="+">0<span class="suffix">+</span></div>
+          <div class="desc">Across mobile, cloud, malware and fraud since 2018.</div>
+        </div>
+        <div class="stat" data-stat>
+          <div class="bar"></div>
+          <div class="label-tag">Admissibility</div>
+          <div class="num" data-value="98" data-suffix="%">0<span class="suffix">%</span></div>
+          <div class="desc">§ 65B certificates accepted on first submission.</div>
+        </div>
+        <div class="stat" data-stat>
+          <div class="bar"></div>
+          <div class="label-tag">Response</div>
+          <div class="num" data-value="24" data-suffix="/7">0<span class="suffix">/7</span></div>
+          <div class="desc">On-call incident response, including the holidays.</div>
+        </div>
+        <div class="stat" data-stat>
+          <div class="bar"></div>
+          <div class="label-tag">Examiners</div>
+          <div class="num" data-value="12" data-suffix="">0</div>
+          <div class="desc">All certified; all under continuous independent peer review.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== FOOT ============== -->
+  <footer class="foot">
+    <div>
+      <div class="label" style="margin-bottom: 8px;">[ End of lab ]</div>
+      <h3>Pick the ones that pass. Discard the rest.</h3>
+    </div>
+    <div class="meta">CE / PARALLAX-LAB v1.0<br/>21 May 2026</div>
+  </footer>
+
+  <!-- ============== TWEAKS PANEL ============== -->
+  <div class="tweaks" id="tweaksPanel">
+    <div class="head">
+      <span>⚙ Tweaks</span>
+      <span class="close" id="tweaksClose">✕</span>
+    </div>
+
+    <div class="slider-row">
+      <div class="top"><label>Parallax intensity</label><span class="val" id="intensityVal">1.00×</span></div>
+      <input type="range" id="intensity" min="0" max="2" step="0.05" value="1" />
+    </div>
+
+    <div class="slider-row">
+      <div class="top"><label>Sticky stack offset</label><span class="val" id="stackVal">120 px</span></div>
+      <input type="range" id="stackOffset" min="0" max="240" step="10" value="120" />
+    </div>
+
+    <div class="slider-row">
+      <div class="top"><label>Horizontal speed</label><span class="val" id="hSpeedVal">1.00×</span></div>
+      <input type="range" id="hSpeed" min="0.5" max="2" step="0.05" value="1" />
+    </div>
+
+    <div class="row">
+      <label>Reduce motion</label>
+      <div class="toggle" id="toggleReduce"></div>
+    </div>
+
+    <div class="row">
+      <label>Debug grid</label>
+      <div class="toggle" id="toggleDebug"></div>
+    </div>
+  </div>
+
+<script>
+  // ============================================================
+  // PARALLAX ENGINE
+  // ============================================================
+  const state = {
+    intensity: 1,
+    stackOffset: 120,
+    hSpeed: 1,
+    reduce: false,
+    debug: false,
+    scrollY: 0,
+    vh: window.innerHeight,
+    vw: window.innerWidth,
+    ticking: false,
+  };
+
+  // Cache parallax elements
+  const parallaxEls = [];
+  function indexParallax() {
+    parallaxEls.length = 0;
+    document.querySelectorAll('[data-parallax]').forEach(el => {
+      const speed = parseFloat(el.dataset.speed || '0.3');
+      parallaxEls.push({ el, speed });
+    });
+  }
+
+  // Hex field — random hex addresses scattered in EXP1
+  function buildHexField() {
+    const field = document.getElementById('hexField');
+    if (!field) return;
+    field.innerHTML = '';
+    const count = 28;
+    for (let i = 0; i < count; i++) {
+      const span = document.createElement('span');
+      const hex = Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+      span.textContent = '0x' + hex.toUpperCase();
+      span.style.left = (Math.random() * 100) + '%';
+      span.style.top = (Math.random() * 100) + '%';
+      span.dataset.depth = (Math.random() * 0.4 + 0.2).toFixed(2);
+      field.appendChild(span);
+    }
+  }
+
+  // Update everything on scroll
+  function update() {
+    state.scrollY = window.scrollY;
+    const i = state.reduce ? 0 : state.intensity;
+
+    // ---- Generic parallax translate ----
+    parallaxEls.forEach(({ el, speed }) => {
+      const rect = el.getBoundingClientRect();
+      const parent = el.offsetParent || document.body;
+      const parentRect = parent.getBoundingClientRect();
+      // distance from viewport center
+      const center = rect.top + rect.height / 2 - state.vh / 2;
+      const offset = -center * (speed - 1) * 0.15 * i;
+      el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+    });
+
+    // ---- Hex field: each hex its own depth ----
+    document.querySelectorAll('#hexField span').forEach(span => {
+      const exp1 = document.getElementById('exp1');
+      const rect = exp1.getBoundingClientRect();
+      const center = rect.top + rect.height / 2 - state.vh / 2;
+      const depth = parseFloat(span.dataset.depth || '0.3');
+      const offset = -center * depth * 0.3 * i;
+      span.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+    });
+
+    // ---- EXP02 sticky stack ----
+    updateStack(i);
+
+    // ---- EXP03 pinned scrub ----
+    updateScrub();
+
+    // ---- EXP04 clip-path reveal ----
+    updateClipReveal(i);
+
+    // ---- EXP05 horizontal pin ----
+    updateHorizontal(i);
+
+    // ---- EXP06 stat scrub ----
+    updateStats();
+
+    // ---- Progress bar + nav dots ----
+    updateProgress();
+
+    state.ticking = false;
+  }
+
+  function updateStack(i) {
+    const exp2 = document.getElementById('exp2');
+    if (!exp2) return;
+    const rect = exp2.getBoundingClientRect();
+    const total = rect.height - state.vh;
+    const progress = Math.max(0, Math.min(1, -rect.top / total));
+    const panels = exp2.querySelectorAll('.panel');
+    const n = panels.length;
+    panels.forEach((p, idx) => {
+      const p0 = idx / n;
+      const p1 = (idx + 1) / n;
+      let panelProgress;
+      if (progress < p0) panelProgress = 0;
+      else if (progress > p1) panelProgress = 1;
+      else panelProgress = (progress - p0) / (p1 - p0);
+
+      // Stack effect: panels enter from below, settle, then push up
+      const enterFrom = 100;
+      const exitTo = -state.stackOffset * 0.4;
+      let y;
+      if (idx === 0) {
+        // first panel: just exits
+        y = panelProgress * exitTo * i;
+      } else {
+        const prevExit = idx > 0 ? 1 : 0; // always shows after exit of previous
+        if (progress < (idx - 0.5) / n) {
+          y = enterFrom * (1 - Math.max(0, (progress - (idx - 1) / n) / (0.5 / n))) * (i || 0.0001);
+        } else {
+          // Slide further as next progresses
+          const next = (progress - (idx - 0.5) / n) / (1 / n);
+          y = -Math.max(0, next - 0.5) * state.stackOffset * i;
+        }
+      }
+      p.style.transform = `translate3d(0, ${y.toFixed(2)}vh, 0)`;
+      p.style.opacity = idx === 0 ? Math.max(0, 1 - panelProgress * 1.4) : '1';
+      p.style.zIndex = idx + 1;
+    });
+  }
+
+  function updateScrub() {
+    const exp3 = document.getElementById('exp3');
+    if (!exp3) return;
+    const rect = exp3.getBoundingClientRect();
+    const total = rect.height - state.vh;
+    const progress = Math.max(0, Math.min(1, -rect.top / total));
+    const steps = exp3.querySelectorAll('#scrubSteps li');
+    const frames = exp3.querySelectorAll('.frame');
+    const idx = Math.min(steps.length - 1, Math.floor(progress * steps.length * 0.999));
+    steps.forEach((s, i) => s.classList.toggle('is-active', i === idx));
+    frames.forEach((f, i) => f.classList.toggle('is-on', i === idx));
+  }
+
+  function updateClipReveal(i) {
+    const exp4 = document.getElementById('exp4');
+    if (!exp4) return;
+    const bg = document.getElementById('revealBg');
+    const rect = exp4.getBoundingClientRect();
+    const total = rect.height - state.vh;
+    const progress = Math.max(0, Math.min(1, -rect.top / total));
+    // 0 → inset 40% 0; 1 → inset 0 0
+    const inset = state.reduce ? 0 : Math.max(0, 40 - progress * 60); // overshoot to fully open
+    bg.style.clipPath = `inset(${inset}% 0 ${inset}% 0)`;
+  }
+
+  function updateHorizontal(i) {
+    const exp5 = document.getElementById('exp5');
+    const track = document.getElementById('hTrack');
+    if (!exp5 || !track) return;
+    const rect = exp5.getBoundingClientRect();
+    const total = rect.height - state.vh;
+    const progress = Math.max(0, Math.min(1, -rect.top / total));
+    const maxScroll = track.scrollWidth - state.vw + 48;
+    const x = -progress * maxScroll * state.hSpeed;
+    track.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+  }
+
+  // Stats: animate when entering viewport
+  const statTriggered = new WeakSet();
+  function updateStats() {
+    document.querySelectorAll('[data-stat]').forEach(stat => {
+      const rect = stat.getBoundingClientRect();
+      const inView = rect.top < state.vh * 0.85 && rect.bottom > 0;
+      if (inView && !statTriggered.has(stat)) {
+        statTriggered.add(stat);
+        const num = stat.querySelector('.num');
+        const target = parseFloat(num.dataset.value);
+        const suffix = num.dataset.suffix || '';
+        const bar = stat.querySelector('.bar');
+        const duration = 1200;
+        const t0 = performance.now();
+        function tick(t) {
+          const p = Math.min(1, (t - t0) / duration);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const val = Math.round(target * eased);
+          num.innerHTML = val + (suffix ? `<span class="suffix">${suffix}</span>` : '');
+          if (bar) bar.style.width = (eased * 100) + '%';
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    });
+  }
+
+  function updateProgress() {
+    const docH = document.documentElement.scrollHeight - state.vh;
+    const p = Math.max(0, Math.min(1, state.scrollY / docH));
+    document.getElementById('progressFill').style.width = (p * 100) + '%';
+
+    // Active nav dot
+    const sections = ['intro','exp1','exp2','exp3','exp4','exp5','exp6'];
+    let activeId = sections[0];
+    for (const id of sections) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (r.top <= state.vh * 0.4) activeId = id;
+    }
+    document.querySelectorAll('.nav-dot').forEach(d => {
+      d.classList.toggle('is-active', d.dataset.target === activeId);
+    });
+  }
+
+  function onScroll() {
+    if (!state.ticking) {
+      requestAnimationFrame(update);
+      state.ticking = true;
+    }
+  }
+
+  function onResize() {
+    state.vh = window.innerHeight;
+    state.vw = window.innerWidth;
+    update();
+  }
+
+  // ============================================================
+  // TWEAKS PANEL
+  // ============================================================
+  function bindTweaks() {
+    const panel = document.getElementById('tweaksPanel');
+    const close = document.getElementById('tweaksClose');
+    close.addEventListener('click', () => {
+      panel.classList.add('is-hidden');
+      window.parent.postMessage({type: '__edit_mode_dismissed'}, '*');
+    });
+
+    const intensity = document.getElementById('intensity');
+    const intensityVal = document.getElementById('intensityVal');
+    intensity.addEventListener('input', e => {
+      state.intensity = parseFloat(e.target.value);
+      intensityVal.textContent = state.intensity.toFixed(2) + '×';
+      update();
+    });
+
+    const stackOffset = document.getElementById('stackOffset');
+    const stackVal = document.getElementById('stackVal');
+    stackOffset.addEventListener('input', e => {
+      state.stackOffset = parseInt(e.target.value);
+      stackVal.textContent = state.stackOffset + ' px';
+      update();
+    });
+
+    const hSpeed = document.getElementById('hSpeed');
+    const hSpeedVal = document.getElementById('hSpeedVal');
+    hSpeed.addEventListener('input', e => {
+      state.hSpeed = parseFloat(e.target.value);
+      hSpeedVal.textContent = state.hSpeed.toFixed(2) + '×';
+      update();
+    });
+
+    const toggleReduce = document.getElementById('toggleReduce');
+    toggleReduce.addEventListener('click', () => {
+      state.reduce = !state.reduce;
+      toggleReduce.classList.toggle('is-on', state.reduce);
+      document.body.classList.toggle('reduce', state.reduce);
+      update();
+    });
+
+    const toggleDebug = document.getElementById('toggleDebug');
+    toggleDebug.addEventListener('click', () => {
+      state.debug = !state.debug;
+      toggleDebug.classList.toggle('is-on', state.debug);
+      document.body.classList.toggle('debug', state.debug);
+    });
+
+    // Host protocol
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === '__activate_edit_mode') panel.classList.remove('is-hidden');
+      if (e.data?.type === '__deactivate_edit_mode') panel.classList.add('is-hidden');
+    });
+    window.parent.postMessage({type: '__edit_mode_available'}, '*');
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  function init() {
+    buildHexField();
+    indexParallax();
+    bindTweaks();
+
+    // Respect prefers-reduced-motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      state.reduce = true;
+      document.body.classList.add('reduce');
+      document.getElementById('toggleReduce').classList.add('is-on');
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    update();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+</script>
+
+</body>
+</html>

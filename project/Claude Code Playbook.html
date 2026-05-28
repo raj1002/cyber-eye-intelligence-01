@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cyber-Eye Intelligence — Claude Code Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #050505;
+    --surface: #101013;
+    --surface-2: #18181B;
+    --line: #2A2A2D;
+    --line-soft: #1F1F22;
+    --mute: #A1A1AA;
+    --text: #E4E4E7;
+    --dim: #71717A;
+    --accent: #10B981;
+    --accent-deep: #0B7F5F;
+    --warn: #F59E0B;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--ink); color: var(--text); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--accent); color: #000; }
+
+  .page { max-width: 1180px; margin: 0 auto; padding: 80px 48px 120px; }
+
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 24px; border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--dim);
+  }
+  .topbar .left { display: flex; align-items: center; gap: 14px; }
+  .topbar .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+
+  /* Header */
+  .doc-head { margin-top: 64px; display: grid; grid-template-columns: 1fr auto; gap: 48px; align-items: end; padding-bottom: 48px; border-bottom: 1px solid var(--line); }
+  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+  .label .accent { color: var(--accent); }
+  h1.display {
+    font-size: 64px; line-height: 1.02; letter-spacing: -0.025em; font-weight: 500;
+    margin: 16px 0 0; color: #fff; text-wrap: balance;
+  }
+  h1.display em { font-style: normal; color: var(--accent); }
+  .lede { color: var(--mute); font-size: 17px; line-height: 1.55; max-width: 620px; margin-top: 24px; }
+
+  .meta-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px 40px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; min-width: 280px;
+  }
+  .meta-grid .k { color: var(--dim); display: block; margin-bottom: 4px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .meta-grid .v { color: var(--text); }
+
+  /* Phase */
+  .phase { margin-top: 96px; }
+  .phase-head { display: flex; align-items: baseline; gap: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line); margin-bottom: 48px; }
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    border: 1px solid var(--accent); padding: 4px 10px; border-radius: 4px; letter-spacing: 0.1em;
+  }
+  .phase-title { font-size: 36px; font-weight: 500; letter-spacing: -0.015em; color: #fff; margin: 0; }
+  .phase-sub { color: var(--mute); margin-left: auto; font-size: 14px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Step */
+  .step { display: grid; grid-template-columns: 80px 1fr; gap: 32px; padding: 32px 0; border-bottom: 1px solid var(--line-soft); }
+  .step:last-child { border-bottom: 0; }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--dim);
+    padding-top: 4px; letter-spacing: 0.08em;
+  }
+  .step-num .big { display: block; font-size: 28px; color: var(--text); font-weight: 500; margin-bottom: 4px; letter-spacing: -0.02em; }
+  .step h3 { font-size: 22px; font-weight: 500; margin: 0 0 12px; color: #fff; letter-spacing: -0.01em; }
+  .step p { color: var(--mute); line-height: 1.6; margin: 0 0 16px; max-width: 780px; }
+  .step ul { color: var(--mute); line-height: 1.7; padding-left: 18px; margin: 0 0 16px; max-width: 780px; }
+  .step ul li::marker { color: var(--accent); }
+  .step code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; background: var(--surface-2); color: var(--text); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); }
+
+  /* Prompt block */
+  .prompt {
+    margin-top: 12px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+  }
+  .prompt-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 16px; border-bottom: 1px solid var(--line);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .prompt-head .tag { color: var(--accent); }
+  .prompt-body {
+    padding: 18px 20px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px; line-height: 1.65; color: var(--text); white-space: pre-wrap;
+  }
+  .prompt-body .com { color: var(--dim); }
+  .prompt-body .kw { color: var(--accent); }
+
+  /* Inventory table */
+  .inv {
+    width: 100%; border-collapse: collapse; margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  }
+  .inv th, .inv td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
+  .inv th { color: var(--dim); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; font-size: 10px; }
+  .inv td { color: var(--text); vertical-align: top; }
+  .inv td.path { color: var(--accent); }
+  .inv td.dim { color: var(--mute); }
+
+  /* Cards row */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  .mini-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px;
+  }
+  .mini-card h4 { font-size: 14px; font-weight: 500; margin: 0 0 8px; color: #fff; }
+  .mini-card p { font-size: 13px; color: var(--mute); margin: 0; line-height: 1.5; }
+  .mini-card .pill { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.08em; }
+
+  /* Sequence diagram */
+  .seq { margin-top: 16px; display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .seq-row {
+    display: grid; grid-template-columns: 100px 1fr 140px; gap: 16px; align-items: center;
+    padding: 12px 16px; background: var(--surface); border: 1px solid var(--line-soft); border-radius: 6px;
+  }
+  .seq-row .stage { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.08em; }
+  .seq-row .action { color: var(--text); font-size: 14px; }
+  .seq-row .owner { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); text-align: right; }
+
+  /* Callout */
+  .callout {
+    margin-top: 24px; padding: 18px 22px; background: rgba(16,185,129,0.06);
+    border-left: 2px solid var(--accent); border-radius: 4px;
+  }
+  .callout .head { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .callout p { color: var(--text); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .warn-callout {
+    margin-top: 24px; padding: 18px 22px; background: rgba(245,158,11,0.06);
+    border-left: 2px solid var(--warn); border-radius: 4px;
+  }
+  .warn-callout .head { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--warn); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .warn-callout p { color: var(--text); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  /* Footer */
+  .foot { margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  @media (max-width: 900px) {
+    .page { padding: 48px 24px 80px; }
+    .doc-head { grid-template-columns: 1fr; }
+    h1.display { font-size: 44px; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 1fr; gap: 12px; }
+    .seq-row { grid-template-columns: 1fr; gap: 4px; }
+    .seq-row .owner { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="left"><span class="dot"></span><span>Cyber-Eye Intelligence · Engineering Brief</span></div>
+    <div>Doc / CE-DEV-001 · v1.0</div>
+  </div>
+
+  <!-- Header -->
+  <header class="doc-head">
+    <div>
+      <div class="label"><span class="accent">[ Build plan ]</span> &nbsp; Phase 1 → Phase 2 &nbsp; · &nbsp; Handoff to Claude Code</div>
+      <h1 class="display">From dummy template to <em>shipped product.</em></h1>
+      <p class="lede">A two-phase plan for taking the Cyber-Eye Intelligence Next.js scaffold to production. Phase 1 wires real imagery into the existing placeholder slots. Phase 2 stands up the backend, integrations, and infra. Every step is written as a prompt you can hand to Claude Code verbatim.</p>
+    </div>
+    <div class="meta-grid">
+      <div><span class="k">Stack</span><span class="v">Next.js 14 · TS · Tailwind</span></div>
+      <div><span class="k">Routes shipped</span><span class="v">13 + dynamic</span></div>
+      <div><span class="k">Placeholders</span><span class="v">~22 image slots</span></div>
+      <div><span class="k">Target</span><span class="v">Vercel · prod-ready</span></div>
+    </div>
+  </header>
+
+  <!-- ============ PHASE 1 ============ -->
+  <section class="phase">
+    <div class="phase-head">
+      <span class="phase-num">PHASE 01</span>
+      <h2 class="phase-title">Populate the images</h2>
+      <span class="phase-sub">Est. 1–2 days · designer + dev</span>
+    </div>
+
+    <p style="color: var(--mute); line-height: 1.6; max-width: 820px; margin: 0 0 32px;">
+      The template renders every image slot as a <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); font-size: 12.5px;">&lt;Placeholder&gt;</code> primitive (see <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); font-size: 12.5px;">components/Primitives.tsx</code>) with a tiny mono caption. Phase 1 is mechanical: inventory the slots, source/shoot/license imagery, drop into <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); font-size: 12.5px;">/public/images/</code>, swap the component for <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); font-size: 12.5px;">next/image</code>.
+    </p>
+
+    <!-- Step 1.1: inventory -->
+    <div class="step">
+      <div class="step-num"><span class="big">1.1</span>Audit</div>
+      <div>
+        <h3>Inventory every placeholder slot</h3>
+        <p>Have Claude Code grep the codebase and produce a typed manifest of every image position, its aspect ratio, page, and a one-line content brief. This becomes the shot-list for the photographer / stock-image search.</p>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ image-manifest.ts</span></div>
+          <div class="prompt-body"><span class="com"># Run inside nextjs-template/</span>
+<span class="kw">claude</span> "Search the repo for every &lt;Placeholder /&gt; usage and every .ph-grid background block.
+For each, produce a row in a new file lib/image-manifest.ts with:
+  id (kebab-case), route (file path), label (existing caption),
+  aspectRatio (parsed from className), context (1-line shot brief based on surrounding JSX),
+  treatment ('photo' | 'illustration' | 'logo' | 'portrait').
+Group rows by route. Add a TODO comment with target file path under /public/images/."</div>
+        </div>
+
+        <table class="inv">
+          <thead><tr><th>Route</th><th>Slot</th><th>Aspect</th><th>Treatment</th></tr></thead>
+          <tbody>
+            <tr><td class="path">/</td><td class="dim">classroom · hands-on forensic lab</td><td>5:4</td><td>photo</td></tr>
+            <tr><td class="path">/</td><td class="dim">testimonial avatars × 3</td><td>1:1</td><td>portrait</td></tr>
+            <tr><td class="path">/about</td><td class="dim">founders · lab interior</td><td>4:5</td><td>photo</td></tr>
+            <tr><td class="path">/about</td><td class="dim">value-pillar icons × 4</td><td>1:1</td><td>illustration</td></tr>
+            <tr><td class="path">/case-files</td><td class="dim">per-case hero × 6</td><td>5:4</td><td>photo / illustration</td></tr>
+            <tr><td class="path">/insights</td><td class="dim">featured + article tiles</td><td>5:4</td><td>illustration</td></tr>
+            <tr><td class="path">/sectors/[slug]</td><td class="dim">sector partnership shot × 5</td><td>4:5</td><td>photo</td></tr>
+            <tr><td class="path">/services/[slug]</td><td class="dim">ph-grid CTA backdrop</td><td>full-bleed</td><td>texture</td></tr>
+            <tr><td class="path">/training</td><td class="dim">academy hero band</td><td>full-bleed</td><td>texture / photo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Step 1.2: source -->
+    <div class="step">
+      <div class="step-num"><span class="big">1.2</span>Source</div>
+      <div>
+        <h3>Decide treatment per slot &amp; gather assets</h3>
+        <p>Forensic imagery is genre-sensitive — wrong photos look like stock-y "cybersecurity" sludge. Pair Claude Code with explicit creative direction:</p>
+        <div class="grid-3">
+          <div class="mini-card">
+            <span class="pill">PHOTO</span>
+            <h4>Studio shoot</h4>
+            <p>Founders, lab interior, evidence workstation, classroom. Brief a photographer with the manifest. Output 2400px JPEG / WebP.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">EDITORIAL</span>
+            <h4>Stock with treatment</h4>
+            <p>Sector "partnership" shots, insights tiles. Pull from licensed library (Unsplash+ / Getty), apply consistent green-grade LUT.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">SVG</span>
+            <h4>Icons &amp; textures</h4>
+            <p>Value-pillar icons, ph-grid backdrops, abstract case-file headers. Keep house-style: 1px stroke, accent green on ink.</p>
+          </div>
+        </div>
+        <div class="callout">
+          <div class="head">[ Creative guard-rail ]</div>
+          <p>Cyber-Eye is a forensics firm, not a SaaS. Avoid: hooded hackers, padlock icons, binary rain, blue HUD overlays. Prefer: hands on hardware, chain-of-custody envelopes, real Cellebrite/FTK rigs, courtroom benches, lab benches at night.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1.3: optimise -->
+    <div class="step">
+      <div class="step-num"><span class="big">1.3</span>Process</div>
+      <div>
+        <h3>Optimise &amp; place into <code>/public/images/</code></h3>
+        <p>One folder per route; one filename per <code>id</code> from the manifest. Run a single script to produce WebP + AVIF + a tiny blur placeholder. Claude Code can author and run the pipeline:</p>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ scripts/optimise-images.ts</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "Write a Node script at scripts/optimise-images.ts that:
+  1. Reads every file in /raw/ (input folder)
+  2. Uses sharp to emit 3 variants per source: 1920w .webp, 960w .webp, 480w .webp
+  3. Generates a base64 blurDataURL (10x10, blurred)
+  4. Writes the blur strings to lib/image-blur.ts as a typed map keyed by manifest id
+  5. Drops outputs into /public/images/[route]/[id]-[width].webp
+Add an npm script: 'images' that runs it. Idempotent."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1.4: swap -->
+    <div class="step">
+      <div class="step-num"><span class="big">1.4</span>Swap</div>
+      <div>
+        <h3>Replace <code>&lt;Placeholder&gt;</code> with <code>next/image</code></h3>
+        <p>One mechanical pass per route. Keep the existing aspect-ratio className — only the inner element changes. Have Claude Code do it route by route and produce a single PR per phase chunk so review stays sane.</p>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ refactor pass</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "For every &lt;Placeholder ... /&gt; in app/, replace with &lt;Image /&gt; from next/image.
+Rules:
+  - Look up the slot's id, src and blurDataURL in lib/image-manifest.ts + lib/image-blur.ts.
+  - Use the manifest's label as the alt text (rewrite to be descriptive, not the mono caption).
+  - Preserve every className from the original Placeholder.
+  - Keep object-cover; add sizes='(max-width: 768px) 100vw, 50vw' for half-width slots and 100vw for full-bleed.
+  - For circular avatar slots (w-10 h-10 rounded-pill), use width/height 40.
+Open one PR per route group: home, about, services, sectors, case-files, insights, training."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1.5: verify -->
+    <div class="step">
+      <div class="step-num"><span class="big">1.5</span>Verify</div>
+      <div>
+        <h3>Visual regression + Lighthouse</h3>
+        <ul>
+          <li>Snapshot every route at three viewports (375 / 1024 / 1440) using Playwright; commit baselines.</li>
+          <li>Run Lighthouse per route — LCP &lt; 2.5s on a throttled 4G profile is the gate.</li>
+          <li>Check that <code>ph-grid</code> backdrops still render where they're <em>intended</em> (CTA section on home, training hero, services CTA) — those are decorative, not placeholders.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHASE 2 ============ -->
+  <section class="phase">
+    <div class="phase-head">
+      <span class="phase-num">PHASE 02</span>
+      <h2 class="phase-title">Backend &amp; production work</h2>
+      <span class="phase-sub">Est. 2–3 weeks · 1 senior dev</span>
+    </div>
+
+    <p style="color: var(--mute); line-height: 1.6; max-width: 820px; margin: 0 0 32px;">
+      The frontend is dummy-content-driven. To ship, we replace <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent); background: var(--surface-2); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--line); font-size: 12.5px;">lib/data.ts</code> with a real CMS, wire the contact form to a real intake pipeline, add SEO / sitemaps / structured data, lock down security, and deploy. Order matters — do not skip the staging environment.
+    </p>
+
+    <!-- Step 2.1: content layer -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.1</span>Content</div>
+      <div>
+        <h3>Move <code>lib/data.ts</code> to a real CMS</h3>
+        <p>Five collections (Services, Sectors, Case Files, Courses, Articles) are currently static TypeScript arrays. Pick a headless CMS — Sanity or Payload are the two clean fits for this codebase — then have Claude Code generate the schema and a typed fetch layer.</p>
+
+        <div class="grid-3">
+          <div class="mini-card">
+            <span class="pill">PICK A</span>
+            <h4>Sanity</h4>
+            <p>Hosted, fast editor UX, GROQ queries. Best if a non-dev edits content. ~$15/editor/mo.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">PICK B</span>
+            <h4>Payload CMS</h4>
+            <p>Self-hosted, TypeScript-native, lives in the same Next.js repo. Best if you control infra.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">PICK C</span>
+            <h4>MDX in-repo</h4>
+            <p>Skip CMS; treat case-files / insights as MDX in <code>/content</code>. Cheapest, dev-only edits.</p>
+          </div>
+        </div>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ Sanity scaffold</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "Scaffold a Sanity Studio inside the repo at /studio.
+For each type in lib/data.ts (Service, Sector, CaseFile, Course, Article), create a matching Sanity schema preserving every field.
+Add a richText body field where currently there is none (Service, CaseFile, Article).
+Create lib/sanity.ts with a typed client and one helper per collection (e.g. getServices, getServiceBySlug).
+Replace every import of lib/data.ts in app/** with the Sanity helper, using await + ISR (revalidate: 300).
+Add a /studio route mounting the embedded Studio."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2.2: contact -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.2</span>Intake</div>
+      <div>
+        <h3>Wire the <code>/contact</code> form to a real intake</h3>
+        <p>Today the form has no <code>action</code>. For a forensics firm, intake is the most sensitive endpoint on the site — treat it accordingly.</p>
+        <div class="seq">
+          <div class="seq-row"><span class="stage">→ STEP A</span><span class="action">Convert to a React Server Action with Zod validation on the input shape.</span><span class="owner">app/contact/page.tsx</span></div>
+          <div class="seq-row"><span class="stage">→ STEP B</span><span class="action">On submit: write a record to a private table (Postgres / Supabase / Notion DB).</span><span class="owner">DB</span></div>
+          <div class="seq-row"><span class="stage">→ STEP C</span><span class="action">Fire a transactional email via Resend to intake@cyber-eye.in with the matter summary.</span><span class="owner">Resend</span></div>
+          <div class="seq-row"><span class="stage">→ STEP D</span><span class="action">Reply-acknowledgement to the requester with NDA attached as PDF.</span><span class="owner">Resend</span></div>
+          <div class="seq-row"><span class="stage">→ STEP E</span><span class="action">Bot protection: Cloudflare Turnstile or hCaptcha + rate-limit by IP via Upstash.</span><span class="owner">Edge</span></div>
+          <div class="seq-row"><span class="stage">→ STEP F</span><span class="action">Audit log every intake (request id, IP, UA, hash). Retention 2 years per § 65B prep.</span><span class="owner">Audit</span></div>
+        </div>
+
+        <div class="warn-callout">
+          <div class="head">[ Security gate ]</div>
+          <p>Do <em>not</em> store the matter narrative in plain-text in a third-party tool. Encrypt the <code>matter</code> field at rest using a KMS-held key; only decrypt server-side for the intake email.</p>
+        </div>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ contact intake</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "Wire /contact end-to-end:
+  1. Convert the form to a Next.js Server Action submitContact(input).
+  2. Add Zod schema in lib/schemas/contact.ts; reject if matter &lt; 20 chars or email invalid.
+  3. Add Cloudflare Turnstile widget; verify token server-side.
+  4. Rate-limit 3 submissions / IP / hour with @upstash/ratelimit.
+  5. Persist to Supabase table 'intakes' (encrypted matter via libsodium sealed box).
+  6. Send two emails via Resend: internal (intake@cyber-eye.in) + acknowledgement.
+  7. Return Server-Action state to the form for success/error rendering.
+Add .env.example with every key required."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2.3: SEO -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.3</span>SEO</div>
+      <div>
+        <h3>Sitemaps, structured data, OG, llms.txt</h3>
+        <ul>
+          <li><code>app/sitemap.ts</code> — dynamic, sources URLs from Sanity (services, sectors, case files, articles).</li>
+          <li><code>app/robots.ts</code> — allow all except <code>/studio</code> and <code>/api/*</code>.</li>
+          <li>JSON-LD generators for: <code>Organization</code> (root layout), <code>Service</code> (per service page), <code>Article</code> (per insights post), <code>FAQPage</code> (services FAQ), <code>BreadcrumbList</code> (every detail page).</li>
+          <li>OG image generator at <code>app/og/[slug]/route.tsx</code> using <code>@vercel/og</code>; renders the headline on the Cyber-Eye dark template.</li>
+          <li><code>/llms.txt</code> at root listing services, sectors, contact — for AI crawlers per the wireframe spec.</li>
+        </ul>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ SEO bundle</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "Add the full SEO surface:
+  - app/sitemap.ts (dynamic, ISR 1h)
+  - app/robots.ts
+  - lib/jsonld.ts with typed factories: orgLd, serviceLd, articleLd, faqLd, breadcrumbLd
+  - Inject the right LD+JSON &lt;script&gt; tag in each page's metadata
+  - app/og/[slug]/route.tsx with @vercel/og — dark BG, accent green corner, headline in Inter 500
+  - public/llms.txt summarising the site for AI discoverability
+  - Per-page generateMetadata() in every dynamic route, pulling title/description from Sanity."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2.4: analytics -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.4</span>Telemetry</div>
+      <div>
+        <h3>Analytics, error monitoring, uptime</h3>
+        <div class="grid-3">
+          <div class="mini-card">
+            <span class="pill">ANALYTICS</span>
+            <h4>Plausible or Vercel Analytics</h4>
+            <p>Cookie-less. Track: route views, CTA clicks (contact / quote / training enrol), outbound links.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">ERRORS</span>
+            <h4>Sentry</h4>
+            <p>Client + server. Source-maps uploaded on build. Alert on 5xx spike, intake form failure rate &gt; 2%.</p>
+          </div>
+          <div class="mini-card">
+            <span class="pill">UPTIME</span>
+            <h4>BetterStack / UptimeRobot</h4>
+            <p>Synthetic check every minute on <code>/</code> and <code>/contact</code>. Status page at <code>status.cyber-eye.in</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2.5: security -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.5</span>Hardening</div>
+      <div>
+        <h3>Security, headers, compliance</h3>
+        <ul>
+          <li>Strict CSP via <code>next.config.js</code> headers — script-src self + nonce; no <code>'unsafe-inline'</code>.</li>
+          <li>HSTS, X-Frame-Options DENY, Referrer-Policy strict-origin-when-cross-origin, Permissions-Policy disable camera/mic/geo.</li>
+          <li>Dependabot + <code>npm audit</code> in CI; fail builds on high+ CVEs.</li>
+          <li>Privacy &amp; Terms (<code>/legal/[slug]</code>) — replace template copy with counsel-reviewed text.</li>
+          <li>India: DPDP Act 2023 compliance note (data fiduciary, contact, grievance officer) at the footer + privacy page.</li>
+          <li>Cookie banner only if analytics provider sets cookies — Plausible avoids the banner entirely.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 2.6: infra -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.6</span>Deploy</div>
+      <div>
+        <h3>CI/CD, environments, DNS</h3>
+        <div class="seq">
+          <div class="seq-row"><span class="stage">→ ENV</span><span class="action">Three branches: <code>main</code> (prod), <code>staging</code>, feature branches → preview URLs.</span><span class="owner">Git</span></div>
+          <div class="seq-row"><span class="stage">→ CI</span><span class="action">GitHub Actions: typecheck, lint, unit tests, Playwright visual, Lighthouse-CI on PR.</span><span class="owner">Actions</span></div>
+          <div class="seq-row"><span class="stage">→ HOST</span><span class="action">Vercel for Next.js. Region: <code>bom1</code> (Mumbai) primary for India latency.</span><span class="owner">Vercel</span></div>
+          <div class="seq-row"><span class="stage">→ DB</span><span class="action">Supabase project in ap-south-1. Connection pooling on. Daily backups.</span><span class="owner">Supabase</span></div>
+          <div class="seq-row"><span class="stage">→ DNS</span><span class="action">Cloudflare proxied. Apex + www. Mail records (Resend) + DMARC strict.</span><span class="owner">Cloudflare</span></div>
+          <div class="seq-row"><span class="stage">→ SECRETS</span><span class="action">Vercel env vars (prod / preview / dev split). Never commit .env. 1Password vault for team.</span><span class="owner">Vercel</span></div>
+        </div>
+
+        <div class="prompt">
+          <div class="prompt-head"><span>Claude Code prompt</span><span class="tag">→ CI bundle</span></div>
+          <div class="prompt-body"><span class="kw">claude</span> "Add .github/workflows/ci.yml with three jobs:
+  - lint-and-typecheck (pnpm typecheck, pnpm lint)
+  - test (pnpm test, pnpm test:e2e with Playwright)
+  - lighthouse (LHCI on preview URL; fail on perf &lt; 90 or LCP &gt; 2500)
+Add .github/workflows/preview-cleanup.yml that prunes preview DB rows older than 30 days.
+Add vercel.json with: region: ['bom1'], headers (full security set), redirects for legacy URLs."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2.7: launch -->
+    <div class="step">
+      <div class="step-num"><span class="big">2.7</span>Launch</div>
+      <div>
+        <h3>Go-live checklist</h3>
+        <ul>
+          <li>All Phase-1 images live; Lighthouse &gt; 90 on every route.</li>
+          <li>CMS content reviewed by founder + legal counsel.</li>
+          <li>Contact form tested end-to-end with a real submission; ack email received; record encrypted in DB.</li>
+          <li>Search Console + Bing Webmaster Tools verified; sitemap submitted.</li>
+          <li>Backups verified — restore one from Supabase to a staging DB.</li>
+          <li>Status page public. Runbook for the most likely incidents (intake outage, CMS publish failure) in <code>RUNBOOK.md</code>.</li>
+          <li>DNS cut-over scheduled for a Tuesday morning IST; rollback plan documented.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ APPENDIX ============ -->
+  <section class="phase">
+    <div class="phase-head">
+      <span class="phase-num">APPX</span>
+      <h2 class="phase-title">Working with Claude Code</h2>
+      <span class="phase-sub">conventions for this repo</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="mini-card">
+        <span class="pill">RULE 1</span>
+        <h4>One PR per step</h4>
+        <p>Every numbered step above maps to one PR. Keeps reviews surgical and reverts cheap.</p>
+      </div>
+      <div class="mini-card">
+        <span class="pill">RULE 2</span>
+        <h4>Manifests, not magic</h4>
+        <p>Anything Claude generates that touches many files (image manifest, JSON-LD, sitemap) must read from a single typed source — never inline.</p>
+      </div>
+      <div class="mini-card">
+        <span class="pill">RULE 3</span>
+        <h4>Branch protection on</h4>
+        <p><code>main</code> requires PR + green CI + 1 approval. No direct pushes — including from Claude.</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="head">[ Repo hygiene ]</div>
+      <p>Add a <code>CLAUDE.md</code> at the repo root with these rules + a pointer to <code>lib/image-manifest.ts</code> and the Sanity schema. Claude Code reads it on every session and stays inside the system.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div>cyber-eye.in / engineering</div>
+    <div>Prepared 21 May 2026</div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body { background: #050505; color: #FFFFFF; }
+  body { -webkit-font-smoothing: antialiased; font-feature-settings: "ss01", "cv11"; }
+}
+
+@layer components {
+  .label {
+    @apply font-mono text-[11px] font-medium tracking-[0.08em] uppercase text-mute;
+  }
+  .display {
+    @apply font-medium tracking-tight;
+    line-height: 1.02;
+  }
+  .pill {
+    @apply inline-flex items-center px-3 py-1.5 rounded-pill border border-line font-mono text-[11px] tracking-wider text-zinc-300;
+  }
+  .pill-on {
+    @apply border-accent text-accent;
+  }
+  .btn-primary {
+    @apply bg-accent text-ink font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-control font-medium transition-colors;
+  }
+  .btn-primary:hover { background: #0db86f; }
+  .btn-ghost {
+    @apply border border-line font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-control transition-colors;
+  }
+  .btn-ghost:hover { @apply border-accent bg-accent/5; }
+  .card {
+    @apply bg-surface border border-line rounded-card;
+  }
+  .card-hover {
+    @apply transition-colors;
+  }
+  .card-hover:hover { @apply border-accent; }
+  .nav-link {
+    @apply transition-colors;
+  }
+  .nav-link:hover { @apply text-accent; }
+  .ph {
+    background: linear-gradient(135deg, #1a1a1d 0%, #0e0e10 50%, #1a1a1d 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .ph::after {
+    content: attr(data-label);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono), monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #52525B;
+  }
+  .ph-grid {
+    background-image:
+      radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 60%),
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+  }
+  .hex {
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    transform: rotate(45deg);
+    display: inline-block;
+  }
+  .num { font-feature-settings: "tnum"; }
+
+  /* Unicorn Studio aura — tinted toward emerald/dark theme */
+  .aura-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .aura-wrap [data-us-project] {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    filter: hue-rotate(110deg) saturate(0.55) brightness(0.55) contrast(1.05);
+    opacity: 0.95;
+    mix-blend-mode: screen;
+  }
+  .aura-tint {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(120% 80% at 75% 20%, rgba(16, 185, 129, 0.18), transparent 60%),
+      linear-gradient(180deg, rgba(5, 5, 5, 0.35) 0%, rgba(5, 5, 5, 0.55) 60%, rgba(5, 5, 5, 0.85) 100%);
+  }
+
+  /* ============ Forensic Globe ============ */
+  .globe-stage { position: relative; width: 100%; aspect-ratio: 1 / 1; }
+  .globe-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .globe-svg .lat, .globe-svg .mer { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 0.4; }
+  .globe-svg .lat-acc { stroke: rgba(16,185,129,0.35); stroke-width: 0.5; }
+  .globe-svg .ring { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 0.4; }
+  .globe-dot { fill: rgba(255,255,255,0.55); }
+  .globe-dot-bright { fill: #fff; }
+  .globe-dot-accent { fill: #10B981; filter: drop-shadow(0 0 5px rgba(16,185,129,0.85)); }
+
+  .chip-fl {
+    position: absolute; display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px; background: rgba(24,24,27,0.78);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(42,42,45,0.9); border-radius: 9999px;
+    font-family: var(--font-mono), monospace; font-size: 11px; color: #E4E4E7;
+    letter-spacing: 0.02em; white-space: nowrap;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6); z-index: 3;
+  }
+  .chip-fl.lg { padding: 8px 14px 8px 8px; }
+  .chip-fl .icn {
+    width: 18px; height: 18px; border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #10B981;
+  }
+  .chip-fl .icn svg { width: 10px; height: 10px; }
+  .chip-fl .pulse-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.18);
+    animation: chip-ping 2s ease-out infinite;
+  }
+  .chip-fl .ava {
+    width: 22px; height: 22px; border-radius: 9999px;
+    background: linear-gradient(135deg, #0A6E51, #10B981);
+    border: 1px solid rgba(16,185,129,0.4);
+  }
+  .chip-fl .stack { display: flex; flex-direction: column; line-height: 1.15; }
+  .chip-fl .stack .nm { color: #fff; font-size: 11px; }
+  .chip-fl .stack .hd { color: #A1A1AA; font-size: 10px; }
+
+  .chip-anim-1 { animation: floaty 9s ease-in-out infinite; }
+  .chip-anim-2 { animation: floaty 11s ease-in-out infinite reverse; }
+  .chip-anim-3 { animation: floaty 13s ease-in-out infinite; }
+  .blink-1 { animation: blink 3s ease-in-out infinite; }
+  .blink-2 { animation: blink 4.2s ease-in-out infinite 0.5s; }
+  .blink-3 { animation: blink 5.5s ease-in-out infinite 1.2s; }
+}
+
+@keyframes chip-ping {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+}
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes blink {
+  0%, 100% { opacity: .3; }
+  50%      { opacity: 1; }
+}
+
+.marquee { display: flex; gap: 64px; animation: marquee 50s linear infinite; }
+details[open] summary .chev { transform: rotate(45deg); }
+.chev { transition: transform .2s ease; }

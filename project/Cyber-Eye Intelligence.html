@@ -1,0 +1,3013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Eye Intelligence — Digital Forensics & Investigation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          /* design.md tokens — adapted for Cyber-Eye dark identity */
+          ink: '#050505',           /* {colors.canvas-dark} — primary background */
+          surface: '#18181B',       /* {colors.surface} — section/card surface */
+          surface2: '#27272A',      /* {colors.surface-soft} */
+          line: '#2A2A2D',          /* {colors.hairline} */
+          lineSoft: '#1F1F22',      /* {colors.hairline-soft} */
+          mute: '#A1A1AA',          /* {colors.steel} */
+          stone: '#71717A',         /* {colors.stone} */
+          accent: '#10B981',        /* {colors.brand-green} — Cyber-Eye emerald */
+          accentDim: '#0A6E51',     /* {colors.brand-green-deep} */
+          accentSoft: '#063D2D',    /* {colors.brand-green-soft} */
+        },
+        fontFamily: {
+          sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          mono: ['Geist Mono', 'SF Mono', 'Menlo', 'monospace'],
+        },
+        borderRadius: {
+          /* design.md radius scale */
+          xs: '4px',
+          sm: '6px',
+          md: '8px',
+          card: '12px',     /* {rounded.lg} — standard cards */
+          control: '9999px',/* pill buttons (was 8px) */
+          xl: '16px',
+          xxl: '24px',
+          pill: '9999px',
+        },
+        spacing: {
+          /* design.md spacing tokens for reference */
+          'section': '64px',
+          'section-lg': '96px',
+          'hero': '120px',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  /* ============ design.md typography & surface tokens ============ */
+  html, body { background: #050505; color: #FFFFFF; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; font-feature-settings: 'cv11','ss01','ss03'; }
+  .mono { font-family: 'Geist Mono', 'SF Mono', Menlo, monospace; }
+  /* micro-uppercase — sidebar/section labels per design.md */
+  .label { font-family: 'Geist Mono', 'SF Mono', Menlo, monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.045em; text-transform: uppercase; color: #A1A1AA; }
+  /* hero-display & display-lg — tight leading, negative tracking */
+  .display { font-weight: 600; letter-spacing: -0.028em; line-height: 1.05; }
+  /* body-md default per design system */
+  p, li { text-wrap: pretty; }
+  .ph { background: linear-gradient(135deg, #1a1a1d 0%, #0e0e10 50%, #1a1a1d 100%); position: relative; overflow: hidden; }
+  .ph::after { content: attr(data-label); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Geist Mono', 'SF Mono', Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #52525B; }
+  .ph-grid { background-image:
+    radial-gradient(circle at 50% 50%, rgba(16,185,129,0.06) 0%, transparent 60%),
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+  }
+  .divider-dot { width: 4px; height: 4px; border-radius: 50%; background: #10B981; display: inline-block; }
+  .ring-accent { box-shadow: 0 0 0 1px #10B981 inset; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  details[open] summary .chev { transform: rotate(45deg); }
+  .chev { transition: transform .2s ease; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .marquee { display: flex; gap: 64px; animation: marq 50s linear infinite; }
+  @keyframes marq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  /* ============ Nav dropdowns ============ */
+  .nav-link { transition: color .15s ease; }
+  .nav-link:hover { color: #10B981; }
+  .nav-item { position: relative; }
+  .nav-trigger { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .nav-trigger .caret {
+    width: 8px; height: 8px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(-1px, -1px);
+    transition: transform .25s ease, color .15s ease;
+    opacity: .65;
+  }
+  .nav-item:hover .nav-trigger .caret,
+  .nav-item:focus-within .nav-trigger .caret { transform: rotate(225deg) translate(-1px, -1px); opacity: 1; }
+
+  .nav-menu {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 0;
+    min-width: 320px;
+    padding: 14px;
+    background:
+      linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(10,10,12,0.55) 100%),
+      rgba(10,10,12,0.78);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 24px 56px -16px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(16,185,129,0.05);
+    opacity: 0; visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+    z-index: 60;
+  }
+  .nav-menu::before {
+    content: "";
+    position: absolute; left: 24px; top: -6px;
+    width: 12px; height: 12px;
+    background: inherit;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    transform: rotate(45deg);
+    backdrop-filter: inherit;
+    -webkit-backdrop-filter: inherit;
+  }
+  /* hover bridge so the menu doesn't close in the gap */
+  .nav-menu::after {
+    content: "";
+    position: absolute; left: 0; right: 0; top: -14px; height: 14px;
+  }
+  .nav-item:hover > .nav-menu,
+  .nav-item:focus-within > .nav-menu {
+    opacity: 1; visibility: visible; transform: translateY(0);
+  }
+  .nav-menu .menu-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 8px;
+  }
+  .nav-menu .menu-head .label { color: #10B981; }
+  .nav-menu .menu-head .count {
+    font-family: 'Geist Mono', monospace; font-size: 10px;
+    color: #71717A; letter-spacing: 0.05em;
+  }
+  .menu-link {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 10px;
+    border-radius: 8px;
+    transition: background .15s ease, transform .15s ease;
+    text-decoration: none;
+  }
+  .menu-link:hover { background: rgba(16,185,129,0.08); }
+  .menu-link .idx {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    color: #10B981;
+    letter-spacing: 0.06em;
+    padding-top: 2px;
+    min-width: 32px;
+  }
+  .menu-link .body { flex: 1; }
+  .menu-link .ttl {
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    margin-bottom: 2px;
+    transition: color .15s ease;
+  }
+  .menu-link:hover .ttl { color: #10B981; }
+  .menu-link .desc {
+    color: #A1A1AA;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .menu-link .arr {
+    color: #52525B;
+    font-size: 14px;
+    align-self: center;
+    transition: transform .2s ease, color .15s ease;
+  }
+  .menu-link:hover .arr { color: #10B981; transform: translateX(2px); }
+  .menu-foot {
+    margin-top: 8px;
+    padding: 10px 10px 4px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .menu-foot a {
+    font-family: 'Geist Mono', monospace; font-size: 10px;
+    color: #A1A1AA; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color .15s ease;
+  }
+  .menu-foot a:hover { color: #10B981; }
+  /* mobile menu toggle */
+  .nav-mobile-toggle {
+    display: none;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(24,24,27,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .nav-mobile-toggle:hover { border-color: rgba(16,185,129,0.55); background: rgba(16,185,129,0.08); }
+  .nav-mobile-toggle .bars { position: relative; width: 18px; height: 14px; }
+  .nav-mobile-toggle .bars span {
+    position: absolute; left: 0; right: 0;
+    height: 1.5px; background: #FFFFFF; border-radius: 2px;
+    transition: transform .25s ease, opacity .2s ease, top .25s ease;
+  }
+  .nav-mobile-toggle .bars span:nth-child(1) { top: 0; }
+  .nav-mobile-toggle .bars span:nth-child(2) { top: 6.25px; }
+  .nav-mobile-toggle .bars span:nth-child(3) { top: 12.5px; }
+  body.nav-open .nav-mobile-toggle .bars span:nth-child(1) { top: 6.25px; transform: rotate(45deg); }
+  body.nav-open .nav-mobile-toggle .bars span:nth-child(2) { opacity: 0; }
+  body.nav-open .nav-mobile-toggle .bars span:nth-child(3) { top: 6.25px; transform: rotate(-45deg); }
+  @media (max-width: 1023px) {
+    .nav-mobile-toggle { display: inline-flex; }
+  }
+
+  /* ============ Mobile drawer ============ */
+  .mobile-drawer-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(5,5,7,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0; visibility: hidden;
+    transition: opacity .25s ease, visibility .25s ease;
+    z-index: 70;
+  }
+  body.nav-open .mobile-drawer-backdrop { opacity: 1; visibility: visible; }
+  .mobile-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(420px, 92vw);
+    background:
+      linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(5,5,7,0.55) 100%),
+      rgba(10,10,12,0.92);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    box-shadow: -24px 0 56px -16px rgba(0,0,0,0.7);
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.22,1,.36,1);
+    z-index: 71;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  body.nav-open .mobile-drawer { transform: translateX(0); }
+  .mobile-drawer .md-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .mobile-drawer .md-close {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 9999px; border: 1px solid rgba(255,255,255,0.10);
+    color: #A1A1AA; cursor: pointer;
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .mobile-drawer .md-close:hover { color: #10B981; border-color: rgba(16,185,129,0.55); }
+  .mobile-drawer .md-body {
+    flex: 1; overflow-y: auto;
+    padding: 8px 12px 20px;
+  }
+  .md-group { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .md-group:last-child { border-bottom: none; }
+  .md-group > summary, .md-group > a.md-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 12px;
+    cursor: pointer;
+    list-style: none;
+    color: #FFFFFF;
+    font-family: 'Geist Mono', 'SF Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    transition: color .15s ease;
+  }
+  .md-group > summary::-webkit-details-marker { display: none; }
+  .md-group > summary:hover, .md-group > a.md-top:hover { color: #10B981; }
+  .md-group > summary .md-chev {
+    width: 8px; height: 8px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translate(-1px,-1px);
+    opacity: .55;
+    transition: transform .25s ease;
+  }
+  .md-group[open] > summary .md-chev { transform: rotate(225deg) translate(-1px,-1px); opacity: 1; }
+  .md-children { padding: 4px 0 10px; display: flex; flex-direction: column; gap: 2px; }
+  .md-children a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px 10px 24px;
+    border-radius: 8px;
+    color: #D4D4D8; font-size: 14px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .md-children a:hover { background: rgba(16,185,129,0.08); color: #10B981; }
+  .md-children a .idx-mini {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; color: #10B981; min-width: 32px;
+    letter-spacing: 0.06em;
+  }
+  .md-cta {
+    margin: 16px 12px 4px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  /* lock body scroll when drawer open */
+  body.nav-open { overflow: hidden; }
+  /* brand wordmark — Space Grotesk lockup, name above tagline */
+  .brand-wordmark {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    line-height: 1;
+    color: #FFFFFF;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  .brand-wordmark .b-mark {
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    font-size: 17px;
+    color: #FFFFFF;
+    white-space: nowrap;
+  }
+  .brand-wordmark .b-sub {
+    font-family: 'Geist Mono', 'SF Mono', Menlo, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #A1A1AA;
+    white-space: nowrap;
+  }
+  .brand-wordmark .b-sub .sep {
+    color: #10B981;
+    margin: 0 0.5em;
+    font-weight: 600;
+  }
+  /* larger stacked variant for footer */
+  .brand-wordmark.lg .b-mark { font-size: 24px; letter-spacing: -0.028em; }
+  .brand-wordmark.lg .b-sub  { font-size: 11px; letter-spacing: 0.18em; }
+  .brand-wordmark.lg { gap: 8px; }
+  /* brand logomark — masked from logo.svg, tinted to emerald accent */
+  .logo-mark {
+    display: inline-block;
+    width: 36px; height: 36px;
+    background-color: #10B981;
+    -webkit-mask: url('logo.svg') center/contain no-repeat;
+            mask: url('logo.svg') center/contain no-repeat;
+    transition: background-color .2s ease, filter .2s ease;
+    filter: drop-shadow(0 0 12px rgba(16,185,129,0.35));
+  }
+  a:hover > .logo-mark { background-color: #34d399; }
+  .glass-nav {
+    background:
+      linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(5,5,5,0.35) 100%),
+      rgba(10,10,12,0.45);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.05),
+      0 8px 24px -16px rgba(0,0,0,0.5);
+  }
+  /* button-accent-green — pill, brand-emphasis CTA per design.md */
+  .btn-primary { background: #10B981; color: #050505; border-radius: 9999px; transition: background .2s ease; font-weight: 500; }
+  .btn-primary:hover { background: #0db86f; }
+  /* button-secondary — outlined pill */
+  .btn-ghost { border: 1px solid #2A2A2D; border-radius: 9999px; transition: border-color .2s ease, background .2s ease; }
+  .btn-ghost:hover { border-color: #10B981; background: rgba(16,185,129,0.06); }
+  /* card-base — glassmorphic w/ subtle emerald gradient */
+  .card {
+    position: relative;
+    background:
+      linear-gradient(135deg, rgba(16,185,129,0.10) 0%, rgba(24,24,27,0.55) 38%, rgba(10,10,12,0.65) 100%),
+      rgba(24,24,27,0.45);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      inset 0 0 0 1px rgba(255,255,255,0.02),
+      0 12px 32px -16px rgba(0,0,0,0.65);
+    overflow: hidden;
+  }
+  .card::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(16,185,129,0.14), transparent 55%),
+      radial-gradient(80% 60% at 100% 100%, rgba(16,185,129,0.06), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .card > * { position: relative; z-index: 1; }
+  .card-hover { transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
+  .card-hover:hover {
+    border-color: rgba(16,185,129,0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 0 0 1px rgba(16,185,129,0.18),
+      0 18px 48px -18px rgba(16,185,129,0.25),
+      0 12px 32px -16px rgba(0,0,0,0.65);
+  }
+  /* glass-accent — strong emerald variant for CTA card */
+  .card-accent {
+    background:
+      linear-gradient(135deg, rgba(16,185,129,0.85) 0%, rgba(10,110,81,0.78) 60%, rgba(6,61,45,0.78) 100%) !important;
+    border-color: rgba(16,185,129,0.55) !important;
+    color: #050505;
+  }
+  .card-accent::before {
+    background:
+      radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,0.22), transparent 55%),
+      radial-gradient(80% 60% at 100% 100%, rgba(0,0,0,0.18), transparent 60%) !important;
+  }
+  /* pill chip — rounded.full + caption-bold typography */
+  .pill { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 9999px; border: 1px solid #2A2A2D; font-family: 'Geist Mono', 'SF Mono', Menlo, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.03em; color: #D4D4D8; }
+  .pill-on { border-color: #10B981; color: #10B981; }
+  .num { font-feature-settings: 'tnum'; }
+  .gradient-edge { background: radial-gradient(circle at 80% 20%, rgba(16,185,129,0.12), transparent 50%); }
+  .hex { width: 8px; height: 8px; background: #10B981; transform: rotate(45deg); display: inline-block; }
+  /* Unicorn Studio aura — color-tint to match emerald/dark theme */
+  .aura-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .aura-wrap [data-us-project] {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    filter: hue-rotate(110deg) saturate(0.55) brightness(0.55) contrast(1.05);
+    opacity: 0.95;
+    mix-blend-mode: screen;
+  }
+  .aura-tint { position: absolute; inset: 0; background:
+      radial-gradient(120% 80% at 75% 20%, rgba(16,185,129,0.18), transparent 60%),
+      linear-gradient(180deg, rgba(5,5,5,0.35) 0%, rgba(5,5,5,0.55) 60%, rgba(5,5,5,0.85) 100%);
+    pointer-events: none;
+  }
+
+  /* ============ Chip stage (was Globe) ============ */
+  .globe-stage { position: relative; width: 100%; aspect-ratio: 1 / 1; }
+  .chip-fl { z-index: 4; }
+
+  /* Chips */
+  .chip-fl { position: absolute; display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px; background: rgba(24,24,27,0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(42,42,45,0.9); border-radius: 9999px;
+    font-family: 'Geist Mono', 'SF Mono', Menlo, monospace; font-size: 11px; color: #E4E4E7; letter-spacing: 0.02em; white-space: nowrap;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.6); z-index: 3;
+  }
+  .chip-fl .icn { width: 18px; height: 18px; border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #10B981; }
+  .chip-fl .icn svg { width: 10px; height: 10px; }
+  .chip-fl .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: #10B981;
+    box-shadow: 0 0 0 4px rgba(16,185,129,0.18); animation: ping 2s ease-out infinite; }
+  @keyframes ping { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.5);} 70%{box-shadow:0 0 0 6px rgba(16,185,129,0);} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0);} }
+  .chip-fl .ava { width: 22px; height: 22px; border-radius: 9999px;
+    background: linear-gradient(135deg, #0A6E51, #10B981); border: 1px solid rgba(16,185,129,0.4); }
+  .chip-fl .stack { display: flex; flex-direction: column; line-height: 1.15; }
+  .chip-fl .stack .nm { color: #fff; font-size: 11px; }
+  .chip-fl .stack .hd { color: #A1A1AA; font-size: 10px; }
+  .chip-fl.lg { padding: 8px 14px 8px 8px; }
+
+  .chip-anim-1 { animation: floaty 9s ease-in-out infinite; }
+  .chip-anim-2 { animation: floaty 11s ease-in-out infinite reverse; }
+  .chip-anim-3 { animation: floaty 13s ease-in-out infinite; }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Dot blink */
+  .blink-1 { animation: blink 3s ease-in-out infinite; }
+  .blink-2 { animation: blink 4.2s ease-in-out infinite 0.5s; }
+  .blink-3 { animation: blink 5.5s ease-in-out infinite 1.2s; }
+  @keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+</style>
+</head>
+<body class="bg-ink text-white">
+
+<!-- ==================== HEADER ==================== -->
+<header class="sticky top-0 z-40 glass-nav">
+  <div class="max-w-[1440px] mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
+    <a href="#home" data-route="home" class="flex items-center gap-3">
+      <span class="logo-mark" aria-hidden="true"></span>
+      <span class="brand-wordmark">
+        <span class="b-mark">Cyber Eye Intelligence</span>
+        <span class="b-sub">Forensics<span class="sep">|</span>Investigations<span class="sep">|</span>Security</span>
+      </span>
+    </a>
+    <nav class="hidden lg:flex items-center gap-8 text-sm">
+      <!-- SERVICES dropdown -->
+      <div class="nav-item">
+        <a href="#services" data-route="services" class="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+          Services <sup class="text-accent">5</sup>
+          <span class="caret" aria-hidden="true"></span>
+        </a>
+        <div class="nav-menu" role="menu">
+          <div class="menu-head">
+            <span class="label">Practice families</span>
+            <span class="count">05 / 05</span>
+          </div>
+          <a href="#service-detail" data-route="service-detail" data-family="digital-forensics" class="menu-link">
+            <span class="idx">01</span>
+            <span class="body">
+              <span class="ttl">Digital Forensics</span>
+              <span class="desc">Acquisition, analysis, § 65B reports & expert testimony.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#service-detail" data-route="service-detail" data-family="digital-intelligence" class="menu-link">
+            <span class="idx">02</span>
+            <span class="body">
+              <span class="ttl">Digital Intelligence</span>
+              <span class="desc">OSINT, social-graph, deep & dark web monitoring.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#service-detail" data-route="service-detail" data-family="managed-security" class="menu-link">
+            <span class="idx">03</span>
+            <span class="body">
+              <span class="ttl">Managed Security</span>
+              <span class="desc">SOC, threat hunting, vulnerability management.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#service-detail" data-route="service-detail" data-family="managed-forensics" class="menu-link">
+            <span class="idx">04</span>
+            <span class="body">
+              <span class="ttl">Managed Forensics</span>
+              <span class="desc">On-premises labs, dedicated examiners, agile IR.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#service-detail" data-route="service-detail" data-family="data-recovery" class="menu-link">
+            <span class="idx">05</span>
+            <span class="body">
+              <span class="ttl">Data Recovery</span>
+              <span class="desc">Disk, RAID, mobile, cloud — physical & logical.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <div class="menu-foot">
+            <a href="#services" data-route="services">All services →</a>
+            <a href="#contact" data-route="contact">Open a case</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTORS dropdown -->
+      <div class="nav-item">
+        <a href="#sectors" data-route="sectors" class="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+          Sectors
+          <span class="caret" aria-hidden="true"></span>
+        </a>
+        <div class="nav-menu" role="menu">
+          <div class="menu-head">
+            <span class="label">Who we serve</span>
+            <span class="count">05 / 05</span>
+          </div>
+          <a href="#sector-detail" data-route="sector-detail" class="menu-link">
+            <span class="idx">S/01</span>
+            <span class="body">
+              <span class="ttl">Law Enforcement</span>
+              <span class="desc">Cyber cells, anti-fraud units, SIT support.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#sector-detail" data-route="sector-detail" class="menu-link">
+            <span class="idx">S/02</span>
+            <span class="body">
+              <span class="ttl">Legal & Litigation</span>
+              <span class="desc">eDiscovery, expert witness, § 65B certificates.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#sector-detail" data-route="sector-detail" class="menu-link">
+            <span class="idx">S/03</span>
+            <span class="body">
+              <span class="ttl">Corporate Enterprise</span>
+              <span class="desc">Internal investigations, IP theft, misconduct.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#sector-detail" data-route="sector-detail" class="menu-link">
+            <span class="idx">S/04</span>
+            <span class="body">
+              <span class="ttl">Government</span>
+              <span class="desc">CERT-aligned, classified handling, audits.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#sector-detail" data-route="sector-detail" class="menu-link">
+            <span class="idx">S/05</span>
+            <span class="body">
+              <span class="ttl">BFSI & Insurance</span>
+              <span class="desc">Fraud, AML, customer-data investigations.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <div class="menu-foot">
+            <a href="#sectors" data-route="sectors">All sectors →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- KNOWLEDGE CENTRE dropdown -->
+      <div class="nav-item">
+        <a href="#knowledge" data-route="knowledge" class="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+          Knowledge Centre
+          <span class="caret" aria-hidden="true"></span>
+        </a>
+        <div class="nav-menu" role="menu" style="min-width: 300px;">
+          <div class="menu-head">
+            <span class="label">Resources</span>
+            <span class="count">04</span>
+          </div>
+          <a href="#insights" data-route="insights" class="menu-link">
+            <span class="idx">K/01</span>
+            <span class="body">
+              <span class="ttl">Field Notes & Articles</span>
+              <span class="desc">Tutorials, references, post-mortems.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#insights" data-route="insights" class="menu-link">
+            <span class="idx">K/02</span>
+            <span class="body">
+              <span class="ttl">Case Studies</span>
+              <span class="desc">Redacted exhibits & outcomes.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#insights" data-route="insights" class="menu-link">
+            <span class="idx">K/03</span>
+            <span class="body">
+              <span class="ttl">Whitepapers</span>
+              <span class="desc">Standards, methodology, compliance.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#insights" data-route="insights" class="menu-link">
+            <span class="idx">K/04</span>
+            <span class="body">
+              <span class="ttl">FAQ</span>
+              <span class="desc">Common forensic questions answered.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- ACADEMY dropdown -->
+      <div class="nav-item">
+        <a href="#training" data-route="training" class="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+          Academy
+          <span class="caret" aria-hidden="true"></span>
+        </a>
+        <div class="nav-menu" role="menu" style="min-width: 320px;">
+          <div class="menu-head">
+            <span class="label">Cyber Eye Academy</span>
+            <span class="count">14 courses</span>
+          </div>
+          <a href="#training" data-route="training" class="menu-link">
+            <span class="idx">A/01</span>
+            <span class="body">
+              <span class="ttl">All Courses</span>
+              <span class="desc">Full catalogue across police, counsel & corporate.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#training" data-route="training" class="menu-link">
+            <span class="idx">A/02</span>
+            <span class="body">
+              <span class="ttl">For Police</span>
+              <span class="desc">Mobile triage, cell-site analysis, seizure protocol.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#training" data-route="training" class="menu-link">
+            <span class="idx">A/03</span>
+            <span class="body">
+              <span class="ttl">For Legal Counsel</span>
+              <span class="desc">§ 65B, cross-examining experts, eDiscovery.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#training" data-route="training" class="menu-link">
+            <span class="idx">A/04</span>
+            <span class="body">
+              <span class="ttl">For Corporate</span>
+              <span class="desc">Insider threat, ransomware tabletop, IR.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#training" data-route="training" class="menu-link">
+            <span class="idx">A/05</span>
+            <span class="body">
+              <span class="ttl">Schedule & Cohorts</span>
+              <span class="desc">Upcoming dates · in-person, hybrid, online.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <div class="menu-foot">
+            <a href="#training" data-route="training">Course catalogue →</a>
+            <a href="#contact" data-route="contact">Enrol</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT dropdown -->
+      <div class="nav-item">
+        <a href="#about" data-route="about" class="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+          About
+          <span class="caret" aria-hidden="true"></span>
+        </a>
+        <div class="nav-menu" role="menu" style="min-width: 300px; left: auto; right: 0;">
+          <div class="menu-head">
+            <span class="label">The firm</span>
+            <span class="count">03</span>
+          </div>
+          <a href="#about" data-route="about" class="menu-link">
+            <span class="idx">B/01</span>
+            <span class="body">
+              <span class="ttl">About Us</span>
+              <span class="desc">Founders, methodology, accreditations.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#careers" data-route="careers" class="menu-link">
+            <span class="idx">B/02</span>
+            <span class="body">
+              <span class="ttl">Hiring</span>
+              <span class="desc">Open roles. We're growing the examiner bench.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <a href="#contact" data-route="contact" class="menu-link">
+            <span class="idx">B/03</span>
+            <span class="body">
+              <span class="ttl">Contact Us</span>
+              <span class="desc">Mumbai · Bengaluru · Delhi. 24/7 incident line.</span>
+            </span>
+            <span class="arr">→</span>
+          </a>
+          <div class="menu-foot">
+            <a href="#contact" data-route="contact">Open a case →</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="#contact" data-route="contact" class="hidden md:inline-flex btn-ghost mono text-xs uppercase tracking-wider px-4 py-2 rounded-control">+91 80 4567 8910</a>
+      <a href="#contact" data-route="contact" class="hidden lg:inline-flex btn-primary mono text-xs uppercase tracking-wider px-4 py-2 rounded-control font-medium">Open a Case →</a>
+      <button type="button" class="nav-mobile-toggle" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false" id="navOpenBtn">
+        <span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== MOBILE DRAWER ==================== -->
+<div class="mobile-drawer-backdrop" id="navBackdrop" aria-hidden="true"></div>
+<aside class="mobile-drawer" id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Site navigation">
+  <div class="md-head">
+    <a href="#home" data-route="home" class="flex items-center gap-3" data-md-close>
+      <span class="logo-mark" aria-hidden="true" style="width:28px;height:28px;"></span>
+      <span class="brand-wordmark">
+        <span class="b-mark">Cyber Eye Intelligence</span>
+        <span class="b-sub">Forensics<span class="sep">|</span>Investigations<span class="sep">|</span>Security</span>
+      </span>
+    </a>
+    <button type="button" class="md-close" aria-label="Close menu" id="navCloseBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="md-body">
+    <!-- Services -->
+    <details class="md-group" open>
+      <summary>
+        <span>Services <sup class="text-accent">5</sup></span>
+        <span class="md-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="md-children">
+        <a href="#service-detail" data-route="service-detail" data-family="digital-forensics" data-md-close><span class="idx-mini">01</span>Digital Forensics</a>
+        <a href="#service-detail" data-route="service-detail" data-family="digital-intelligence" data-md-close><span class="idx-mini">02</span>Digital Intelligence</a>
+        <a href="#service-detail" data-route="service-detail" data-family="managed-security" data-md-close><span class="idx-mini">03</span>Managed Security</a>
+        <a href="#service-detail" data-route="service-detail" data-family="managed-forensics" data-md-close><span class="idx-mini">04</span>Managed Forensics</a>
+        <a href="#service-detail" data-route="service-detail" data-family="data-recovery" data-md-close><span class="idx-mini">05</span>Data Recovery</a>
+      </div>
+    </details>
+
+    <!-- Sectors -->
+    <details class="md-group">
+      <summary>
+        <span>Sectors</span>
+        <span class="md-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="md-children">
+        <a href="#sector-detail" data-route="sector-detail" data-md-close><span class="idx-mini">S/01</span>Law Enforcement</a>
+        <a href="#sector-detail" data-route="sector-detail" data-md-close><span class="idx-mini">S/02</span>Legal & Litigation</a>
+        <a href="#sector-detail" data-route="sector-detail" data-md-close><span class="idx-mini">S/03</span>Corporate Enterprise</a>
+        <a href="#sector-detail" data-route="sector-detail" data-md-close><span class="idx-mini">S/04</span>Government</a>
+        <a href="#sector-detail" data-route="sector-detail" data-md-close><span class="idx-mini">S/05</span>BFSI & Insurance</a>
+      </div>
+    </details>
+
+    <!-- Knowledge -->
+    <details class="md-group">
+      <summary>
+        <span>Knowledge Centre</span>
+        <span class="md-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="md-children">
+        <a href="#insights" data-route="insights" data-md-close><span class="idx-mini">K/01</span>Field Notes & Articles</a>
+        <a href="#insights" data-route="insights" data-md-close><span class="idx-mini">K/02</span>Case Studies</a>
+        <a href="#insights" data-route="insights" data-md-close><span class="idx-mini">K/03</span>Whitepapers</a>
+        <a href="#insights" data-route="insights" data-md-close><span class="idx-mini">K/04</span>FAQ</a>
+      </div>
+    </details>
+
+    <!-- Academy -->
+    <details class="md-group">
+      <summary>
+        <span>Academy</span>
+        <span class="md-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="md-children">
+        <a href="#training" data-route="training" data-md-close><span class="idx-mini">A/01</span>All Courses</a>
+        <a href="#training" data-route="training" data-md-close><span class="idx-mini">A/02</span>For Police</a>
+        <a href="#training" data-route="training" data-md-close><span class="idx-mini">A/03</span>For Legal Counsel</a>
+        <a href="#training" data-route="training" data-md-close><span class="idx-mini">A/04</span>For Corporate</a>
+        <a href="#training" data-route="training" data-md-close><span class="idx-mini">A/05</span>Schedule & Cohorts</a>
+      </div>
+    </details>
+
+    <!-- About -->
+    <details class="md-group">
+      <summary>
+        <span>About</span>
+        <span class="md-chev" aria-hidden="true"></span>
+      </summary>
+      <div class="md-children">
+        <a href="#about" data-route="about" data-md-close><span class="idx-mini">B/01</span>About Us</a>
+        <a href="#careers" data-route="careers" data-md-close><span class="idx-mini">B/02</span>Hiring</a>
+        <a href="#contact" data-route="contact" data-md-close><span class="idx-mini">B/03</span>Contact Us</a>
+      </div>
+    </details>
+
+    <div class="md-cta">
+      <a href="#contact" data-route="contact" data-md-close class="btn-primary mono text-xs uppercase tracking-wider px-5 py-3 rounded-control font-medium text-center">Open a case →</a>
+      <a href="tel:+918045678910" class="btn-ghost mono text-xs uppercase tracking-wider px-5 py-3 rounded-control text-center">+91 80 4567 8910</a>
+    </div>
+  </div>
+</aside>
+
+<script>
+  (function() {
+    const body = document.body;
+    const openBtn = document.getElementById('navOpenBtn');
+    const closeBtn = document.getElementById('navCloseBtn');
+    const backdrop = document.getElementById('navBackdrop');
+    function openDrawer() {
+      body.classList.add('nav-open');
+      openBtn && openBtn.setAttribute('aria-expanded', 'true');
+    }
+    function closeDrawer() {
+      body.classList.remove('nav-open');
+      openBtn && openBtn.setAttribute('aria-expanded', 'false');
+    }
+    openBtn && openBtn.addEventListener('click', openDrawer);
+    closeBtn && closeBtn.addEventListener('click', closeDrawer);
+    backdrop && backdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+    // close after any nav link inside the drawer fires
+    document.querySelectorAll('[data-md-close]').forEach(el => {
+      el.addEventListener('click', () => setTimeout(closeDrawer, 50));
+    });
+  })();
+</script>
+
+<!-- ==================== HOME ==================== -->
+<div id="page-home" class="page active">
+
+  <!-- HERO -->
+  <section class="relative overflow-hidden">
+    <div class="aura-wrap">
+      <div data-us-project="bKN5upvoulAmWvInmHza"></div>
+      <div class="aura-tint"></div>
+      <div class="absolute inset-0 ph-grid opacity-30"></div>
+    </div>
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 pt-14 pb-16 lg:pt-20 lg:pb-24 relative">
+      <div class="grid lg:grid-cols-12 gap-10 items-end">
+        <div class="lg:col-span-7">
+          <div class="flex items-center gap-3 mb-6 lg:mb-8">
+            <span class="hex"></span>
+            <span class="label">[ 01 — Digital Forensics ]</span>
+          </div>
+          <h1 class="display text-[40px] sm:text-[56px] lg:text-[88px] leading-[1.02] lg:leading-[0.95]">Digital forensics
+that holds up
+<span class="text-accent">in court.</span></h1>
+          <p class="mt-6 lg:mt-8 text-base lg:text-lg text-mute max-w-lg leading-relaxed">
+            We recover, preserve and present digital evidence for police, prosecutors and enterprise legal teams. Court-admissible reports. Chain of custody. 24/7 incident response.
+          </p>
+          <div class="flex flex-wrap items-center gap-3 mt-8 lg:mt-10">
+            <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Open a case →</a>
+            <a href="#services" data-route="services" class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">Browse services</a>
+          </div>
+        </div>
+        <div class="lg:col-span-5 hidden lg:block">
+          <div class="globe-stage">
+
+            <!-- Floating chips · forensics jargon -->
+            <div class="chip-fl chip-anim-1" style="top: 4%; left: 50%; transform: translateX(-50%);">
+              <span class="pulse-dot"></span> 820 MB/s · ingest
+            </div>
+
+            <div class="chip-fl" style="top: 10%; right: 0%;">
+              <span class="icn">⌂</span> +418 · devices
+            </div>
+
+            <div class="chip-fl chip-anim-2" style="top: 22%; left: -10%;">
+              <span class="icn">
+                <svg viewBox="0 0 10 10" fill="none"><ellipse cx="5" cy="3" rx="3.2" ry="0.9" stroke="currentColor" stroke-width="1.2"/><path d="M1.8 3v4c0 .55 1.4.95 3.2.95s3.2-.4 3.2-.95V3" stroke="currentColor" stroke-width="1.2"/></svg>
+              </span>
+              19.5 TB · imaged
+            </div>
+
+            <div class="chip-fl lg" style="top: 30%; left: 8%;">
+              <span class="ava"></span>
+              <div class="stack">
+                <span class="nm">Hash verified · SHA-256</span>
+                <span class="hd">@p_ranganathan / lead</span>
+              </div>
+            </div>
+
+            <div class="chip-fl chip-anim-3" style="top: 36%; right: -6%;">
+              <span class="icn">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M1 2.5l4-1.3 4 1.3L5 3.8 1 2.5z" stroke="currentColor" stroke-width="1.1"/><path d="M1 5l4 1.3L9 5M1 7.3l4 1.3L9 7.3" stroke="currentColor" stroke-width="1.1"/></svg>
+              </span>
+              2.41 PB · archive
+            </div>
+
+            <div class="chip-fl" style="top: 44%; right: 4%;">
+              <span class="icn">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M1 5l3 3 5-6" stroke="currentColor" stroke-width="1.4"/></svg>
+              </span>
+              § 65B · certified
+            </div>
+
+            <div class="chip-fl" style="top: 60%; left: -4%;">
+              <span class="icn">●</span> CoC · sealed
+            </div>
+
+            <div class="chip-fl chip-anim-1" style="top: 66%; right: 2%;">
+              <span class="icn">
+                <svg viewBox="0 0 10 10" fill="none"><path d="M2 5h6M5 2v6" stroke="currentColor" stroke-width="1.4"/></svg>
+              </span>
+              Write-blocker on
+            </div>
+
+            <div class="chip-fl lg chip-anim-2" style="bottom: 4%; left: 4%;">
+              <span class="ava"></span>
+              <div class="stack">
+                <span class="nm">M. Khan</span>
+                <span class="hd">@triage_03 · online</span>
+              </div>
+            </div>
+
+            <div class="chip-fl lg" style="bottom: 0%; left: 50%; transform: translateX(-50%);">
+              <span class="ava"></span>
+              <div class="stack">
+                <span class="nm">P. Ranganathan</span>
+                <span class="hd">@lead_exam · imaging</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-12 lg:mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pt-8 border-t border-line">
+        <div>
+          <div class="display text-3xl lg:text-4xl num">600<span class="text-accent">+</span></div>
+          <div class="label mt-2">Cases closed</div>
+        </div>
+        <div>
+          <div class="display text-3xl lg:text-4xl num">98<span class="text-accent">%</span></div>
+          <div class="label mt-2">Admissibility rate</div>
+        </div>
+        <div>
+          <div class="display text-3xl lg:text-4xl num">24<span class="text-accent">/7</span></div>
+          <div class="label mt-2">Incident response</div>
+        </div>
+        <div>
+          <div class="display text-3xl lg:text-4xl num">12</div>
+          <div class="label mt-2">Certified examiners</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGO MARQUEE -->
+  <section class="border-y border-line py-6 overflow-hidden">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 mb-4">
+      <div class="label">Trusted by police, prosecutors & enterprise legal teams</div>
+    </div>
+    <div class="relative overflow-hidden">
+      <div class="marquee whitespace-nowrap">
+        <div class="flex gap-16 items-center mono text-mute text-lg uppercase tracking-widest">
+          <span>Mumbai Police</span><span class="text-accent">◇</span>
+          <span>State Cyber Cell</span><span class="text-accent">◇</span>
+          <span>HDFC Securities</span><span class="text-accent">◇</span>
+          <span>Khaitan & Co</span><span class="text-accent">◇</span>
+          <span>SBI Cyber Defence</span><span class="text-accent">◇</span>
+          <span>Tata Consultancy</span><span class="text-accent">◇</span>
+          <span>CERT-In</span><span class="text-accent">◇</span>
+          <span>Reliance Legal</span><span class="text-accent">◇</span>
+        </div>
+        <div class="flex gap-16 items-center mono text-mute text-lg uppercase tracking-widest">
+          <span>Mumbai Police</span><span class="text-accent">◇</span>
+          <span>State Cyber Cell</span><span class="text-accent">◇</span>
+          <span>HDFC Securities</span><span class="text-accent">◇</span>
+          <span>Khaitan & Co</span><span class="text-accent">◇</span>
+          <span>SBI Cyber Defence</span><span class="text-accent">◇</span>
+          <span>Tata Consultancy</span><span class="text-accent">◇</span>
+          <span>CERT-In</span><span class="text-accent">◇</span>
+          <span>Reliance Legal</span><span class="text-accent">◇</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="py-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-14">
+        <div>
+          <div class="label mb-4">[ Services / 5 practice families ]</div>
+          <h2 class="display text-5xl lg:text-6xl">Forensic services<br><span class="text-accent">end to end.</span></h2>
+        </div>
+        <a href="#services" data-route="services" class="mono text-sm uppercase tracking-wider text-accent hover:underline">All services →</a>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- 01 Digital Forensics -->
+        <a href="#service-detail" data-route="service-detail" data-family="digital-forensics" class="card card-hover p-7 group">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-accent text-xs">01 / 05</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6" stroke="#10B981" stroke-width="1.2"/><circle cx="10" cy="10" r="2" fill="#10B981"/></svg>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Digital Forensics</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Evidence collection, incident response, data recovery, malware analysis, mobile & network forensics — with court-grade chain of custody.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">Evidence</span><span class="pill">IR</span><span class="pill">Mobile</span><span class="pill">Network</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">8 services →</div>
+        </a>
+
+        <!-- 02 Digital Intelligence -->
+        <a href="#service-detail" data-route="service-detail" data-family="digital-intelligence" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-accent text-xs">02 / 05</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10c2-4 5-6 7-6s5 2 7 6c-2 4-5 6-7 6s-5-2-7-6z" stroke="#10B981" stroke-width="1.2"/><circle cx="10" cy="10" r="2.5" fill="#10B981"/></svg>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Digital Intelligence</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">OSINT, SOCMINT, dark web monitoring, threat intelligence, data mining and predictive analytics — turning the open digital world into actionable signal.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">OSINT</span><span class="pill">SOCMINT</span><span class="pill">Dark web</span><span class="pill">Threat intel</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">7 services →</div>
+        </a>
+
+        <!-- 03 Managed Security Service -->
+        <a href="#service-detail" data-route="service-detail" data-family="managed-security" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-accent text-xs">03 / 05</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="#10B981" stroke-width="1.2"/><path d="M7 10l2 2 4-4" stroke="#10B981" stroke-width="1.4"/></svg>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Managed Security Services</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">24/7 SOC, XDR, vulnerability management, EDR, SIEM, IAM, UEBA and compliance — across on-prem, cloud and hybrid infrastructures.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">SOC 24/7</span><span class="pill">XDR</span><span class="pill">SIEM</span><span class="pill">IAM</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">13 services →</div>
+        </a>
+
+        <!-- 04 Managed Digital Forensic Services -->
+        <a href="#service-detail" data-route="service-detail" data-family="managed-forensics" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-accent text-xs">04 / 05</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#10B981" stroke-width="1.2"/><path d="M3 7h14M7 3v14" stroke="#10B981" stroke-width="1.2"/></svg>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Managed Digital Forensic Services</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">On-premises forensic infrastructure, dedicated examiners, agile incident response and tailored training — delivered inside your facility.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">On-prem lab</span><span class="pill">Agile IR</span><span class="pill">Training</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">5 services →</div>
+        </a>
+
+        <!-- 05 Data Recovery -->
+        <a href="#service-detail" data-route="service-detail" data-family="data-recovery" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-accent text-xs">05 / 05</div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="5" rx="6" ry="2" stroke="#10B981" stroke-width="1.2"/><path d="M4 5v10c0 1 3 2 6 2s6-1 6-2V5M4 10c0 1 3 2 6 2s6-1 6-2" stroke="#10B981" stroke-width="1.2"/></svg>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Data Recovery</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Hard drive, file system, database, removable media, ransomware-encrypted, mobile and chain-of-custody forensic recovery — across all major brands and formats.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">HDD / SSD</span><span class="pill">RAID</span><span class="pill">Ransomware</span><span class="pill">Mobile</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">6 services →</div>
+        </a>
+
+        <!-- Talk to examiner -->
+        <a href="#contact" data-route="contact" class="card card-hover card-accent p-7 text-ink">
+          <div class="flex items-start justify-between mb-6">
+            <div class="mono text-xs opacity-70">→ Not sure?</div>
+            <span class="hex" style="background:#050505;"></span>
+          </div>
+          <h3 class="text-xl mb-3 font-medium">Talk to an examiner.</h3>
+          <p class="text-sm leading-relaxed mb-6 opacity-80">30-minute scoping call. Free, examiner-led. We'll match you to the right practice family — or tell you if it isn't us.</p>
+          <div class="mono text-xs uppercase tracking-wider font-medium">Open scoping call →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAINING CALLOUT -->
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="card overflow-hidden grid lg:grid-cols-2">
+        <div class="p-10 lg:p-14">
+          <div class="label mb-6">[ Cyber Eye Academy ]</div>
+          <h2 class="display text-4xl lg:text-5xl mb-6">
+            Train your officers<br>
+            <span class="text-accent">& security team.</span>
+          </h2>
+          <p class="text-mute leading-relaxed mb-8 max-w-md">
+            Hands-on courses in mobile, cloud and network forensics — built for police investigators, in-house counsel and corporate security teams.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="#training" data-route="training" class="pill">For Police</a>
+            <a href="#training" data-route="training" class="pill">For Corporate</a>
+            <a href="#training" data-route="training" class="pill pill-on">Course catalogue →</a>
+          </div>
+          <div class="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-line">
+            <div><div class="display text-2xl num">14</div><div class="label mt-1">Courses</div></div>
+            <div><div class="display text-2xl num">2,400+</div><div class="label mt-1">Officers trained</div></div>
+            <div><div class="display text-2xl num">4.9</div><div class="label mt-1">Avg rating</div></div>
+          </div>
+        </div>
+        <div class="ph aspect-[5/4] lg:aspect-auto border-l border-line" data-label="classroom · hands-on forensic lab"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTORS -->
+  <section class="py-24 border-y border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-14">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Sectors ]</div>
+          <h2 class="display text-5xl lg:text-6xl">Who we<br><span class="text-accent">serve.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-6">
+          <p class="text-lg text-mute leading-relaxed">
+            Our examiners are trained for adversarial environments — courtrooms, boardrooms, and active threat scenarios. We work shoulder-to-shoulder with investigators on cases where the evidence has to stand up to the toughest cross-examination.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-6 group">
+          <div class="mono text-xs text-accent mb-12">S/01</div>
+          <h3 class="text-xl font-medium mb-2">Law Enforcement</h3>
+          <p class="text-xs text-mute leading-relaxed">Cyber cells, anti-fraud units, SIT support.</p>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-6">
+          <div class="mono text-xs text-accent mb-12">S/02</div>
+          <h3 class="text-xl font-medium mb-2">Legal & Litigation</h3>
+          <p class="text-xs text-mute leading-relaxed">eDiscovery, expert witness, § 65B certification.</p>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-6">
+          <div class="mono text-xs text-accent mb-12">S/03</div>
+          <h3 class="text-xl font-medium mb-2">Corporate Enterprise</h3>
+          <p class="text-xs text-mute leading-relaxed">Internal investigations, IP theft, misconduct.</p>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-6">
+          <div class="mono text-xs text-accent mb-12">S/04</div>
+          <h3 class="text-xl font-medium mb-2">Government</h3>
+          <p class="text-xs text-mute leading-relaxed">CERT-aligned, classified-handling, audits.</p>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-6">
+          <div class="mono text-xs text-accent mb-12">S/05</div>
+          <h3 class="text-xl font-medium mb-2">BFSI & Insurance</h3>
+          <p class="text-xs text-mute leading-relaxed">Wire fraud, claims, AML, KYC investigations.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED CASE FILE -->
+  <section class="py-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-6">
+          <div class="card ph aspect-[4/3] relative" data-label="case file · redacted exhibit"></div>
+        </div>
+        <div class="lg:col-span-6">
+          <div class="label mb-6">[ Case File · #CE-2025-014 ]</div>
+          <blockquote class="display text-3xl lg:text-4xl leading-tight mb-8">
+            "Recovered 14 deleted chats from a wiped iPhone. Conviction secured in <span class="text-accent">9 months</span>."
+          </blockquote>
+          <div class="text-mute mb-10">
+            — Sr. Counsel, listed manufacturing company<br>
+            <span class="label">Mumbai · Corporate IP Theft</span>
+          </div>
+          <div class="grid grid-cols-3 gap-6 pb-8 border-b border-line mb-8">
+            <div><div class="display text-3xl num">2.4<span class="text-accent text-xl">TB</span></div><div class="label mt-1">Data examined</div></div>
+            <div><div class="display text-3xl num">14</div><div class="label mt-1">Artefacts recovered</div></div>
+            <div><div class="display text-3xl num">9<span class="text-accent text-xl">mo</span></div><div class="label mt-1">To conviction</div></div>
+          </div>
+          <a href="#case-file" data-route="case-file" class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex">Read the full case file →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="py-24 border-y border-line bg-surface/30">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex items-end justify-between mb-14">
+        <div>
+          <div class="label mb-4">[ Voices ]</div>
+          <h2 class="display text-5xl">What clients <span class="text-accent">say.</span></h2>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="card p-7">
+          <div class="text-accent text-5xl leading-none mb-4">"</div>
+          <p class="text-lg leading-relaxed mb-8">Their § 65B certificate held under cross-examination. The opposing expert couldn't dent a single hash.</p>
+          <div class="flex items-center gap-3 pt-6 border-t border-line">
+            <div class="ph w-10 h-10 rounded-pill" data-label=""></div>
+            <div>
+              <div class="text-sm">Adv. R. Subramanian</div>
+              <div class="label">Senior Counsel · Bombay HC</div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-7">
+          <div class="text-accent text-5xl leading-none mb-4">"</div>
+          <p class="text-lg leading-relaxed mb-8">Cyber Eye trained 40 of our investigators on mobile triage. We've cleared our backlog of seized devices for the first time in three years.</p>
+          <div class="flex items-center gap-3 pt-6 border-t border-line">
+            <div class="ph w-10 h-10 rounded-pill" data-label=""></div>
+            <div>
+              <div class="text-sm">Inspector M. Khan</div>
+              <div class="label">Cyber Crime · State Police</div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-7">
+          <div class="text-accent text-5xl leading-none mb-4">"</div>
+          <p class="text-lg leading-relaxed mb-8">Discreet, fast, methodical. Their insider investigation report became our HR action playbook for the next two years.</p>
+          <div class="flex items-center gap-3 pt-6 border-t border-line">
+            <div class="ph w-10 h-10 rounded-pill" data-label=""></div>
+            <div>
+              <div class="text-sm">P. Mehrotra</div>
+              <div class="label">CISO · Listed Bank</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS PREVIEW -->
+  <section class="py-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex items-end justify-between mb-14">
+        <div>
+          <div class="label mb-4">[ Insights · From the lab ]</div>
+          <h2 class="display text-5xl lg:text-6xl">Latest <span class="text-accent">writing.</span></h2>
+        </div>
+        <a href="#insights" data-route="insights" class="mono text-sm uppercase tracking-wider text-accent">All insights →</a>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <a href="#insights" data-route="insights" class="group">
+          <div class="ph aspect-[5/3] rounded-card mb-5 card-hover" data-label="article · ios 18 acquisitions"></div>
+          <div class="label mb-3">Tutorial · 6 min · Apr 28, 2026</div>
+          <h3 class="text-xl font-medium leading-snug group-hover:text-accent transition">Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes.</h3>
+        </a>
+        <a href="#insights" data-route="insights" class="group">
+          <div class="ph aspect-[5/3] rounded-card mb-5 card-hover" data-label="article · bec headers"></div>
+          <div class="label mb-3">Field notes · 8 min · Apr 14, 2026</div>
+          <h3 class="text-xl font-medium leading-snug group-hover:text-accent transition">BEC fraud: a five-step header forensics workflow for in-house counsel.</h3>
+        </a>
+        <a href="#insights" data-route="insights" class="group">
+          <div class="ph aspect-[5/3] rounded-card mb-5 card-hover" data-label="article · m365 logs"></div>
+          <div class="label mb-3">Reference · 11 min · Mar 30, 2026</div>
+          <h3 class="text-xl font-medium leading-snug group-hover:text-accent transition">Cloud forensics in M365: which logs actually survive a 90-day retention window?</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-24 border-t border-line scroll-mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-4">
+          <div class="label mb-4">[ FAQ ]</div>
+          <h2 class="display text-5xl mb-6">Frequently<br><span class="text-accent">asked.</span></h2>
+          <p class="text-mute leading-relaxed">Can't find what you're after? Talk to a certified examiner — no sales filter, no chatbots.</p>
+          <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-5 py-3 rounded-control inline-flex mt-6">Talk to an examiner →</a>
+        </div>
+        <div class="lg:col-span-8">
+          <div class="space-y-3">
+            <details class="card p-5 group">
+              <summary class="flex items-center justify-between cursor-pointer list-none">
+                <span class="font-medium">Are your forensic reports court-admissible?</span>
+                <span class="chev text-accent text-2xl leading-none">+</span>
+              </summary>
+              <p class="text-mute leading-relaxed mt-4 text-sm">Yes. Every report is prepared under § 65B of the Indian Evidence Act, with twin-examiner review, full chain-of-custody documentation and reproducible hashing. We've testified in over 80 matters across district, sessions and high courts.</p>
+            </details>
+            <details class="card p-5 group">
+              <summary class="flex items-center justify-between cursor-pointer list-none">
+                <span class="font-medium">Can you recover deleted WhatsApp / Signal messages?</span>
+                <span class="chev text-accent text-2xl leading-none">+</span>
+              </summary>
+              <p class="text-mute leading-relaxed mt-4 text-sm">In most cases, yes. Recovery depends on the OS, encryption mode, time since deletion and whether cloud sync was enabled. We image, parse and reconstruct from SQLite remnants and unallocated space using Cellebrite, MSAB and our own tooling.</p>
+            </details>
+            <details class="card p-5 group">
+              <summary class="flex items-center justify-between cursor-pointer list-none">
+                <span class="font-medium">Do you preserve chain of custody?</span>
+                <span class="chev text-accent text-2xl leading-none">+</span>
+              </summary>
+              <p class="text-mute leading-relaxed mt-4 text-sm">Always. Tamper-evident seals, dual-signed handover forms, photographed acquisitions and SHA-256 verification at every handoff. Our COC logs survive cross-examination.</p>
+            </details>
+            <details class="card p-5 group">
+              <summary class="flex items-center justify-between cursor-pointer list-none">
+                <span class="font-medium">How fast can you respond to an active intrusion?</span>
+                <span class="chev text-accent text-2xl leading-none">+</span>
+              </summary>
+              <p class="text-mute leading-relaxed mt-4 text-sm">Our 24/7 incident line dispatches a triage analyst within 30 minutes; an on-site team within 4 hours in Tier 1 cities, 12 hours elsewhere in India.</p>
+            </details>
+            <details class="card p-5 group">
+              <summary class="flex items-center justify-between cursor-pointer list-none">
+                <span class="font-medium">Do you provide expert witness testimony?</span>
+                <span class="chev text-accent text-2xl leading-none">+</span>
+              </summary>
+              <p class="text-mute leading-relaxed mt-4 text-sm">Yes. Six of our principal examiners are court-recognised expert witnesses. Briefs include written affidavit, cross-prep, exhibit walkthroughs and live testimony.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="py-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="card relative overflow-hidden">
+        <div class="absolute inset-0 ph-grid opacity-40"></div>
+        <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-accent/20 blur-3xl"></div>
+        <div class="relative p-12 lg:p-20 text-center">
+          <div class="label mb-6">[ 24/7 — Incident Line ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-6">Active incident<br><span class="text-accent">or open case?</span></h2>
+          <p class="text-mute text-lg max-w-xl mx-auto mb-10">Speak to a certified examiner. No call centres. No bots. Live triage from a forensic analyst in 30 minutes or less.</p>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Open a case →</a>
+            <a href="#contact" data-route="contact" class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">+91 80 4567 8910</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== SERVICES HUB ==================== -->
+<div id="page-services" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / <span class="text-white">Services</span></div>
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7">
+          <h1 class="display text-6xl lg:text-7xl mb-8">Digital forensics, cyber investigation, digital intelligence
+&amp; <span class="text-accent">managed security.</span></h1>
+        </div>
+        <div class="lg:col-span-5 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">Five practice families. One lab. Cyber Eye Intelligence Inc combines DFIR speed with court-recognised rigour — from evidence collection and OSINT to 24/7 SOC, on-prem managed labs and ransomware recovery. Every engagement is examiner-led.</p>
+          <div class="flex flex-wrap gap-2 mt-6">
+            <a href="#fam-digital-forensics" class="pill">01 Digital Forensics</a>
+            <a href="#fam-digital-intelligence" class="pill">02 Digital Intelligence</a>
+            <a href="#fam-managed-security" class="pill">03 Managed Security</a>
+            <a href="#fam-managed-forensics" class="pill">04 Managed Forensics</a>
+            <a href="#fam-data-recovery" class="pill">05 Data Recovery</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 01 DIGITAL FORENSICS ========== -->
+  <section id="fam-digital-forensics" class="py-20 border-b border-line scroll-mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Family 01 / 05 ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-4">Digital<br><span class="text-accent">Forensics.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">Cyber Eye Intelligence Inc leads digital investigations end-to-end. In an era where digital evidence is decisive — for prosecutors, regulators and corporate boards — our examiners deliver meticulous, court-defensible findings across mobile, network, cloud and malware-borne incidents.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-01</div><h3 class="text-lg font-medium mb-2">Digital Evidence Collection & Preservation</h3><p class="text-sm text-mute leading-relaxed">Meticulous acquisition from computers, mobiles, cloud and network infrastructure. Integrity-first handling for admissibility.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-02</div><h3 class="text-lg font-medium mb-2">Incident Response Forensics</h3><p class="text-sm text-mute leading-relaxed">Rapid root-cause identification, containment and actionable insight to prevent recurrence — when minutes matter.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-03</div><h3 class="text-lg font-medium mb-2">Data Recovery & Reconstruction</h3><p class="text-sm text-mute leading-relaxed">Restore information lost to accident or tampering. Advanced reconstruction of digital artefacts and timelines.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-04</div><h3 class="text-lg font-medium mb-2">Malware Analysis</h3><p class="text-sm text-mute leading-relaxed">Dissect behaviour, origins and impact. Empower your team to fortify and proactively defend.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-05</div><h3 class="text-lg font-medium mb-2">Mobile Device Forensics</h3><p class="text-sm text-mute leading-relaxed">Targeted extraction from smartphones, tablets and wearables. Court-grade insight from the device in their pocket.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-06</div><h3 class="text-lg font-medium mb-2">Network Forensics</h3><p class="text-sm text-mute leading-relaxed">Trace digital communications, identify breaches and reconstruct events across your infrastructure.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-07</div><h3 class="text-lg font-medium mb-2">Compliance & Chain of Custody</h3><p class="text-sm text-mute leading-relaxed">§ 65B-aligned documentation that survives cross-examination. Audit-grade evidence integrity end-to-end.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DF-08</div><h3 class="text-lg font-medium mb-2">Empowerment Through Knowledge</h3><p class="text-sm text-mute leading-relaxed">Tailored training programmes and workshops to upskill your team in defensible forensic processes.</p></div>
+      </div>
+      <div class="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-mute max-w-2xl">Partner with us in your digital forensic journey. Rely on Cyber Eye Intelligence Inc to unveil the truth, deliver actionable insights and stand by your organisation in the pursuit of justice and security.</p>
+        <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 02 DIGITAL INTELLIGENCE ========== -->
+  <section id="fam-digital-intelligence" class="py-20 border-b border-line scroll-mt-20 bg-surface/30">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Family 02 / 05 ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-4">Digital<br><span class="text-accent">Intelligence.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">Extract actionable insights from vast digital landscapes. Our solutions empower organisations to make informed decisions, uncover hidden patterns and stay one step ahead — where knowledge becomes power in an era of information overload.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-01</div><h3 class="text-lg font-medium mb-2">Open-Source Intelligence (OSINT)</h3><p class="text-sm text-mute leading-relaxed">Navigate online sources to inform threat assessments, due diligence and strategic decision-making with precision.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-02</div><h3 class="text-lg font-medium mb-2">Social Media Intelligence (SOCMINT)</h3><p class="text-sm text-mute leading-relaxed">Monitor sentiment, emerging trends and risk across the social landscape. Comprehensive, listening-grade SOCMINT.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-03</div><h3 class="text-lg font-medium mb-2">Dark Web Monitoring</h3><p class="text-sm text-mute leading-relaxed">Identify risk, monitor illicit activity and protect your digital assets from underground threats proactively.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-04</div><h3 class="text-lg font-medium mb-2">Digital Threat Intelligence</h3><p class="text-sm text-mute leading-relaxed">Timely, actionable intelligence sourced from a wide range of data feeds — to anticipate and mitigate cyber risk.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-05</div><h3 class="text-lg font-medium mb-2">Data Mining & Analysis</h3><p class="text-sm text-mute leading-relaxed">Unlock hidden value in large datasets. Advanced techniques to drive strategic decisions and operational efficiency.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DI-06</div><h3 class="text-lg font-medium mb-2">Predictive Analytics</h3><p class="text-sm text-mute leading-relaxed">Machine learning and statistical modelling to anticipate trends and risks — empowering proactive decisions.</p></div>
+        <div class="card p-6 md:col-span-2 lg:col-span-2"><div class="mono text-accent text-xs mb-8">DI-07</div><h3 class="text-lg font-medium mb-2">Digital Reconnaissance</h3><p class="text-sm text-mute leading-relaxed">Comprehensive understanding of your digital footprint. Uncover exposure with precision; mitigate with confidence.</p></div>
+      </div>
+      <div class="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-mute max-w-2xl">Partner with us in your digital intelligence empowerment journey. From revealing concealed threats to strategic insights, our services elevate your intelligence capabilities in the digital age.</p>
+        <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 03 MANAGED SECURITY ========== -->
+  <section id="fam-managed-security" class="py-20 border-b border-line scroll-mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Family 03 / 05 ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-4">Managed Security<br><span class="text-accent">Services.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">Unparalleled cybersecurity for on-premises, cloud and hybrid infrastructures — integrated with cutting-edge SOC and eXtended Detection &amp; Response (XDR). Fortify your defences, detect and respond proactively, and ensure continuous security monitoring.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-01</div><h3 class="text-lg font-medium mb-2">Comprehensive Managed Security</h3><p class="text-sm text-mute leading-relaxed">End-to-end MSS with integrated SOC and XDR. From assessment to ongoing management — a complete cybersecurity solution.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-02</div><h3 class="text-lg font-medium mb-2">24/7 Security Monitoring & IR</h3><p class="text-sm text-mute leading-relaxed">Round-the-clock surveillance and rapid incident response — minimising impact, reducing response time.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-03</div><h3 class="text-lg font-medium mb-2">Managed Network Security</h3><p class="text-sm text-mute leading-relaxed">Firewall management, intrusion detection and access control. Resilient network defence against evolving threats.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-04</div><h3 class="text-lg font-medium mb-2">Vulnerability Management</h3><p class="text-sm text-mute leading-relaxed">Continuous assessment, penetration testing and proactive patch management for a hardened posture.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-05</div><h3 class="text-lg font-medium mb-2">Endpoint Protection & Response (EDR)</h3><p class="text-sm text-mute leading-relaxed">Advanced endpoint security to detect and respond to malicious activity across every device.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-06</div><h3 class="text-lg font-medium mb-2">Managed SIEM</h3><p class="text-sm text-mute leading-relaxed">Centralise and analyse security data. Real-time correlation for sharper threat detection and response.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-07</div><h3 class="text-lg font-medium mb-2">Advanced Threat Detection</h3><p class="text-sm text-mute leading-relaxed">Machine learning, behavioural analytics and threat-intel feeds — proactive defence against sophisticated threats.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-08</div><h3 class="text-lg font-medium mb-2">IR Planning & Automation</h3><p class="text-sm text-mute leading-relaxed">Robust runbooks and automated response — swift, effective handling of potential incidents.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-09</div><h3 class="text-lg font-medium mb-2">Unified Security Across Environments</h3><p class="text-sm text-mute leading-relaxed">Continuous coverage across on-prem, cloud and hybrid — one unified monitoring approach.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-10</div><h3 class="text-lg font-medium mb-2">XDR Technology Integration</h3><p class="text-sm text-mute leading-relaxed">Unified visibility and control across endpoints, networks and cloud through seamless XDR.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-11</div><h3 class="text-lg font-medium mb-2">Cloud Security Monitoring</h3><p class="text-sm text-mute leading-relaxed">Visibility and control over cloud assets with XDR integration. Robust cloud-native protection.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-12</div><h3 class="text-lg font-medium mb-2">Identity & Access Management (IAM)</h3><p class="text-sm text-mute leading-relaxed">Implement and manage access controls so only authorised users reach sensitive information.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MSS-13</div><h3 class="text-lg font-medium mb-2">User & Entity Behaviour Analytics (UEBA)</h3><p class="text-sm text-mute leading-relaxed">Mitigate insider threats. Detect compromised accounts and abnormal behaviour with precision.</p></div>
+        <div class="card p-6 lg:col-span-2"><div class="mono text-accent text-xs mb-8">MSS-14</div><h3 class="text-lg font-medium mb-2">Compliance Monitoring & Reporting</h3><p class="text-sm text-mute leading-relaxed">Continuous alignment with industry regulations — proactive reporting that reduces legal and regulatory risk.</p></div>
+      </div>
+      <div class="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-mute max-w-2xl">Establish a robust defence, detect threats in real time, and respond to evolving cyber risk on a global scale. Fortify your security posture with the unwavering expertise of Cyber Eye Intelligence Inc.</p>
+        <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 04 MANAGED DIGITAL FORENSIC SERVICES ========== -->
+  <section id="fam-managed-forensics" class="py-20 border-b border-line scroll-mt-20 bg-surface/30">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Family 04 / 05 ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-4">Managed Digital<br>Forensic <span class="text-accent">Services.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">Tailored on-premises managed digital forensic services — strategically crafted to provide dedicated expertise and infrastructure for precise digital investigations within the confines of your own facilities. Unleash localised capability to enhance your cybersecurity posture.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MDF-01</div><h3 class="text-lg font-medium mb-2">Dedicated Localised Expertise</h3><p class="text-sm text-mute leading-relaxed">Embedded examiners working alongside your team for thorough understanding of your environment.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MDF-02</div><h3 class="text-lg font-medium mb-2">Infrastructure for Confidentiality & Control</h3><p class="text-sm text-mute leading-relaxed">On-prem deployment for unparalleled control, confidentiality and regulatory adherence end-to-end.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MDF-03</div><h3 class="text-lg font-medium mb-2">End-to-End Digital Investigations</h3><p class="text-sm text-mute leading-relaxed">Evidence collection, deep analysis, incident response and reporting — a thorough exam of devices, networks and systems.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MDF-04</div><h3 class="text-lg font-medium mb-2">Tailored Training Solutions</h3><p class="text-sm text-mute leading-relaxed">Hands-on training and workshops — arm your team with essential skills for on-prem investigations.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">MDF-05</div><h3 class="text-lg font-medium mb-2">Agile Incident Response</h3><p class="text-sm text-mute leading-relaxed">Specialised rapid-response team for swift, precise action — collaborative containment and actionable insight.</p></div>
+        <div class="card p-6 bg-accent text-ink">
+          <div class="mono text-xs mb-8 opacity-70">→ For you?</div>
+          <h3 class="text-lg font-medium mb-2">Stand up your forensic capability.</h3>
+          <p class="text-sm leading-relaxed opacity-80">A discovery call sets the scope, infrastructure and SLA. We'll tell you if you don't need this.</p>
+        </div>
+      </div>
+      <div class="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-mute max-w-2xl">Choose Cyber Eye Intelligence Inc as your trusted partner for On-Premises Managed Digital Forensic Services. Localised expertise, unparalleled confidentiality and tailor-made solutions — to safeguard your digital future.</p>
+        <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 05 DATA RECOVERY ========== -->
+  <section id="fam-data-recovery" class="py-20 border-b border-line scroll-mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Family 05 / 05 ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-4">Data<br><span class="text-accent">Recovery.</span></h2>
+        </div>
+        <div class="lg:col-span-7 lg:pt-4">
+          <p class="text-lg text-mute leading-relaxed">World-class data recovery to protect your critical information. Cutting-edge technology and seasoned engineers retrieve data across physical damage, file corruption and malicious attacks — across all major brands and formats.</p>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-01</div><h3 class="text-lg font-medium mb-2">Hard Drive Recovery</h3><p class="text-sm text-mute leading-relaxed">HDD, SSD and complex RAID arrays — recovery from spindle failures, damaged heads and electronic malfunction.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-02</div><h3 class="text-lg font-medium mb-2">File System & Database Recovery</h3><p class="text-sm text-mute leading-relaxed">NTFS, FAT, HFS+, Ext3/4 — plus SQL and Oracle database recoveries from corrupted or damaged stores.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-03</div><h3 class="text-lg font-medium mb-2">Removable Media Recovery</h3><p class="text-sm text-mute leading-relaxed">USB drives, memory cards and external HDDs — physical damage, corruption and accidental format.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-04</div><h3 class="text-lg font-medium mb-2">Ransomware Data Recovery</h3><p class="text-sm text-mute leading-relaxed">Decryption and file restoration after cyberattack — paired with incident response and prevention guidance.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-05</div><h3 class="text-lg font-medium mb-2">Mobile Device Recovery</h3><p class="text-sm text-mute leading-relaxed">iOS and Android — recover contacts, photos, messages and app data from damage, crashes and corruption.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">DR-06</div><h3 class="text-lg font-medium mb-2">Forensic Recovery Services</h3><p class="text-sm text-mute leading-relaxed">Chain-of-custody-compliant recovery for litigation, audit and compliance — evidence integrity preserved.</p></div>
+      </div>
+      <div class="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+        <p class="text-mute max-w-2xl">Partner with us — for businesses, IT service providers and resellers. Access state-of-the-art recovery technology, expert engineering and a dedicated team ready to help your clients in critical data-loss scenarios.</p>
+        <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENGAGEMENT FLOW -->
+  <section class="py-24 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <h2 class="display text-5xl mb-12">How an engagement <span class="text-accent">works.</span></h2>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">01</div><h4 class="text-xl font-medium mb-2">Intake</h4><p class="text-sm text-mute leading-relaxed">Free 30-min triage call. NDA, scope, custody handoff plan.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">02</div><h4 class="text-xl font-medium mb-2">Acquire</h4><p class="text-sm text-mute leading-relaxed">Evidence preserved with chain of custody, twin-witnessed.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">03</div><h4 class="text-xl font-medium mb-2">Examine</h4><p class="text-sm text-mute leading-relaxed">Lab analysis with twin-examiner review and sign-off.</p></div>
+        <div class="card p-6"><div class="mono text-accent text-xs mb-8">04</div><h4 class="text-xl font-medium mb-2">Report</h4><p class="text-sm text-mute leading-relaxed">Court-ready report. Expert testimony. Defensible exhibits.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== SERVICE DETAIL ==================== -->
+<div id="page-service-mobile" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / Services / <span class="text-white">Mobile Forensics</span></div>
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7">
+          <div class="label mb-4">[ Service · 01 / 07 ]</div>
+          <h1 class="display text-6xl lg:text-7xl mb-6">Mobile<br>Forensic<br><span class="text-accent">Services.</span></h1>
+          <p class="text-lg text-mute max-w-xl mb-8 leading-relaxed">Acquisition, recovery and analysis of evidence from iOS, Android and feature phones — including locked, encrypted and physically damaged devices.</p>
+          <div class="flex flex-wrap gap-3">
+            <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Open a case →</a>
+            <a class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex">↓ Sample report (PDF)</a>
+          </div>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="card p-6">
+            <div class="label mb-4">[ On this page ]</div>
+            <ol class="space-y-3 text-sm">
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">01</span> What is mobile forensics?</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">02</span> Data we can recover</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">03</span> Devices supported</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">04</span> Methodology & chain of custody</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">05</span> Sample deliverables</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">06</span> Pricing & turnaround</li>
+              <li class="flex gap-3"><span class="mono text-accent text-xs w-6">07</span> FAQ</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-3 lg:pt-2"><div class="label">01 — Definition</div></div>
+        <div class="lg:col-span-9">
+          <h2 class="display text-4xl mb-6">What is mobile <span class="text-accent">forensics?</span></h2>
+          <p class="text-xl leading-relaxed text-mute max-w-3xl">Mobile forensics is the science of extracting, preserving and analysing data from mobile devices in a manner that is legally defensible. It covers active, deleted, encrypted and cloud-synced artefacts — and it requires equipment, training and process that off-the-shelf data-recovery tools cannot match.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-3 lg:pt-2"><div class="label">02 — Recoverable</div></div>
+        <div class="lg:col-span-9">
+          <h2 class="display text-4xl mb-8">What we can <span class="text-accent">recover.</span></h2>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Deleted SMS & MMS</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">WhatsApp / Signal / Telegram</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Call logs & contacts</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Photos, videos & EXIF</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">GPS history & geofencing</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">App data (Insta, Tinder…)</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Browser history & cookies</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Cloud sync artefacts</span><span class="text-accent">✓</span></div>
+            <div class="card p-5 flex items-center justify-between"><span class="text-sm">Cryptocurrency wallets</span><span class="text-accent">✓</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-3 lg:pt-2"><div class="label">03 — Devices</div></div>
+        <div class="lg:col-span-9">
+          <h2 class="display text-4xl mb-8">Devices we <span class="text-accent">support.</span></h2>
+          <div class="flex flex-wrap gap-2">
+            <span class="pill">iPhone (all gens)</span>
+            <span class="pill">iPad</span>
+            <span class="pill">Samsung</span>
+            <span class="pill">Google Pixel</span>
+            <span class="pill">OnePlus</span>
+            <span class="pill">Xiaomi / Redmi</span>
+            <span class="pill">Feature phones</span>
+            <span class="pill">Locked devices</span>
+            <span class="pill">Damaged (chip-off)</span>
+            <span class="pill">SIM cards</span>
+            <span class="pill">Wearables · Apple Watch</span>
+            <span class="pill">Wear OS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-3 lg:pt-2"><div class="label">04 — Methodology</div></div>
+        <div class="lg:col-span-9">
+          <h2 class="display text-4xl mb-8">Methodology & <span class="text-accent">chain of custody.</span></h2>
+          <div class="grid md:grid-cols-4 gap-4">
+            <div class="card p-6"><div class="mono text-accent text-xs mb-8">Step 01</div><h4 class="text-xl mb-2">Seize</h4><p class="text-sm text-mute">Faraday-bagged, hash-sealed, dual-signed.</p></div>
+            <div class="card p-6"><div class="mono text-accent text-xs mb-8">Step 02</div><h4 class="text-xl mb-2">Image</h4><p class="text-sm text-mute">Bit-by-bit, write-blocked, SHA-256.</p></div>
+            <div class="card p-6"><div class="mono text-accent text-xs mb-8">Step 03</div><h4 class="text-xl mb-2">Examine</h4><p class="text-sm text-mute">Twin-examiner review, signed worklog.</p></div>
+            <div class="card p-6"><div class="mono text-accent text-xs mb-8">Step 04</div><h4 class="text-xl mb-2">Report</h4><p class="text-sm text-mute">Findings, exhibits, expert testimony.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="card relative overflow-hidden p-12 lg:p-16 text-center">
+        <div class="absolute inset-0 ph-grid opacity-40"></div>
+        <div class="relative">
+          <h2 class="display text-4xl lg:text-5xl mb-6">Got a device? Get a quote <span class="text-accent">in 24 hours.</span></h2>
+          <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex font-medium">Start a case →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== SECTORS HUB ==================== -->
+<div id="page-sectors" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / <span class="text-white">Sectors</span></div>
+      <h1 class="display text-6xl lg:text-7xl mb-8">Built for<br>adversarial<br><span class="text-accent">environments.</span></h1>
+      <p class="text-lg text-mute max-w-2xl">Whoever's on the other side — defence counsel, a hostile insider, a state-backed actor — the evidence has to hold. Our practices are organised by who we report to, not what tools we run.</p>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-8">
+          <div class="mono text-xs text-accent mb-12">S/01</div>
+          <h3 class="display text-3xl mb-3">Law Enforcement & Police</h3>
+          <p class="text-mute leading-relaxed mb-6">Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, training.</p>
+          <div class="mono text-sm text-accent">Open sector →</div>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-8">
+          <div class="mono text-xs text-accent mb-12">S/02</div>
+          <h3 class="display text-3xl mb-3">Legal & Litigation</h3>
+          <p class="text-mute leading-relaxed mb-6">eDiscovery, § 65B certification, expert witness, hostile cross-prep.</p>
+          <div class="mono text-sm text-accent">Open sector →</div>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-8">
+          <div class="mono text-xs text-accent mb-12">S/03</div>
+          <h3 class="display text-3xl mb-3">Corporate Enterprise</h3>
+          <p class="text-mute leading-relaxed mb-6">Internal investigations, IP theft, misconduct, exit forensics.</p>
+          <div class="mono text-sm text-accent">Open sector →</div>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-8">
+          <div class="mono text-xs text-accent mb-12">S/04</div>
+          <h3 class="display text-3xl mb-3">Government Agencies</h3>
+          <p class="text-mute leading-relaxed mb-6">CERT-In aligned, classified handling, audit-ready procedures.</p>
+          <div class="mono text-sm text-accent">Open sector →</div>
+        </a>
+        <a href="#sector-detail" data-route="sector-detail" class="card card-hover p-8">
+          <div class="mono text-xs text-accent mb-12">S/05</div>
+          <h3 class="display text-3xl mb-3">BFSI & Insurance</h3>
+          <p class="text-mute leading-relaxed mb-6">Wire fraud, claims, AML, KYC investigations. UPI / payments fraud.</p>
+          <div class="mono text-sm text-accent">Open sector →</div>
+        </a>
+        <a href="#contact" data-route="contact" class="card card-hover p-8 bg-accent text-ink hover:bg-accent">
+          <div class="mono text-xs mb-12 opacity-70">→ For you?</div>
+          <h3 class="display text-3xl mb-3">Talk to an examiner.</h3>
+          <p class="leading-relaxed mb-6 opacity-80">Healthcare, education, media, manufacturing — we support adversarial casework across sectors.</p>
+          <div class="mono text-sm font-medium">Contact us →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Case Files callout — surfaces the Knowledge Centre case-files tab -->
+  <section class="pb-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <a href="#knowledge" data-route="knowledge" data-tab="cases" class="card card-hover relative overflow-hidden grid md:grid-cols-12 group">
+        <div class="absolute inset-0 ph-grid opacity-30 pointer-events-none"></div>
+        <div class="relative md:col-span-7 p-8 lg:p-12">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="hex"></span>
+            <span class="label">[ Case Files · Redacted ]</span>
+          </div>
+          <h3 class="display text-4xl lg:text-5xl mb-4">Proof of method.<br><span class="text-accent">Filter by sector.</span></h3>
+          <p class="text-mute leading-relaxed max-w-md mb-8">Redacted casework across every sector — admissibility outcomes, methodology notes, exhibits. Find precedent like yours.</p>
+          <span class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex font-medium">Browse case files →</span>
+        </div>
+        <div class="relative md:col-span-5 border-t md:border-t-0 md:border-l border-line p-8 lg:p-12 flex flex-col justify-between gap-8">
+          <div class="grid grid-cols-2 gap-x-6 gap-y-5">
+            <div>
+              <div class="display text-3xl num">120<span class="text-accent">+</span></div>
+              <div class="label mt-1.5">Redacted files</div>
+            </div>
+            <div>
+              <div class="display text-3xl num">06</div>
+              <div class="label mt-1.5">Sectors covered</div>
+            </div>
+            <div>
+              <div class="display text-3xl num">98<span class="text-accent">%</span></div>
+              <div class="label mt-1.5">Admissibility</div>
+            </div>
+            <div>
+              <div class="display text-3xl num">11<span class="text-accent">y</span></div>
+              <div class="label mt-1.5">Of precedent</div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="pill">Law Enforcement</span>
+            <span class="pill">Legal</span>
+            <span class="pill">Corporate</span>
+            <span class="pill">Gov</span>
+            <span class="pill">BFSI</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== KNOWLEDGE CENTRE ==================== -->
+<div id="page-knowledge" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / <span class="text-white">Knowledge Centre</span></div>
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-10">
+        <h1 class="display text-6xl lg:text-7xl">Knowledge<br><span class="text-accent">Centre.</span></h1>
+        <p class="text-lg text-mute max-w-md">Casework, field notes, deep references and the occasional opinion — published by working examiners between acquisitions.</p>
+      </div>
+      <!-- Sub-tab nav -->
+      <div class="flex flex-wrap gap-2" id="kc-tabs">
+        <button type="button" class="pill pill-on" data-kc-tab="cases">Case Files</button>
+        <button type="button" class="pill" data-kc-tab="insights">Insights</button>
+        <button type="button" class="pill" data-kc-tab="whitepapers">White Papers</button>
+        <button type="button" class="pill" data-kc-tab="blogs">Blogs</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: CASE FILES ============ -->
+  <section class="kc-panel py-16" data-kc-panel="cases">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex flex-wrap items-end justify-between gap-6 mb-8">
+        <div>
+          <div class="label mb-3">[ Case Files · Redacted ]</div>
+          <h2 class="display text-4xl">Filter by <span class="text-accent">sector.</span></h2>
+        </div>
+        <div class="text-sm text-mute"><span id="cf-count" class="text-white num">6</span> of <span class="num">6</span> files</div>
+      </div>
+
+      <!-- Sector filter -->
+      <div class="flex flex-wrap gap-2 mb-10" id="cf-filter">
+        <button type="button" class="pill pill-on" data-sector="all">All sectors</button>
+        <button type="button" class="pill" data-sector="law-enforcement">Law Enforcement</button>
+        <button type="button" class="pill" data-sector="legal">Legal & Litigation</button>
+        <button type="button" class="pill" data-sector="corporate">Corporate</button>
+        <button type="button" class="pill" data-sector="government">Government</button>
+        <button type="button" class="pill" data-sector="bfsi">BFSI & Insurance</button>
+        <button type="button" class="pill" data-sector="healthcare">Healthcare</button>
+        <button type="button" class="pill" data-sector="ngo">NGO</button>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="cf-grid">
+        <a href="#case-file" data-route="case-file" data-sector="corporate" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · IP theft"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2025/014</span><span>·</span><span>Corporate · Mobile</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.</h3>
+          <p class="text-sm text-mute mt-2">2.4 TB examined · § 65B admitted · Mumbai sessions.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="bfsi" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · BEC fraud"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2025/008</span><span>·</span><span>BFSI · Email</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Traced ₹4.6 cr BEC fraud across 3 jurisdictions in 11 days.</h3>
+          <p class="text-sm text-mute mt-2">Attribution to Lagos-based ring · funds frozen.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="corporate" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · insider"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2025/003</span><span>·</span><span>Corporate · Insider</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Identified data exfiltration through personal cloud — termination upheld.</h3>
+          <p class="text-sm text-mute mt-2">17 USB events · 2 SaaS exports · labour tribunal accepted.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="corporate" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · ransomware"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2024/097</span><span>·</span><span>Corporate · Malware</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Mapped ransomware dwell time — 41 days. Insurer paid out under coverage.</h3>
+          <p class="text-sm text-mute mt-2">Conti-affiliated · attribution upheld in arbitration.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="legal" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · custody"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2024/082</span><span>·</span><span>Legal · Mobile</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Reconstructed 6-week location timeline in a contested custody matter.</h3>
+          <p class="text-sm text-mute mt-2">Geofencing · cell-site verification · family court accepted.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="ngo" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · m365"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2024/061</span><span>·</span><span>NGO · Cloud</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Reversed unauthorised mailbox rules — donor data breach contained in 36 h.</h3>
+          <p class="text-sm text-mute mt-2">M365 audit log · attribution to compromised contractor.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="law-enforcement" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · narcotics ring"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2024/048</span><span>·</span><span>Law Enforcement · Mobile</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Cell-site triangulation closed a 9-suspect narcotics syndicate.</h3>
+          <p class="text-sm text-mute mt-2">23 devices imaged · 4 burner phones decrypted.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="government" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · ministry leak"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2024/032</span><span>·</span><span>Government · Insider</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Traced a ministry document leak to a single endpoint in 9 days.</h3>
+          <p class="text-sm text-mute mt-2">USB telemetry · classified handling · auditor accepted.</p>
+        </a>
+        <a href="#case-file" data-route="case-file" data-sector="healthcare" class="cf-card group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="case · hospital"></div>
+          <div class="flex items-center gap-3 label mb-3"><span class="text-accent">CE/2023/118</span><span>·</span><span>Healthcare · Malware</span></div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Contained a hospital ransomware attack — restored ICU systems in 18 hours.</h3>
+          <p class="text-sm text-mute mt-2">No patient data lost · CERT-In incident filing closed.</p>
+        </a>
+      </div>
+      <div id="cf-empty" class="hidden text-center py-16 text-mute">
+        <div class="display text-3xl mb-2">No matching cases.</div>
+        <p class="text-sm">Try a different sector — or contact us about a precedent like yours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: INSIGHTS ============ -->
+  <section class="kc-panel py-16 hidden" data-kc-panel="insights">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <a class="card card-hover overflow-hidden grid md:grid-cols-2 mb-12">
+        <div class="ph aspect-[5/4] md:aspect-auto" data-label="featured · ios 18"></div>
+        <div class="p-10 flex flex-col justify-center">
+          <div class="label mb-4">[ Featured · Tutorial · 6 min ]</div>
+          <h2 class="display text-3xl lg:text-4xl mb-6">Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes.</h2>
+          <p class="text-mute leading-relaxed mb-6">Apple's File System tweaks in iOS 18 quietly shifted what we can carve from unallocated space. Here's what still works, what doesn't, and the workflows we've replaced.</p>
+          <div class="mono text-sm text-accent">Read article →</div>
+        </div>
+      </a>
+      <div class="grid md:grid-cols-3 gap-8">
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Field notes · 8 min · Apr 14</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">BEC fraud: a five-step header forensics workflow for in-house counsel.</h3>
+        </a>
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Reference · 11 min · Mar 30</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Cloud forensics in M365: which logs actually survive a 90-day retention window?</h3>
+        </a>
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Opinion · 4 min · Mar 22</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Why "AI-powered forensics" is mostly marketing — and the two places it isn't.</h3>
+        </a>
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Tutorial · 9 min · Mar 10</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Carving Signal sealed-sender artefacts from Android 14 user data.</h3>
+        </a>
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Case law · 5 min · Feb 28</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">SC ruling on § 65B: what it changes for digital evidence in 2026.</h3>
+        </a>
+        <a class="group">
+          <div class="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label="article"></div>
+          <div class="label mb-2">Tool review · 7 min · Feb 20</div>
+          <h3 class="text-xl leading-snug group-hover:text-accent transition">Magnet AXIOM 8.3 — the iOS module that finally got chat reconstruction right.</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: WHITE PAPERS ============ -->
+  <section class="kc-panel py-16 hidden" data-kc-panel="whitepapers">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid md:grid-cols-2 gap-6">
+        <a class="card card-hover p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="label">[ White Paper · 28 pp ]</div>
+            <span class="hex"></span>
+          </div>
+          <h3 class="display text-2xl mb-3">§ 65B Certification in 2026 — a Practitioner's Reference</h3>
+          <p class="text-mute leading-relaxed mb-6">Drafting templates, judicial trends and worked examples. Co-authored with a sitting metropolitan magistrate.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>PDF · 4.2 MB · May 2026</span>
+            <span class="text-accent">Download →</span>
+          </div>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="label">[ White Paper · 34 pp ]</div>
+            <span class="hex"></span>
+          </div>
+          <h3 class="display text-2xl mb-3">The Ransomware Negotiation Playbook for Indian Enterprises</h3>
+          <p class="text-mute leading-relaxed mb-6">A defensible response framework. Includes CERT-In incident-filing checklist and insurer notification templates.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>PDF · 5.6 MB · Mar 2026</span>
+            <span class="text-accent">Download →</span>
+          </div>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="label">[ White Paper · 22 pp ]</div>
+            <span class="hex"></span>
+          </div>
+          <h3 class="display text-2xl mb-3">Cloud Forensics in M365: The 90-Day Retention Problem</h3>
+          <p class="text-mute leading-relaxed mb-6">A reference of which logs survive, which die, and how to commission preservation orders that hold up.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>PDF · 3.1 MB · Feb 2026</span>
+            <span class="text-accent">Download →</span>
+          </div>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div class="label">[ White Paper · 41 pp ]</div>
+            <span class="hex"></span>
+          </div>
+          <h3 class="display text-2xl mb-3">Mobile Triage Standard Operating Procedure</h3>
+          <p class="text-mute leading-relaxed mb-6">Field-tested seizure, preservation and triage protocol — co-developed with two state cyber cells.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>PDF · 6.8 MB · Dec 2025</span>
+            <span class="text-accent">Download →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB: BLOGS ============ -->
+  <section class="kc-panel py-16 hidden" data-kc-panel="blogs">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid md:grid-cols-2 gap-6">
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 3 min · May 14, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">A week in the lab: 6 ransomware acquisitions, 1 chip-off, 0 sleep.</h3>
+          <p class="text-mute leading-relaxed">Five days, three time zones, one resigned senior examiner. Notes from the trenches of incident-response week.</p>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 5 min · May 02, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">Why we still keep a paper logbook — and you should too.</h3>
+          <p class="text-mute leading-relaxed">Defensible documentation is older than your SIEM. A short essay on analogue habits that survive cross-examination.</p>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 4 min · Apr 19, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">The first 30 minutes of a phishing-led BEC incident.</h3>
+          <p class="text-mute leading-relaxed">A short runbook. Print it. Pin it to the wall. Hope you never need it.</p>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 6 min · Apr 03, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">On hiring forensic examiners: the three traits we screen for.</h3>
+          <p class="text-mute leading-relaxed">Patience, paranoia, paper-trail discipline. A note on the people who outlast the tooling.</p>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 4 min · Mar 21, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">When NOT to image a device — three real situations.</h3>
+          <p class="text-mute leading-relaxed">Sometimes the right answer is to walk away and call counsel. Three cases from the past year.</p>
+        </a>
+        <a class="card card-hover p-8">
+          <div class="label mb-4">[ Blog · 7 min · Mar 08, 2026 ]</div>
+          <h3 class="display text-2xl mb-3">Reading the room: cross-examining the cross-examiner.</h3>
+          <p class="text-mute leading-relaxed">Field notes on what hostile counsel looks like before they open their mouth — and how to prepare.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== CASE FILE DETAIL ==================== -->
+<div id="page-case-file" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / Case Files / <span class="text-white">CE/2025/014</span></div>
+      <div class="flex flex-wrap gap-2 mb-6">
+        <span class="pill pill-on">Mobile Forensics</span>
+        <span class="pill">Corporate · IP Theft</span>
+        <span class="pill">Mumbai · 2025</span>
+      </div>
+      <h1 class="display text-5xl lg:text-7xl mb-8 max-w-4xl">"Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months."</h1>
+      <p class="text-lg text-mute max-w-3xl leading-relaxed">A senior R&D engineer at a listed manufacturer was suspected of exfiltrating proprietary firmware blueprints. The device had been wiped before seizure; the suspect denied possessing any IP at the time of resignation.</p>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="card p-6"><div class="display text-3xl num">2.4 <span class="text-accent text-base">TB</span></div><div class="label mt-1">Data examined</div></div>
+        <div class="card p-6"><div class="display text-3xl num">14</div><div class="label mt-1">Deleted artefacts</div></div>
+        <div class="card p-6"><div class="display text-3xl num">3</div><div class="label mt-1">Devices imaged</div></div>
+        <div class="card p-6"><div class="display text-3xl num">9 <span class="text-accent text-base">mo</span></div><div class="label mt-1">To conviction</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-t border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-12">
+        <div class="lg:col-span-8 space-y-12">
+          <div>
+            <div class="label mb-3">01 — Brief</div>
+            <h2 class="display text-3xl mb-4">The brief.</h2>
+            <p class="text-mute leading-relaxed">Counsel briefed us at 22:00 hrs on a Friday. The suspect was due to fly out 48 hours later. We dispatched a triage analyst overnight to the client's Andheri office to image three devices: a corporate iPhone 14 Pro, a personal Samsung S23, and a MacBook Air.</p>
+          </div>
+          <div>
+            <div class="label mb-3">02 — Approach</div>
+            <h2 class="display text-3xl mb-4">What we did.</h2>
+            <p class="text-mute leading-relaxed mb-4">Chip-off was unnecessary — the iPhone had been factory-reset, not destroyed, leaving unallocated APFS regions intact. We imaged with Cellebrite UFED, parsed in Magnet AXIOM, then ran custom SQLite carving against the iMessage and WhatsApp shards.</p>
+            <p class="text-mute leading-relaxed">The Samsung yielded a partial Signal SQLite remnant. We cross-referenced timestamps against the suspect's iCloud backups (court-ordered) and built a 6-week communication timeline.</p>
+          </div>
+          <div>
+            <div class="label mb-3">03 — Outcome</div>
+            <h2 class="display text-3xl mb-4">The outcome.</h2>
+            <p class="text-mute leading-relaxed">14 deleted WhatsApp chats recovered, two of which contained CAD attachments matching the client's protected designs. The Mumbai sessions court admitted the § 65B certificate without dilution. Conviction in nine months. Suspect served 14 months.</p>
+          </div>
+        </div>
+        <div class="lg:col-span-4">
+          <div class="card p-6 sticky top-24">
+            <div class="label mb-4">[ Engagement details ]</div>
+            <dl class="space-y-4 text-sm">
+              <div><dt class="label">Sector</dt><dd>Listed manufacturing</dd></div>
+              <div><dt class="label">Jurisdiction</dt><dd>Mumbai Sessions Court</dd></div>
+              <div><dt class="label">Practice</dt><dd>Mobile + Cloud Forensics</dd></div>
+              <div><dt class="label">Duration</dt><dd>6 weeks lab · 9 months total</dd></div>
+              <div><dt class="label">Lead examiner</dt><dd>P. Ranganathan, EnCE</dd></div>
+              <div><dt class="label">Tools</dt><dd>Cellebrite UFED · Magnet AXIOM · custom SQLite carver</dd></div>
+            </dl>
+            <a href="#contact" data-route="contact" class="btn-primary mono text-xs uppercase tracking-wider px-5 py-3 rounded-control inline-flex mt-6 font-medium">Open a similar case →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== TRAINING ==================== -->
+<div id="page-training" class="page">
+  <section class="py-20 border-b border-line relative overflow-hidden">
+    <div class="absolute inset-0 ph-grid opacity-40"></div>
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 relative">
+      <div class="label mb-6">Home / <span class="text-white">Cyber Eye Academy</span></div>
+      <div class="grid lg:grid-cols-12 gap-10 items-end">
+        <div class="lg:col-span-7">
+          <h1 class="display text-6xl lg:text-7xl mb-6">Cyber Eye<br><span class="text-accent">Academy.</span></h1>
+          <p class="text-lg text-mute leading-relaxed max-w-xl">Hands-on forensic training for police, prosecutors, in-house counsel and corporate security teams. Taught by working examiners — every cohort runs alongside live casework.</p>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="card p-5"><div class="display text-3xl num">14</div><div class="label mt-1">Courses</div></div>
+            <div class="card p-5"><div class="display text-3xl num">2,400<span class="text-accent text-base">+</span></div><div class="label mt-1">Officers trained</div></div>
+            <div class="card p-5"><div class="display text-3xl num">4.9<span class="text-accent text-base">/5</span></div><div class="label mt-1">Avg rating</div></div>
+            <div class="card p-5"><div class="display text-3xl num">12<span class="text-accent text-base"> mo</span></div><div class="label mt-1">CPE valid</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex flex-wrap gap-2 mb-10">
+        <span class="pill pill-on">All courses</span>
+        <span class="pill">For Police</span>
+        <span class="pill">For Counsel</span>
+        <span class="pill">For Corporate</span>
+        <span class="pill">Beginner</span>
+        <span class="pill">Advanced</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill pill-on">For Police</span>
+            <span class="mono text-xs text-accent">CE-101</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">Mobile Triage for First Responders</h3>
+          <p class="text-sm text-mute mb-6">How to safely seize, document and preserve a mobile device under field conditions.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>2 days · in-person</span>
+            <span class="text-accent">₹18,000</span>
+          </div>
+        </div>
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill">For Counsel</span>
+            <span class="mono text-xs text-accent">CE-204</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">Cross-Examining a Forensic Expert</h3>
+          <p class="text-sm text-mute mb-6">A litigator's playbook — what to ask, what to challenge, what concedes the case.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>1 day · hybrid</span>
+            <span class="text-accent">₹14,000</span>
+          </div>
+        </div>
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill">For Corporate</span>
+            <span class="mono text-xs text-accent">CE-307</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">Insider Threat Hunting</h3>
+          <p class="text-sm text-mute mb-6">Detection, evidence collection and legal handoff for in-house security teams.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>3 days · online</span>
+            <span class="text-accent">₹32,000</span>
+          </div>
+        </div>
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill pill-on">For Police</span>
+            <span class="mono text-xs text-accent">CE-115</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">Cell-Site Analysis Foundations</h3>
+          <p class="text-sm text-mute mb-6">Reading CDRs, mapping tower geometry, building a defensible movement timeline.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>2 days · in-person</span>
+            <span class="text-accent">₹22,000</span>
+          </div>
+        </div>
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill">For Counsel</span>
+            <span class="mono text-xs text-accent">CE-211</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">§ 65B in Practice</h3>
+          <p class="text-sm text-mute mb-6">Drafting, challenging and defending § 65B certificates under current case law.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>1 day · hybrid</span>
+            <span class="text-accent">₹14,000</span>
+          </div>
+        </div>
+        <div class="card card-hover p-6">
+          <div class="flex items-center justify-between mb-6">
+            <span class="pill">For Corporate</span>
+            <span class="mono text-xs text-accent">CE-314</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-2">Ransomware Tabletop</h3>
+          <p class="text-sm text-mute mb-6">Live-fire exercise for boards and incident teams. Realistic scenarios, hot debrief.</p>
+          <div class="flex items-center justify-between text-xs label">
+            <span>1 day · in-person</span>
+            <span class="text-accent">₹48,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== ABOUT ==================== -->
+<div id="page-about" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / <span class="text-white">About</span></div>
+      <h1 class="display text-6xl lg:text-7xl mb-10 max-w-4xl">We find what others<br>miss — and prove it <span class="text-accent">in court.</span></h1>
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7 space-y-6 text-lg text-mute leading-relaxed">
+          <p>Cyber Eye Intelligence was founded in 2018 by three forensic examiners who had spent a decade between police labs, Big Four practices and contested courtrooms. Each had walked out of an engagement where good evidence was undone by sloppy custody, or a case lost on a technicality that an extra hour of imaging would have prevented.</p>
+          <p>We started Cyber Eye to do the work the way it should be done — slowly when it matters, fast when lives are on the line, and always documented to a standard that survives the most hostile cross-examination.</p>
+          <p>Today we run a fully accredited lab out of Mumbai with satellite operations in Bengaluru and Delhi. Every engagement is led by a named examiner. No sales filter, no account managers, no "we'll loop in the team".</p>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="card ph aspect-[4/5]" data-label="founders · lab interior"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="card p-6"><div class="display text-4xl num">2018</div><div class="label mt-2">Founded</div></div>
+        <div class="card p-6"><div class="display text-4xl num">600<span class="text-accent">+</span></div><div class="label mt-2">Cases handled</div></div>
+        <div class="card p-6"><div class="display text-4xl num">2,400<span class="text-accent">+</span></div><div class="label mt-2">Officers trained</div></div>
+        <div class="card p-6"><div class="display text-4xl num">12</div><div class="label mt-2">Certified examiners</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">[ How we operate ]</div>
+      <h2 class="display text-5xl mb-12">Three rules.</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="card p-8">
+          <div class="hex mb-8"></div>
+          <h3 class="display text-2xl mb-3">Court-first methodology.</h3>
+          <p class="text-mute leading-relaxed">Every step documented. Every artefact hashed. Every report defensible — even when nothing ever reaches a courtroom.</p>
+        </div>
+        <div class="card p-8">
+          <div class="hex mb-8"></div>
+          <h3 class="display text-2xl mb-3">Examiner-led, never sold.</h3>
+          <p class="text-mute leading-relaxed">You speak to the analyst handling your case. Quotes are scoped by examiners, not commercial leads.</p>
+        </div>
+        <div class="card p-8">
+          <div class="hex mb-8"></div>
+          <h3 class="display text-2xl mb-3">Discretion by default.</h3>
+          <p class="text-mute leading-relaxed">NDAs at intake, encrypted transit, sealed handling for sensitive matters. Some clients we'll never name.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ Why choose us? ]</div>
+          <h2 class="display text-5xl mb-6">Six reasons<br>clients <span class="text-accent">return.</span></h2>
+          <p class="text-mute leading-relaxed">No two engagements are alike. What clients tell us — across police, prosecutors, in-house counsel and CISOs — is that they came back for one or more of these reasons.</p>
+        </div>
+        <div class="lg:col-span-7">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">01</div></div>
+              <h3 class="text-lg font-medium mb-2">Court-defensible by default</h3>
+              <p class="text-sm text-mute leading-relaxed">98% admissibility rate. Every report drafted to § 65B, twin-examined, hash-verified end-to-end. Built to survive the toughest cross-examination.</p>
+            </div>
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">02</div></div>
+              <h3 class="text-lg font-medium mb-2">Examiner-led, never sold</h3>
+              <p class="text-sm text-mute leading-relaxed">Your first call is with the analyst who will handle your case. No account managers, no commercial gatekeeping, no warm-body BD.</p>
+            </div>
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">03</div></div>
+              <h3 class="text-lg font-medium mb-2">24/7 incident response</h3>
+              <p class="text-sm text-mute leading-relaxed">Triage analyst on the phone within 30 minutes. On-site team within 4 hours in Tier 1 cities, 12 hours elsewhere in India.</p>
+            </div>
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">04</div></div>
+              <h3 class="text-lg font-medium mb-2">Cross-sector range</h3>
+              <p class="text-sm text-mute leading-relaxed">Five practice families. Police, legal, corporate, government, BFSI, healthcare, NGO. Pattern recognition across thousands of artefacts.</p>
+            </div>
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">05</div></div>
+              <h3 class="text-lg font-medium mb-2">Discretion at the core</h3>
+              <p class="text-sm text-mute leading-relaxed">NDAs at intake. Encrypted transit. Tamper-evident seals. Sealed handling for sensitive matters. Some clients we will never name.</p>
+            </div>
+            <div class="card p-6">
+              <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">06</div></div>
+              <h3 class="text-lg font-medium mb-2">In-house tooling</h3>
+              <p class="text-sm text-mute leading-relaxed">We don't just run Cellebrite and AXIOM. We've shipped our own SQLite carvers, log-correlators and chain-of-custody systems — used in 200+ cases.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">[ Accreditations ]</div>
+      <h2 class="display text-5xl mb-12">Memberships & <span class="text-accent">alignment.</span></h2>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="card p-8 text-center">
+          <div class="ph aspect-square w-20 mx-auto mb-4 rounded-pill" data-label=""></div>
+          <div class="font-medium">ISO 17025 aligned</div>
+          <div class="label mt-1">Lab procedures</div>
+        </div>
+        <div class="card p-8 text-center">
+          <div class="ph aspect-square w-20 mx-auto mb-4 rounded-pill" data-label=""></div>
+          <div class="font-medium">CERT-In empanelled</div>
+          <div class="label mt-1">Auditor of Record</div>
+        </div>
+        <div class="card p-8 text-center">
+          <div class="ph aspect-square w-20 mx-auto mb-4 rounded-pill" data-label=""></div>
+          <div class="font-medium">HTCIA member</div>
+          <div class="label mt-1">Since 2019</div>
+        </div>
+        <div class="card p-8 text-center">
+          <div class="ph aspect-square w-20 mx-auto mb-4 rounded-pill" data-label=""></div>
+          <div class="font-medium">IACIS member</div>
+          <div class="label mt-1">CFCE certified</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== CAREERS / HIRING ==================== -->
+<div id="page-careers" class="page" data-screen-label="Careers">
+  <section class="py-20 border-b border-line relative overflow-hidden">
+    <div class="absolute inset-0 ph-grid opacity-30"></div>
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 relative">
+      <div class="label mb-6">Home / About / <span class="text-white">Hiring</span></div>
+      <div class="grid lg:grid-cols-12 gap-10 items-end">
+        <div class="lg:col-span-7">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="hex"></span>
+            <span class="label">[ Open roles · 06 ]</span>
+          </div>
+          <h1 class="display text-6xl lg:text-7xl mb-6">Build the bench<br>that <span class="text-accent">prosecutors trust.</span></h1>
+          <p class="text-lg text-mute leading-relaxed max-w-xl">We hire examiners, not analysts-who-might-get-better. Every offer is preceded by a paid technical exercise on a redacted real artefact. No riddles, no whiteboard theatre.</p>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="card p-5"><div class="display text-3xl num">06</div><div class="label mt-1">Open roles</div></div>
+            <div class="card p-5"><div class="display text-3xl num">12</div><div class="label mt-1">Examiners</div></div>
+            <div class="card p-5"><div class="display text-3xl num">3</div><div class="label mt-1">Cities · IN</div></div>
+            <div class="card p-5"><div class="display text-3xl num">100<span class="text-accent text-base">%</span></div><div class="label mt-1">Examiner-led hiring</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 mb-12">
+        <div class="lg:col-span-5">
+          <div class="label mb-4">[ What you get ]</div>
+          <h2 class="display text-5xl mb-6">Practitioner<br>over <span class="text-accent">process.</span></h2>
+          <p class="text-mute leading-relaxed">We're a flat lab of working examiners. No layered approvals, no commercial gatekeepers between you and the case. Compensation is transparent; promotion is based on casework, not tenure.</p>
+        </div>
+        <div class="lg:col-span-7 grid sm:grid-cols-2 gap-3">
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">P/01</div></div>
+            <h3 class="text-lg font-medium mb-2">Casework from day one</h3>
+            <p class="text-sm text-mute leading-relaxed">First-week shadowing on live engagements. Your name on report cover pages by month three.</p>
+          </div>
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">P/02</div></div>
+            <h3 class="text-lg font-medium mb-2">Tool & cert budget</h3>
+            <p class="text-sm text-mute leading-relaxed">₹2L/yr for CFCE, CCE, SANS, EnCE — your choice. Plus 40 hrs of paid study time per cycle.</p>
+          </div>
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">P/03</div></div>
+            <h3 class="text-lg font-medium mb-2">Publish, teach, testify</h3>
+            <p class="text-sm text-mute leading-relaxed">Academy faculty rotations. Conference travel covered. Court testimony coaching from senior examiners.</p>
+          </div>
+          <div class="card p-6">
+            <div class="flex items-center gap-3 mb-3"><span class="hex"></span><div class="mono text-xs text-accent">P/04</div></div>
+            <h3 class="text-lg font-medium mb-2">Transparent comp</h3>
+            <p class="text-sm text-mute leading-relaxed">Published bands. No negotiation roulette. Bonus tied to lab outcomes, not individual billing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN ROLES -->
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <div class="label mb-4">[ Open roles ]</div>
+          <h2 class="display text-5xl">Currently <span class="text-accent">hiring.</span></h2>
+        </div>
+        <div class="mono text-xs text-mute uppercase tracking-wider">Updated May 2026</div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill pill-on">Mumbai · Full-time</span>
+            <span class="mono text-xs text-accent">R-01</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Senior Mobile Forensics Examiner</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Lead acquisitions on iOS 18 / Android 15, parse encrypted app artefacts, draft § 65B-grade reports and testify in High Court matters.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">Cellebrite · AXIOM</span><span class="pill">5+ yrs</span><span class="pill">₹18–28 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill pill-on">Bengaluru · Full-time</span>
+            <span class="mono text-xs text-accent">R-02</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Incident Response Lead</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Own the 24/7 IR rota. First-responder on ransomware, BEC and intrusion engagements across BFSI and corporate clients.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">DFIR · SIEM</span><span class="pill">7+ yrs</span><span class="pill">₹24–36 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill pill-on">Mumbai · Full-time</span>
+            <span class="mono text-xs text-accent">R-03</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Digital Intelligence Analyst (OSINT)</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Build attribution dossiers from open and deep-web sources. Pivot across infrastructure, identities and crypto wallets.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">OSINT · Maltego</span><span class="pill">3+ yrs</span><span class="pill">₹14–22 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill pill-on">Delhi · Full-time</span>
+            <span class="mono text-xs text-accent">R-04</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Malware Reverse Engineer</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Static + dynamic analysis of native and Android samples. Build YARA, write technical addenda, support attribution work.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">IDA · Ghidra</span><span class="pill">4+ yrs</span><span class="pill">₹20–32 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill">Mumbai · Full-time</span>
+            <span class="mono text-xs text-accent">R-05</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Forensic Tooling Engineer</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">Ship our in-house SQLite carvers, log correlators and chain-of-custody systems. Python + Rust shop.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">Python · Rust</span><span class="pill">3+ yrs</span><span class="pill">₹18–28 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+
+        <a href="#contact" data-route="contact" class="card card-hover p-7">
+          <div class="flex items-start justify-between mb-6">
+            <span class="pill">Mumbai · Apprentice</span>
+            <span class="mono text-xs text-accent">R-06</span>
+          </div>
+          <h3 class="text-2xl font-medium mb-3">Forensic Apprentice (Graduate)</h3>
+          <p class="text-sm text-mute leading-relaxed mb-6">12-month structured rotation across mobile, host and network forensics. Mentored by senior examiners; clear path to junior examiner.</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="pill">B.Tech / B.Sc</span><span class="pill">0–1 yrs</span><span class="pill">₹8–10 LPA</span>
+          </div>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Apply →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="py-16 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10 items-start">
+        <div class="lg:col-span-4">
+          <div class="label mb-4">[ Hiring process ]</div>
+          <h2 class="display text-5xl mb-6">Four steps.<br><span class="text-accent">No theatre.</span></h2>
+          <p class="text-mute leading-relaxed">From first contact to offer in two to three weeks. Every step is examiner-led and time-boxed. We pay for the technical exercise — your time is not a free option.</p>
+        </div>
+        <div class="lg:col-span-8 space-y-3">
+          <div class="card p-6 flex items-start gap-6">
+            <div class="display text-3xl text-accent num shrink-0 w-12">01</div>
+            <div>
+              <h3 class="text-lg font-medium mb-1">Intro call · 30 min</h3>
+              <p class="text-sm text-mute leading-relaxed">A working examiner — not a recruiter — walks through your background and answers your questions.</p>
+            </div>
+          </div>
+          <div class="card p-6 flex items-start gap-6">
+            <div class="display text-3xl text-accent num shrink-0 w-12">02</div>
+            <div>
+              <h3 class="text-lg font-medium mb-1">Paid technical exercise · ~6 hrs</h3>
+              <p class="text-sm text-mute leading-relaxed">A redacted real artefact from a closed case. Write the report you'd submit to the prosecutor. Paid at ₹5,000.</p>
+            </div>
+          </div>
+          <div class="card p-6 flex items-start gap-6">
+            <div class="display text-3xl text-accent num shrink-0 w-12">03</div>
+            <div>
+              <h3 class="text-lg font-medium mb-1">Lab day · half day, on-site</h3>
+              <p class="text-sm text-mute leading-relaxed">Meet the team. Walk the lab. Sit in on a case review. Two short pair-sessions with senior examiners.</p>
+            </div>
+          </div>
+          <div class="card p-6 flex items-start gap-6">
+            <div class="display text-3xl text-accent num shrink-0 w-12">04</div>
+            <div>
+              <h3 class="text-lg font-medium mb-1">Offer · 48 hrs</h3>
+              <p class="text-sm text-mute leading-relaxed">Published-band compensation, no negotiation roulette. Start dates are flexible — we'd rather wait a month than rush onboarding.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-24">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="card relative overflow-hidden">
+        <div class="absolute inset-0 ph-grid opacity-40"></div>
+        <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-accent/20 blur-3xl"></div>
+        <div class="relative p-12 lg:p-20 text-center">
+          <div class="label mb-6">[ Don't see your role? ]</div>
+          <h2 class="display text-5xl lg:text-6xl mb-6 max-w-3xl mx-auto">If you've examined<br>a case <span class="text-accent">we've never seen</span>, we want to hear from you.</h2>
+          <p class="text-mute text-lg max-w-xl mx-auto mb-10">Senior examiners with unusual specialisms — DPRK crypto, ICS forensics, drone telemetry — write directly to the partners.</p>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <a href="#contact" data-route="contact" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Open a conversation →</a>
+            <a href="mailto:careers@cybereye.example" class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">careers@cybereye.example</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== CONTACT ==================== -->
+<div id="page-contact" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / <span class="text-white">Contact</span></div>
+      <h1 class="display text-6xl lg:text-7xl mb-6">Talk to an<br><span class="text-accent">examiner.</span></h1>
+      <p class="text-lg text-mute max-w-xl">No call centres. No bots. Your first call is with a certified forensic examiner. NDA on request.</p>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7">
+          <div class="card p-8 lg:p-10">
+            <h2 class="display text-3xl mb-8">Open a case.</h2>
+            <div class="space-y-5">
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <div class="label mb-2">Your name</div>
+                  <div class="card p-4 text-sm text-mute">Full name</div>
+                </div>
+                <div>
+                  <div class="label mb-2">Organisation</div>
+                  <div class="card p-4 text-sm text-mute">Firm or company</div>
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-5">
+                <div>
+                  <div class="label mb-2">Email</div>
+                  <div class="card p-4 text-sm text-mute">name@firm.com</div>
+                </div>
+                <div>
+                  <div class="label mb-2">Phone</div>
+                  <div class="card p-4 text-sm text-mute">+91 ····· ·····</div>
+                </div>
+              </div>
+              <div>
+                <div class="label mb-2">Practice area</div>
+                <div class="flex flex-wrap gap-2">
+                  <span class="pill pill-on">Mobile</span>
+                  <span class="pill">Cloud</span>
+                  <span class="pill">Insider</span>
+                  <span class="pill">Malware</span>
+                  <span class="pill">Email</span>
+                  <span class="pill">Fraud</span>
+                  <span class="pill">Disk</span>
+                </div>
+              </div>
+              <div>
+                <div class="label mb-2">Tell us about the matter</div>
+                <div class="card p-4 text-sm text-mute h-32">Brief — no privileged details. We'll send an NDA before specifics.</div>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-4 pt-4">
+                <label class="flex items-center gap-2 text-sm text-mute"><span class="w-4 h-4 ring-accent rounded-sm"></span> Send me a sample report (PDF)</label>
+                <a href="#" class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Submit →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lg:col-span-5 space-y-4">
+          <div class="card p-6 ring-accent">
+            <div class="flex items-start justify-between mb-4">
+              <div class="label">[ 24/7 Incident Line ]</div>
+              <span class="relative flex h-2 w-2 mt-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+              </span>
+            </div>
+            <div class="display text-3xl mb-2">+91 80 4567 8910</div>
+            <p class="text-sm text-mute">Active breach? Lost data? Time-sensitive seizure? Call now. Triage analyst on the line within 30 minutes.</p>
+          </div>
+          <div class="card p-6">
+            <div class="label mb-3">Email</div>
+            <div class="text-lg mb-1">cases<span class="text-accent">@</span>cybereye.com</div>
+            <div class="text-sm text-mute mb-4">Encrypted attachments welcome. PGP key on request.</div>
+            <div class="label mb-3 mt-6">Press & media</div>
+            <div class="text-lg">press<span class="text-accent">@</span>cybereye.com</div>
+          </div>
+          <div class="card p-6">
+            <div class="label mb-3">Mumbai (HQ)</div>
+            <p class="text-sm text-mute">Lab 04, Floor 12, Maker Maxity<br>Bandra Kurla Complex<br>Mumbai 400051 · India</p>
+            <div class="label mb-3 mt-6">Satellite labs</div>
+            <p class="text-sm text-mute">Bengaluru · Delhi · Gurugram</p>
+          </div>
+
+          <!-- Google Business -->
+          <a href="https://g.co/kgs/cybereye" target="_blank" rel="noopener" class="card card-hover p-6 block">
+            <div class="flex items-start justify-between mb-3">
+              <div class="label">[ Google Business ]</div>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M19 10c0-.7-.1-1.4-.2-2H10v3.8h5c-.2 1.2-.9 2.2-1.9 2.9v2.4h3.1c1.8-1.7 2.8-4.1 2.8-7.1z" fill="#4285F4"/><path d="M10 19c2.6 0 4.7-.8 6.3-2.3l-3.1-2.4c-.8.6-1.9 1-3.2 1-2.5 0-4.6-1.7-5.3-3.9H1.5v2.5C3.1 16.9 6.3 19 10 19z" fill="#34A853"/><path d="M4.7 11.4c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V5.1H1.5C.5 6.5 0 8.2 0 10s.5 3.5 1.5 4.9l3.2-2.5z" fill="#FBBC05"/><path d="M10 4c1.4 0 2.7.5 3.7 1.4l2.8-2.8C14.7 1 12.6 0 10 0 6.3 0 3.1 2.1 1.5 5.1l3.2 2.5C5.4 5.4 7.5 4 10 4z" fill="#EA4335"/></svg>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="display text-2xl num">4.9</span>
+              <div class="flex items-center gap-0.5" aria-label="4.9 of 5 stars">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+              </div>
+              <span class="text-xs text-mute">· 214 reviews</span>
+            </div>
+            <p class="text-sm text-mute mb-3">Verified on Google · Open now · Lab tours by appointment.</p>
+            <div class="mono text-xs text-accent uppercase tracking-wider">View on Google →</div>
+          </a>
+
+          <!-- Google Map -->
+          <a href="https://maps.app.goo.gl/cybereye-intelligence-mumbai" target="_blank" rel="noopener" class="card overflow-hidden block group">
+            <div class="relative">
+              <iframe
+                title="Cyber Eye Intelligence — Mumbai HQ"
+                src="https://maps.google.com/maps?q=Maker%20Maxity%20BKC%20Mumbai&t=&z=14&ie=UTF8&iwloc=&output=embed&hl=en"
+                width="100%" height="220" style="border:0; filter: grayscale(0.6) contrast(1.05) invert(0.92) hue-rotate(180deg);"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade" aria-hidden="true">
+              </iframe>
+              <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(180deg, transparent 50%, rgba(5,5,5,0.7) 100%);"></div>
+            </div>
+            <div class="p-6 flex items-center justify-between">
+              <div>
+                <div class="label mb-1">[ Map ]</div>
+                <div class="text-sm">Maker Maxity, BKC · Mumbai 400051</div>
+              </div>
+              <div class="mono text-xs text-accent uppercase tracking-wider">Directions →</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== SECTOR DETAIL ==================== -->
+<div id="page-sector-detail" class="page">
+  <section class="py-20 border-b border-line">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">Home / Sectors / <span class="text-white">Law Enforcement & Police</span></div>
+      <div class="grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-7">
+          <div class="label mb-4">[ Sector · S/01 ]</div>
+          <h1 class="display text-6xl lg:text-7xl mb-6">Built for<br>cyber cells<br>and <span class="text-accent">SITs.</span></h1>
+          <p class="text-lg text-mute max-w-xl mb-8 leading-relaxed">Backlog clearance, mobile triage, training and lab partnerships for police forces — across central agencies, state cyber cells and specialised investigation teams.</p>
+          <div class="flex flex-wrap gap-3">
+            <a class="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Request lab MOU →</a>
+            <a class="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">Police training catalogue</a>
+          </div>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="ph aspect-[4/5] rounded-card card" data-label="lab partnership · police"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16">
+    <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+      <div class="label mb-6">[ Engagement modes ]</div>
+      <h2 class="display text-5xl mb-12">How we partner with <span class="text-accent">police.</span></h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="card p-8">
+          <div class="mono text-accent text-xs mb-8">01</div>
+          <h3 class="text-2xl font-medium mb-3">Lab overflow</h3>
+          <p class="text-sm text-mute leading-relaxed">When the cyber cell is at capacity, we take on triaged devices and return court-ready reports inside agreed SLAs.</p>
+        </div>
+        <div class="card p-8">
+          <div class="mono text-accent text-xs mb-8">02</div>
+          <h3 class="text-2xl font-medium mb-3">Specialised casework</h3>
+          <p class="text-sm text-mute leading-relaxed">Chip-off, ransomware reversal, cross-border attribution — where the in-house lab needs an outside expert.</p>
+        </div>
+        <div class="card p-8">
+          <div class="mono text-accent text-xs mb-8">03</div>
+          <h3 class="text-2xl font-medium mb-3">Officer training</h3>
+          <p class="text-sm text-mute leading-relaxed">Custom curricula — from field-seizure for constables to CDR analysis for inspectors.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="border-t border-line pt-16 pb-12 mt-12">
+  <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+
+    <!-- =============== TRUST BAND: FAQ + GMB + MAP =============== -->
+    <div class="grid lg:grid-cols-3 gap-4 mb-16">
+
+      <!-- FAQ teaser -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div class="label">[ FAQs · Quick answers ]</div>
+          <span class="hex"></span>
+        </div>
+        <div class="space-y-3">
+          <details class="border-b border-line pb-3">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <span class="text-sm font-medium">Are your reports admissible in court?</span>
+              <span class="chev text-accent text-xl leading-none">+</span>
+            </summary>
+            <p class="text-xs text-mute leading-relaxed mt-3">Yes — drafted under § 65B of the Indian Evidence Act, twin-examiner reviewed, hashed end-to-end. 98% admissibility across 600+ cases.</p>
+          </details>
+          <details class="border-b border-line pb-3">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <span class="text-sm font-medium">How fast can you respond?</span>
+              <span class="chev text-accent text-xl leading-none">+</span>
+            </summary>
+            <p class="text-xs text-mute leading-relaxed mt-3">Triage analyst within 30 minutes on the 24/7 line. On-site within 4 hours in Tier 1 cities, 12 hours elsewhere in India.</p>
+          </details>
+          <details class="pb-1">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <span class="text-sm font-medium">Can you recover wiped iPhones / Androids?</span>
+              <span class="chev text-accent text-xl leading-none">+</span>
+            </summary>
+            <p class="text-xs text-mute leading-relaxed mt-3">Often, yes — depending on OS, encryption mode and time since wipe. We image, parse and reconstruct from SQLite remnants and unallocated space.</p>
+          </details>
+        </div>
+        <a href="#home" data-route="home" data-anchor="faq" class="mono text-xs text-accent uppercase tracking-wider mt-5 inline-flex cursor-pointer">All FAQs →</a>
+      </div>
+
+      <!-- Google Business Card -->
+      <a href="https://g.co/kgs/cybereye" target="_blank" rel="noopener" class="card card-hover p-6 block">
+        <div class="flex items-start justify-between mb-4">
+          <div class="label">[ Rated on Google ]</div>
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M19 10c0-.7-.1-1.4-.2-2H10v3.8h5c-.2 1.2-.9 2.2-1.9 2.9v2.4h3.1c1.8-1.7 2.8-4.1 2.8-7.1z" fill="#4285F4"/><path d="M10 19c2.6 0 4.7-.8 6.3-2.3l-3.1-2.4c-.8.6-1.9 1-3.2 1-2.5 0-4.6-1.7-5.3-3.9H1.5v2.5C3.1 16.9 6.3 19 10 19z" fill="#34A853"/><path d="M4.7 11.4c-.2-.6-.3-1.2-.3-1.9s.1-1.3.3-1.9V5.1H1.5C.5 6.5 0 8.2 0 10s.5 3.5 1.5 4.9l3.2-2.5z" fill="#FBBC05"/><path d="M10 4c1.4 0 2.7.5 3.7 1.4l2.8-2.8C14.7 1 12.6 0 10 0 6.3 0 3.1 2.1 1.5 5.1l3.2 2.5C5.4 5.4 7.5 4 10 4z" fill="#EA4335"/></svg>
+        </div>
+        <div class="flex items-end gap-3 mb-3">
+          <span class="display text-5xl num leading-none">4.9</span>
+          <div class="pb-1">
+            <div class="flex items-center gap-0.5 mb-1" aria-label="4.9 of 5 stars">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="#10B981"><path d="M10 1l2.6 5.6 6.1.8-4.5 4.2 1.2 6L10 14.8 4.6 17.6l1.2-6L1.3 7.4l6.1-.8L10 1z"/></svg>
+            </div>
+            <div class="text-xs text-mute">214 verified reviews</div>
+          </div>
+        </div>
+        <p class="text-sm text-mute leading-relaxed mb-4">"Their § 65B certificate held under cross-examination. The opposing expert couldn't dent a single hash." <span class="text-mute">— Adv. R. Subramanian, Bombay HC</span></p>
+        <div class="mono text-xs text-accent uppercase tracking-wider">Read all reviews on Google →</div>
+      </a>
+
+      <!-- Map -->
+      <a href="https://maps.app.goo.gl/cybereye-intelligence-mumbai" target="_blank" rel="noopener" class="card overflow-hidden block">
+        <div class="relative">
+          <iframe
+            title="Cyber Eye Intelligence — Mumbai HQ"
+            src="https://maps.google.com/maps?q=Maker%20Maxity%20BKC%20Mumbai&t=&z=14&ie=UTF8&iwloc=&output=embed&hl=en"
+            width="100%" height="200" style="border:0; filter: grayscale(0.6) contrast(1.05) invert(0.92) hue-rotate(180deg);"
+            loading="lazy" referrerpolicy="no-referrer-when-downgrade" aria-hidden="true">
+          </iframe>
+          <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(180deg, transparent 50%, rgba(5,5,5,0.7) 100%);"></div>
+        </div>
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-3">
+            <div class="label">[ Find us ]</div>
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 1c-3.3 0-6 2.7-6 6 0 4 6 12 6 12s6-8 6-12c0-3.3-2.7-6-6-6z" stroke="#10B981" stroke-width="1.4"/><circle cx="10" cy="7" r="2" fill="#10B981"/></svg>
+          </div>
+          <div class="text-sm mb-1">Maker Maxity, BKC</div>
+          <p class="text-xs text-mute mb-3">Lab 04, Floor 12 · Mumbai 400051</p>
+          <div class="mono text-xs text-accent uppercase tracking-wider">Open in Google Maps →</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- =============== NAV COLUMNS =============== -->
+    <div class="grid lg:grid-cols-12 gap-10 mb-16 border-t border-line pt-12">
+      <div class="lg:col-span-5">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="logo-mark" aria-hidden="true"></span>
+          <span class="brand-wordmark lg">
+            <span class="b-mark">Cyber Eye Intelligence</span>
+            <span class="b-sub">Forensics<span class="sep">|</span>Investigations<span class="sep">|</span>Security</span>
+          </span>
+        </div>
+        <p class="text-mute text-sm max-w-xs leading-relaxed mb-8">Digital forensics, intelligence and managed security. Mumbai · Bengaluru · Delhi.</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="pill">ISO 17025 aligned</span>
+          <span class="pill">CERT-In empanelled</span>
+        </div>
+      </div>
+      <div class="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div>
+          <div class="label mb-4">Services</div>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#services" data-route="services" class="nav-link">Digital Forensics</a></li>
+            <li><a href="#services" data-route="services" class="nav-link">Digital Intelligence</a></li>
+            <li><a href="#services" data-route="services" class="nav-link">Managed Security</a></li>
+            <li><a href="#services" data-route="services" class="nav-link">Managed Forensics</a></li>
+            <li><a href="#services" data-route="services" class="nav-link">Data Recovery</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="label mb-4">Sectors</div>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#sector-detail" data-route="sector-detail" class="nav-link">Law Enforcement</a></li>
+            <li><a href="#sector-detail" data-route="sector-detail" class="nav-link">Legal</a></li>
+            <li><a href="#sector-detail" data-route="sector-detail" class="nav-link">Corporate</a></li>
+            <li><a href="#sector-detail" data-route="sector-detail" class="nav-link">Government</a></li>
+            <li><a href="#sector-detail" data-route="sector-detail" class="nav-link">BFSI</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="label mb-4">Knowledge</div>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#knowledge" data-route="knowledge" data-tab="cases" class="nav-link">Case Files</a></li>
+            <li><a href="#knowledge" data-route="knowledge" data-tab="insights" class="nav-link">Insights</a></li>
+            <li><a href="#knowledge" data-route="knowledge" data-tab="whitepapers" class="nav-link">White Papers</a></li>
+            <li><a href="#knowledge" data-route="knowledge" data-tab="blogs" class="nav-link">Blogs</a></li>
+            <li><a href="#home" data-route="home" data-anchor="faq" class="nav-link cursor-pointer">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="label mb-4">Company</div>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#about" data-route="about" class="nav-link">About</a></li>
+            <li><a href="#training" data-route="training" class="nav-link">Academy</a></li>
+            <li><a href="#careers" data-route="careers" class="nav-link">Hiring</a></li>
+            <li><a href="#contact" data-route="contact" class="nav-link">Contact</a></li>
+          </ul>
+          <div class="label mb-2 mt-6">24/7</div>
+          <p class="text-sm text-mute leading-relaxed"><a href="tel:+918045678910" class="text-white">+91 80 4567 8910</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-line pt-8 flex flex-wrap justify-between gap-4 label">
+      <div>© 2026 Cyber Eye Intelligence Pvt Ltd · CIN: U72200MH2018PTC000000</div>
+      <div class="flex gap-6">
+        <a class="nav-link cursor-pointer">Privacy</a>
+        <a class="nav-link cursor-pointer">Terms</a>
+        <a class="nav-link cursor-pointer">§ 65B disclaimers</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Unicorn Studio loader
+  (function(){
+    if (window.UnicornStudio) return;
+    window.UnicornStudio = { isInitialized: false };
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
+    s.onload = function(){
+      if (!window.UnicornStudio.isInitialized) {
+        UnicornStudio.init();
+        window.UnicornStudio.isInitialized = true;
+      }
+    };
+    (document.head || document.body).appendChild(s);
+  })();
+</script>
+
+<script>
+  // Simple hash-based routing
+  const pages = ['home','services','service-mobile','service-detail','sectors','sector-detail','knowledge','case-file','training','about','careers','contact'];
+  // Legacy hash redirects (Case Files / Insights collapsed into Knowledge Centre)
+  const aliases = { 'case-files': 'knowledge', 'insights': 'knowledge' };
+  function go(route, opts) {
+    route = aliases[route] || route;
+    if (!pages.includes(route)) route = 'home';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById('page-' + route);
+    if (el) el.classList.add('active');
+    if (opts && opts.anchor) {
+      // jump to anchor inside the just-activated page
+      requestAnimationFrame(() => {
+        const target = document.getElementById(opts.anchor);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    } else {
+      window.scrollTo(0, 0);
+    }
+    if (location.hash !== '#' + route) {
+      history.pushState({}, '', '#' + route);
+    }
+    // Knowledge Centre — optional sub-tab activation
+    if (route === 'knowledge' && opts && opts.tab) {
+      activateKcTab(opts.tab);
+    }
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-route]');
+    if (a) {
+      e.preventDefault();
+      const opts = {};
+      if (a.dataset.tab) opts.tab = a.dataset.tab;
+      if (a.dataset.anchor) opts.anchor = a.dataset.anchor;
+      go(a.dataset.route, Object.keys(opts).length ? opts : null);
+    }
+  });
+  window.addEventListener('popstate', () => {
+    const r = location.hash.replace('#','') || 'home';
+    go(r);
+  });
+
+  // ============ Knowledge Centre — sub-tab switcher ============
+  function activateKcTab(tab) {
+    document.querySelectorAll('#kc-tabs [data-kc-tab]').forEach(b => {
+      b.classList.toggle('pill-on', b.dataset.kcTab === tab);
+    });
+    document.querySelectorAll('.kc-panel').forEach(p => {
+      p.classList.toggle('hidden', p.dataset.kcPanel !== tab);
+    });
+  }
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('#kc-tabs [data-kc-tab]');
+    if (t) { activateKcTab(t.dataset.kcTab); }
+  });
+
+  // ============ Case Files — sector filter ============
+  function applyCfFilter(sector) {
+    const cards = document.querySelectorAll('#cf-grid .cf-card');
+    let visible = 0;
+    cards.forEach(c => {
+      const match = sector === 'all' || c.dataset.sector === sector;
+      c.classList.toggle('hidden', !match);
+      if (match) visible++;
+    });
+    const count = document.getElementById('cf-count');
+    if (count) count.textContent = visible;
+    const empty = document.getElementById('cf-empty');
+    if (empty) empty.classList.toggle('hidden', visible !== 0);
+    document.querySelectorAll('#cf-filter [data-sector]').forEach(b => {
+      b.classList.toggle('pill-on', b.dataset.sector === sector);
+    });
+  }
+  document.addEventListener('click', (e) => {
+    const f = e.target.closest('#cf-filter [data-sector]');
+    if (f) { applyCfFilter(f.dataset.sector); }
+  });
+
+  // initial
+  const initial = location.hash.replace('#','') || 'home';
+  if (initial !== 'home') go(initial);
+</script>
+
+</body>
+</html>
