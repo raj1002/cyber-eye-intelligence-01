@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Section } from "@/components/Primitives";
-import { caseFiles } from "@/lib/data";
+import { Placeholder } from "@/components/Primitives";
+
+const caseFiles = [
+  { slug: "ce-2025-014", id: "CE/2025/014", sector: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions court.", quote: "Recovered 14 deleted chats from a wiped iPhone. Conviction secured in 9 months.", client: "Sr. Counsel, listed manufacturing company", location: "Mumbai · Corporate IP Theft" },
+  { slug: "ce-2025-008", id: "CE/2025/008", sector: "BFSI · Email", title: "Traced ₹4.6 cr BEC fraud across 3 jurisdictions in 11 days.", sub: "Attribution to Lagos-based ring · funds frozen.", quote: "BEC fraud worth ₹4.6 crore traced across three jurisdictions in eleven days. The funds were frozen in time.", client: "CFO, Listed NBFC", location: "Mumbai · BFSI" },
+  { slug: "ce-2025-003", id: "CE/2025/003", sector: "Corporate · Insider", title: "Identified data exfiltration through personal cloud — termination upheld.", sub: "17 USB events · 2 SaaS exports · labour tribunal accepted.", quote: "Discreet, fast, methodical. Their insider investigation report became our HR action playbook.", client: "CISO, Listed Bank", location: "Mumbai · Corporate Insider" },
+];
 
 export async function generateStaticParams() {
   return caseFiles.map((c) => ({ slug: c.slug }));
@@ -10,85 +15,71 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const c = caseFiles.find((x) => x.slug === params.slug);
   if (!c) return {};
-  return { title: `${c.ref} · ${c.title} — Cyber-Eye Intelligence`, description: c.blurb };
+  return { title: `${c.id} — Cyber Eye Intelligence`, description: c.title };
 }
 
 export default function CaseFileDetailPage({ params }: { params: { slug: string } }) {
-  const c = caseFiles.find((x) => x.slug === params.slug);
-  if (!c) notFound();
+  const caseFile = caseFiles.find((c) => c.slug === params.slug);
+  if (!caseFile) notFound();
 
   return (
     <>
       <section className="py-20 border-b border-line">
-        <Section>
+        <div className="max-w-page mx-auto px-6 lg:px-10">
           <div className="label mb-6">
             Home / <Link href="/case-files" className="hover:text-accent">Case Files</Link> /{" "}
-            <span className="text-white">{c.ref}</span>
+            <span className="text-white">{caseFile.id}</span>
           </div>
-          <div className="flex flex-wrap gap-2 mb-6">
-            <span className="pill pill-on">{c.category.split(" · ")[0]}</span>
-            <span className="pill">{c.category}</span>
-            <span className="pill">{c.ref}</span>
+          <div className="grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-6">
+              <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-line">
+                <Placeholder label="case file · redacted exhibit" className="absolute inset-0" />
+                <div className="absolute top-4 left-4 w-5 h-5 border-t border-l border-accent z-10" />
+                <div className="absolute bottom-4 right-4 w-5 h-5 border-b border-r border-accent z-10" />
+                <div className="absolute bottom-3 left-3 right-3 z-10 flex justify-between mono text-[10px] uppercase tracking-widest text-stone">
+                  <span>{caseFile.id}</span>
+                  <span className="text-accent">ADMITTED</span>
+                </div>
+              </div>
+            </div>
+            <div className="lg:col-span-6">
+              <div className="label mb-6">[ Case File · #{caseFile.id} ]</div>
+              <blockquote className="display text-3xl lg:text-4xl leading-tight mb-8">
+                &ldquo;{caseFile.quote}&rdquo;
+              </blockquote>
+              <div className="text-mute mb-10">
+                — {caseFile.client}<br />
+                <span className="label">{caseFile.location}</span>
+              </div>
+              <p className="text-mute mb-8 leading-relaxed">{caseFile.sub}</p>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/contact" className="btn-primary">Open a similar case →</Link>
+                <Link href="/case-files" className="btn-ghost">All case files</Link>
+              </div>
+            </div>
           </div>
-          <h1 className="display text-5xl lg:text-7xl mb-8 max-w-4xl">&ldquo;{c.title}&rdquo;</h1>
-          <p className="text-lg text-mute max-w-3xl leading-relaxed">{c.blurb}</p>
-        </Section>
+        </div>
       </section>
 
-      <Section className="py-16">
-        <div className="grid md:grid-cols-4 gap-4">
-          <div className="card p-6"><div className="display text-3xl num">2.4 <span className="text-accent text-base">TB</span></div><div className="label mt-1">Data examined</div></div>
-          <div className="card p-6"><div className="display text-3xl num">14</div><div className="label mt-1">Deleted artefacts</div></div>
-          <div className="card p-6"><div className="display text-3xl num">3</div><div className="label mt-1">Devices imaged</div></div>
-          <div className="card p-6"><div className="display text-3xl num">9 <span className="text-accent text-base">mo</span></div><div className="label mt-1">To resolution</div></div>
-        </div>
-      </Section>
-
       <section className="py-16 border-t border-line">
-        <Section>
-          <div className="grid lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-8 space-y-12">
-              <div>
-                <div className="label mb-3">01 — Brief</div>
-                <h2 className="display text-3xl mb-4">The brief.</h2>
-                <p className="text-mute leading-relaxed">
-                  Counsel briefed us at 22:00 hrs on a Friday. The suspect was due to fly out 48 hours later. We dispatched a triage analyst overnight to image three devices: a corporate iPhone, a personal Samsung and a MacBook Air.
-                </p>
+        <div className="max-w-page mx-auto px-6 lg:px-10">
+          <div className="label mb-6">[ Methodology ]</div>
+          <h2 className="display text-4xl mb-12">How we <span className="text-accent">worked it.</span></h2>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              { n: "01", t: "Intake", d: "Evidence received with dual-signed chain of custody and hash verification." },
+              { n: "02", t: "Acquire", d: "Write-blocked imaging. Bit-by-bit copy. SHA-256 on source and working copy." },
+              { n: "03", t: "Examine", d: "Twin-examiner analysis. Worklog timestamped and signed at every step." },
+              { n: "04", t: "Report", d: "§ 65B compliant certificate. Expert testimony on standby." },
+            ].map((s) => (
+              <div key={s.n} className="card p-6">
+                <div className="mono text-accent text-xs mb-8">{s.n}</div>
+                <h4 className="text-xl font-medium mb-2">{s.t}</h4>
+                <p className="text-sm text-mute leading-relaxed">{s.d}</p>
               </div>
-              <div>
-                <div className="label mb-3">02 — Approach</div>
-                <h2 className="display text-3xl mb-4">What we did.</h2>
-                <p className="text-mute leading-relaxed mb-4">
-                  Chip-off was unnecessary — the device had been factory-reset, not destroyed, leaving unallocated APFS regions intact. We imaged with Cellebrite UFED, parsed in Magnet AXIOM, then ran custom SQLite carving against the chat shards.
-                </p>
-                <p className="text-mute leading-relaxed">
-                  Cross-referenced timestamps against the suspect's cloud backups (court-ordered) and built a 6-week communication timeline.
-                </p>
-              </div>
-              <div>
-                <div className="label mb-3">03 — Outcome</div>
-                <h2 className="display text-3xl mb-4">The outcome.</h2>
-                <p className="text-mute leading-relaxed">
-                  14 deleted chats recovered, two of which contained attachments matching the client's protected designs. The sessions court admitted the § 65B certificate without dilution. Resolution in nine months.
-                </p>
-              </div>
-            </div>
-            <div className="lg:col-span-4">
-              <div className="card p-6 sticky top-24">
-                <div className="label mb-4">[ Engagement details ]</div>
-                <dl className="space-y-4 text-sm">
-                  <div><dt className="label">Sector</dt><dd>{c.category}</dd></div>
-                  <div><dt className="label">Reference</dt><dd>{c.ref}</dd></div>
-                  <div><dt className="label">Practice</dt><dd>Mobile + Cloud Forensics</dd></div>
-                  <div><dt className="label">Duration</dt><dd>6 weeks lab · 9 months total</dd></div>
-                  <div><dt className="label">Lead examiner</dt><dd>P. Ranganathan, EnCE</dd></div>
-                  <div><dt className="label">Tools</dt><dd>Cellebrite UFED · Magnet AXIOM · custom SQLite carver</dd></div>
-                </dl>
-                <Link href="/contact" className="btn-primary inline-flex mt-6">Open a similar case →</Link>
-              </div>
-            </div>
+            ))}
           </div>
-        </Section>
+        </div>
       </section>
     </>
   );

@@ -1,11 +1,21 @@
-import { Section, Pulse } from "@/components/Primitives";
+'use client';
 
-export const metadata = {
-  title: "Contact — Cyber-Eye Intelligence",
-  description: "Talk to a certified forensic examiner. 24/7 incident line. NDA on request.",
-};
+import { useFormState, useFormStatus } from 'react-dom';
+import { Section, Pulse } from '@/components/Primitives';
+import { submitContact } from './actions';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" className="btn-primary" disabled={pending}>
+      {pending ? 'Sending…' : 'Submit →'}
+    </button>
+  );
+}
 
 export default function ContactPage() {
+  const [state, formAction] = useFormState(submitContact, null);
+
   return (
     <>
       <section className="py-20 border-b border-line">
@@ -21,46 +31,75 @@ export default function ContactPage() {
       <Section className="py-16">
         <div className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-7">
-            <form className="card p-8 lg:p-10 space-y-5">
-              <h2 className="display text-3xl mb-4">Open a case.</h2>
-
-              <div className="grid md:grid-cols-2 gap-5">
-                <Field label="Your name" placeholder="Full name" />
-                <Field label="Organisation" placeholder="Firm or company" />
-              </div>
-              <div className="grid md:grid-cols-2 gap-5">
-                <Field label="Email" placeholder="name@firm.com" type="email" />
-                <Field label="Phone" placeholder="+91 ····· ·····" type="tel" />
-              </div>
-
-              <div>
-                <div className="label mb-2">Practice area</div>
-                <div className="flex flex-wrap gap-2">
-                  {["Mobile", "Cloud", "Insider", "Malware", "Email", "Fraud", "Disk"].map((p, i) => (
-                    <label key={p} className={`pill cursor-pointer ${i === 0 ? "pill-on" : ""}`}>
-                      <input type="radio" name="practice" className="sr-only" defaultChecked={i === 0} />
-                      {p}
-                    </label>
-                  ))}
+            {state?.success ? (
+              <div className="card p-8 lg:p-10 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div style={{ width: '40px', height: '4px', background: '#10B981' }} />
                 </div>
+                <h2 className="display text-3xl mb-2">Enquiry received.</h2>
+                <p className="text-mute">A senior examiner will contact you within 4 hours during business hours (or via our 24/7 line for urgent matters).</p>
+                <p className="text-sm text-mute mt-4">For immediate assistance, call <a href="tel:+918045678910" className="text-white hover:text-accent transition-colors">+91 80 4567 8910</a>.</p>
               </div>
+            ) : (
+              <form className="card p-8 lg:p-10 space-y-5" action={formAction}>
+                <h2 className="display text-3xl mb-4">Open a case.</h2>
 
-              <div>
-                <div className="label mb-2">Tell us about the matter</div>
-                <textarea
-                  className="w-full card p-4 text-sm bg-surface focus:outline-none focus:border-accent placeholder:text-zinc-600 min-h-32"
-                  placeholder="Brief — no privileged details. We'll send an NDA before specifics."
-                />
-              </div>
+                {state?.success === false && state.error && (
+                  <div className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-md px-4 py-3">
+                    {state.error}
+                  </div>
+                )}
 
-              <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
-                <label className="flex items-center gap-2 text-sm text-mute">
-                  <input type="checkbox" className="w-4 h-4 accent-accent" />
-                  Send me a sample report (PDF)
-                </label>
-                <button type="submit" className="btn-primary">Submit →</button>
-              </div>
-            </form>
+                {/* Hidden defaults */}
+                <input type="hidden" name="urgency" value="standard" />
+
+                <div className="grid md:grid-cols-2 gap-5">
+                  <Field label="Your name" name="name" placeholder="Full name" />
+                  <Field label="Organisation" name="organisation" placeholder="Firm or company" />
+                </div>
+                <div className="grid md:grid-cols-2 gap-5">
+                  <Field label="Email" name="email" placeholder="name@firm.com" type="email" />
+                  <Field label="Phone" name="phone" placeholder="+91 ····· ·····" type="tel" />
+                </div>
+
+                <div>
+                  <div className="label mb-2">Practice area</div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: 'Mobile', value: 'digital-forensics' },
+                      { label: 'Cloud', value: 'managed-security' },
+                      { label: 'Insider', value: 'managed-forensics' },
+                      { label: 'Malware', value: 'digital-forensics' },
+                      { label: 'Email', value: 'digital-intelligence' },
+                      { label: 'Fraud', value: 'digital-intelligence' },
+                      { label: 'Disk', value: 'data-recovery' },
+                    ].map(({ label, value }, i) => (
+                      <label key={label} className={`pill cursor-pointer ${i === 0 ? 'pill-on' : ''}`}>
+                        <input type="radio" name="matter" value={value} className="sr-only" defaultChecked={i === 0} />
+                        {label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="label mb-2">Tell us about the matter</div>
+                  <textarea
+                    name="narrative"
+                    className="w-full card p-4 text-sm bg-surface focus:outline-none focus:border-accent placeholder:text-zinc-600 min-h-32"
+                    placeholder="Brief — no privileged details. We'll send an NDA before specifics."
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
+                  <label className="flex items-center gap-2 text-sm text-mute">
+                    <input type="checkbox" className="w-4 h-4 accent-accent" />
+                    Send me a sample report (PDF)
+                  </label>
+                  <SubmitButton />
+                </div>
+              </form>
+            )}
           </div>
 
           <div className="lg:col-span-5 space-y-4">
@@ -98,10 +137,12 @@ export default function ContactPage() {
 
 function Field({
   label,
+  name,
   placeholder,
-  type = "text",
+  type = 'text',
 }: {
   label: string;
+  name: string;
   placeholder: string;
   type?: string;
 }) {
@@ -110,6 +151,7 @@ function Field({
       <div className="label mb-2">{label}</div>
       <input
         type={type}
+        name={name}
         placeholder={placeholder}
         className="w-full card p-4 text-sm bg-surface focus:outline-none focus:border-accent placeholder:text-zinc-600"
       />
