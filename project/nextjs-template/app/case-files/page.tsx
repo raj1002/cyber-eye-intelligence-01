@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { Placeholder } from "@/components/Primitives";
+import { getCaseFiles } from "@/lib/sanity";
 
-export const metadata = {
-  title: "Case Files — Cyber Eye Intelligence",
-  description: "Redacted summaries from real digital forensic engagements. Court-tested, peer-reviewed.",
-};
-
-const caseFiles = [
+const FALLBACK = [
   { id: "CE/2025/014", sector: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions.", imgLabel: "case · IP theft" },
   { id: "CE/2025/008", sector: "BFSI · Email", title: "Traced ₹4.6 cr BEC fraud across 3 jurisdictions in 11 days.", sub: "Attribution to Lagos-based ring · funds frozen.", imgLabel: "case · BEC fraud" },
   { id: "CE/2025/003", sector: "Corporate · Insider", title: "Identified data exfiltration through personal cloud — termination upheld.", sub: "17 USB events · 2 SaaS exports · labour tribunal accepted.", imgLabel: "case · insider" },
@@ -18,9 +14,25 @@ const caseFiles = [
   { id: "CE/2023/118", sector: "Healthcare · Malware", title: "Contained a hospital ransomware attack — restored ICU systems in 18 hours.", sub: "No patient data lost · CERT-In incident filing closed.", imgLabel: "case · hospital" },
 ];
 
-const filters = ["All", "Mobile", "Cloud", "Fraud", "Insider", "Malware", "Email"];
+const FILTERS = ["All", "Mobile", "Cloud", "Fraud", "Insider", "Malware", "Email"];
 
-export default function CaseFilesPage() {
+export const metadata = {
+  title: "Case Files — Cyber Eye Intelligence",
+  description: "Redacted summaries from real digital forensic engagements. Court-tested, peer-reviewed.",
+};
+
+export default async function CaseFilesPage() {
+  const sanity = await getCaseFiles();
+  const caseFiles = sanity.length > 0
+    ? sanity.map((c) => ({
+        id: c.ref ?? c._id,
+        sector: c.label ?? c.sector ?? "",
+        title: c.title,
+        sub: c.sub ?? "",
+        imgLabel: c.imgLabel ?? "case file",
+      }))
+    : FALLBACK;
+
   return (
     <>
       <section className="py-20 border-b border-line">
@@ -31,7 +43,7 @@ export default function CaseFilesPage() {
             <p className="text-lg text-mute max-w-md">Redacted summaries from real engagements. Every file passed peer review and, where applicable, judicial scrutiny.</p>
           </div>
           <div className="flex flex-wrap gap-2 mt-12">
-            {filters.map((f, i) => (
+            {FILTERS.map((f, i) => (
               <span key={f} className={`pill ${i === 0 ? "pill-on" : ""}`}>{f}</span>
             ))}
           </div>
