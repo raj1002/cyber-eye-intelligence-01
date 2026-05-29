@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { Hex } from "@/components/Primitives";
+import { getSectors } from "@/lib/sanity";
 
-export const metadata = {
-  title: "Sectors — Cyber Eye Intelligence",
-  description: "Built for adversarial environments. Digital forensics for law enforcement, legal, corporate, government and BFSI sectors.",
-};
-
-const sectors = [
+const FALLBACK = [
   { num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, training.", slug: "law-enforcement" },
   { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, § 65B certification, expert witness, hostile cross-prep.", slug: "legal-litigation" },
   { num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct, exit forensics.", slug: "corporate-enterprise" },
@@ -14,7 +10,22 @@ const sectors = [
   { num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims, AML, KYC investigations. UPI / payments fraud.", slug: "bfsi-insurance" },
 ];
 
-export default function SectorsPage() {
+export const metadata = {
+  title: "Sectors — Cyber Eye Intelligence",
+  description: "Built for adversarial environments. Digital forensics for law enforcement, legal, corporate, government and BFSI sectors.",
+};
+
+export default async function SectorsPage() {
+  const sanity = await getSectors();
+  const sectors = sanity.length > 0
+    ? sanity.map((s, i) => ({
+        num: `S/${String(i + 1).padStart(2, "0")}`,
+        title: s.title,
+        sub: s.description ?? s.tagline ?? "",
+        slug: s.slug.current,
+      }))
+    : FALLBACK;
+
   return (
     <>
       {/* Hero */}

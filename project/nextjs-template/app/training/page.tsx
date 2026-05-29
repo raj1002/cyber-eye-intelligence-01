@@ -1,11 +1,7 @@
 import Link from "next/link";
+import { getCourses } from "@/lib/sanity";
 
-export const metadata = {
-  title: "Cyber Eye Academy — Training",
-  description: "Hands-on forensic training for police, prosecutors, counsel and corporate security teams.",
-};
-
-const courses = [
+const FALLBACK = [
   { code: "CE-101", audience: "police", title: "Mobile Device Forensics for Investigators", sub: "Extraction, parsing and evidence handling from iOS and Android in a live lab environment.", duration: "3 days", format: "In-person", price: "₹18,000" },
   { code: "CE-102", audience: "police", title: "Digital Evidence Handling & § 65B Compliance", sub: "Correct acquisition, labelling and certification so evidence holds under cross-examination.", duration: "2 days", format: "In-person", price: "₹12,000" },
   { code: "CE-103", audience: "police", title: "Network Forensics & Log Analysis", sub: "PCAP analysis, log correlation and ISP coordination for cyber-crime investigations.", duration: "4 days", format: "In-person", price: "₹22,000" },
@@ -22,13 +18,31 @@ const courses = [
   { code: "CE-402", audience: "corporate", title: "OSINT for Corporate Due Diligence", sub: "Vendor risk, competitor intelligence, fraudulent identity detection — structured OSINT workflow.", duration: "1 day", format: "Online", price: "₹9,000" },
 ];
 
-const audiences = [
+const AUDIENCES = [
   { key: "police", label: "Law Enforcement" },
   { key: "counsel", label: "Legal & Counsel" },
   { key: "corporate", label: "Corporate Security" },
 ];
 
-export default function TrainingPage() {
+export const metadata = {
+  title: "Cyber Eye Academy — Training",
+  description: "Hands-on forensic training for police, prosecutors, counsel and corporate security teams.",
+};
+
+export default async function TrainingPage() {
+  const sanity = await getCourses();
+  const courses = sanity.length > 0
+    ? sanity.map((c) => ({
+        code: c.code ?? c._id.slice(0, 6).toUpperCase(),
+        audience: c.audience ?? "police",
+        title: c.title,
+        sub: c.sub ?? "",
+        duration: c.duration ?? "",
+        format: c.format ?? "",
+        price: c.price ?? "",
+      }))
+    : FALLBACK;
+
   return (
     <>
       {/* Hero */}
@@ -45,13 +59,13 @@ export default function TrainingPage() {
                 Train the people<br />who handle the<br /><span className="text-accent">evidence.</span>
               </h1>
               <p className="text-lg text-mute max-w-lg leading-relaxed">
-                14 courses for law enforcement, in-house counsel and corporate security teams. Every module taught by a working examiner — no slides-only theory.
+                {courses.length} courses for law enforcement, in-house counsel and corporate security teams. Every module taught by a working examiner — no slides-only theory.
               </p>
             </div>
             <div className="lg:col-span-5">
               <div className="grid grid-cols-3 gap-4">
                 <div className="card p-6 text-center">
-                  <div className="display text-3xl num">14</div>
+                  <div className="display text-3xl num">{courses.length}</div>
                   <div className="label mt-2">Courses</div>
                 </div>
                 <div className="card p-6 text-center">
@@ -73,15 +87,16 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      {/* Audience tabs — static for now, client filtering in future */}
-      {audiences.map((aud) => (
-        <section key={aud.key} id={`audience-${aud.key}`} className="py-16 border-b border-line">
-          <div className="max-w-page mx-auto px-6 lg:px-10">
-            <div className="label mb-10">[ For {aud.label} ]</div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {courses
-                .filter((c) => c.audience === aud.key)
-                .map((c) => (
+      {/* Course sections per audience */}
+      {AUDIENCES.map((aud) => {
+        const audienceCourses = courses.filter((c) => c.audience === aud.key);
+        if (audienceCourses.length === 0) return null;
+        return (
+          <section key={aud.key} id={`audience-${aud.key}`} className="py-16 border-b border-line">
+            <div className="max-w-page mx-auto px-6 lg:px-10">
+              <div className="label mb-10">[ For {aud.label} ]</div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {audienceCourses.map((c) => (
                   <div key={c.code} className="card card-hover p-7">
                     <div className="flex items-start justify-between mb-8">
                       <div className="mono text-accent text-xs">{c.code}</div>
@@ -90,8 +105,8 @@ export default function TrainingPage() {
                     <h3 className="text-xl font-medium mb-3 leading-snug">{c.title}</h3>
                     <p className="text-sm text-mute leading-relaxed mb-6">{c.sub}</p>
                     <div className="flex flex-wrap gap-2 mb-6">
-                      <span className="pill">{c.duration}</span>
-                      <span className="pill">{c.format}</span>
+                      {c.duration && <span className="pill">{c.duration}</span>}
+                      {c.format && <span className="pill">{c.format}</span>}
                     </div>
                     <div className="flex items-center justify-between pt-6 border-t border-line">
                       <div className="display text-xl num">{c.price}</div>
@@ -99,17 +114,18 @@ export default function TrainingPage() {
                     </div>
                   </div>
                 ))}
+              </div>
             </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        );
+      })}
 
       {/* Group training CTA */}
       <section className="py-24">
         <div className="max-w-page mx-auto px-6 lg:px-10">
           <div className="card relative overflow-hidden grid lg:grid-cols-2">
             <div className="p-10 lg:p-14">
-              <div className="label mb-6">[ In-house & Group training ]</div>
+              <div className="label mb-6">[ In-house &amp; Group training ]</div>
               <h2 className="display text-4xl lg:text-5xl mb-6">
                 Bring the lab<br /><span className="text-accent">to your force.</span>
               </h2>
