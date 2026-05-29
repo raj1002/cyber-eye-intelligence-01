@@ -1,10 +1,30 @@
 import { MetadataRoute } from 'next';
-import { serviceFamilies, sectors } from '@/lib/data';
+import { getServiceFamilies, getSectors } from '@/lib/sanity';
 
 const BASE_URL = 'https://cybereyeintelligence.com';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const FALLBACK_SERVICE_SLUGS = [
+  'digital-forensics', 'digital-intelligence', 'managed-security', 'managed-forensics', 'data-recovery',
+];
+const FALLBACK_SECTOR_SLUGS = [
+  'law-enforcement', 'legal-litigation', 'corporate-enterprise', 'government', 'bfsi-insurance',
+];
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  const [sanityServices, sanitySectors] = await Promise.all([
+    getServiceFamilies(),
+    getSectors(),
+  ]);
+
+  const serviceSlugs = sanityServices.length > 0
+    ? sanityServices.map((s) => s.slug.current)
+    : FALLBACK_SERVICE_SLUGS;
+
+  const sectorSlugs = sanitySectors.length > 0
+    ? sanitySectors.map((s) => s.slug.current)
+    : FALLBACK_SECTOR_SLUGS;
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
@@ -17,15 +37,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/careers`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
   ];
 
-  const serviceRoutes: MetadataRoute.Sitemap = serviceFamilies.map((sf) => ({
-    url: `${BASE_URL}/services/${sf.id}`,
+  const serviceRoutes: MetadataRoute.Sitemap = serviceSlugs.map((slug) => ({
+    url: `${BASE_URL}/services/${slug}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
 
-  const sectorRoutes: MetadataRoute.Sitemap = sectors.map((s) => ({
-    url: `${BASE_URL}/sectors/${s.slug}`,
+  const sectorRoutes: MetadataRoute.Sitemap = sectorSlugs.map((slug) => ({
+    url: `${BASE_URL}/sectors/${slug}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: 0.7,

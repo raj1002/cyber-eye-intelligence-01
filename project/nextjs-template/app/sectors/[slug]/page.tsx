@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Placeholder } from "@/components/Primitives";
+import { getSectors, getSectorBySlug } from "@/lib/sanity";
 
-const sectors = [
+const FALLBACK = [
   { slug: "law-enforcement", num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, specialist training for investigators." },
   { slug: "legal-litigation", num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, § 65B certification, expert witness testimony, hostile cross-examination preparation." },
   { slug: "corporate-enterprise", num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct, exit forensics and insider threat analysis." },
@@ -11,17 +12,35 @@ const sectors = [
 ];
 
 export async function generateStaticParams() {
-  return sectors.map((s) => ({ slug: s.slug }));
+  const sanity = await getSectors();
+  if (sanity.length > 0) return sanity.map((s) => ({ slug: s.slug.current }));
+  return FALLBACK.map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const s = sectors.find((x) => x.slug === params.slug);
-  if (!s) return {};
-  return { title: `${s.title} — Cyber Eye Intelligence`, description: s.sub };
+  const sanity = await getSectorBySlug(params.slug);
+  if (sanity) {
+    return {
+      title: `${sanity.title} — Cyber Eye Intelligence`,
+      description: sanity.seoDescription ?? sanity.description ?? sanity.tagline ?? "",
+    };
+  }
+  const fb = FALLBACK.find((s) => s.slug === params.slug);
+  if (!fb) return {};
+  return { title: `${fb.title} — Cyber Eye Intelligence`, description: fb.sub };
 }
 
-export default function SectorDetailPage({ params }: { params: { slug: string } }) {
-  const sector = sectors.find((s) => s.slug === params.slug);
+export default async function SectorDetailPage({ params }: { params: { slug: string } }) {
+  const sanity = await getSectorBySlug(params.slug);
+  const sector = sanity
+    ? {
+        slug: sanity.slug.current,
+        num: "S/??",
+        title: sanity.title,
+        sub: sanity.description ?? sanity.tagline ?? "",
+      }
+    : FALLBACK.find((s) => s.slug === params.slug);
+
   if (!sector) notFound();
 
   return (

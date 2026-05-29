@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Placeholder } from "@/components/Primitives";
+import { getServiceFamilies, getServiceBySlug } from "@/lib/sanity";
 
-const families = [
+const FALLBACK = [
   { slug: "digital-forensics", num: "01", title: "Digital Forensics", sub: "Evidence collection, incident response, data recovery, malware analysis, mobile & network forensics — with court-grade chain of custody.", tags: ["Evidence", "IR", "Mobile", "Network"] },
   { slug: "digital-intelligence", num: "02", title: "Digital Intelligence", sub: "OSINT, SOCMINT, dark web monitoring, threat intelligence, data mining and predictive analytics — turning the open digital world into actionable signal.", tags: ["OSINT", "SOCMINT", "Dark web", "Threat intel"] },
   { slug: "managed-security", num: "03", title: "Managed Security Services", sub: "24/7 SOC, XDR, vulnerability management, EDR, SIEM, IAM, UEBA and compliance — across on-prem, cloud and hybrid infrastructures.", tags: ["SOC 24/7", "XDR", "SIEM", "IAM"] },
@@ -11,17 +12,36 @@ const families = [
 ];
 
 export async function generateStaticParams() {
-  return families.map((f) => ({ slug: f.slug }));
+  const sanity = await getServiceFamilies();
+  if (sanity.length > 0) return sanity.map((f) => ({ slug: f.slug.current }));
+  return FALLBACK.map((f) => ({ slug: f.slug }));
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const f = families.find((x) => x.slug === params.slug);
-  if (!f) return {};
-  return { title: `${f.title} — Cyber Eye Intelligence`, description: f.sub };
+  const sanity = await getServiceBySlug(params.slug);
+  if (sanity) {
+    return {
+      title: `${sanity.title} — Cyber Eye Intelligence`,
+      description: sanity.seoDescription ?? sanity.description ?? sanity.tagline ?? "",
+    };
+  }
+  const fb = FALLBACK.find((f) => f.slug === params.slug);
+  if (!fb) return {};
+  return { title: `${fb.title} — Cyber Eye Intelligence`, description: fb.sub };
 }
 
-export default function ServiceDetailPage({ params }: { params: { slug: string } }) {
-  const family = families.find((f) => f.slug === params.slug);
+export default async function ServiceDetailPage({ params }: { params: { slug: string } }) {
+  const sanity = await getServiceBySlug(params.slug);
+  const family = sanity
+    ? {
+        slug: sanity.slug.current,
+        num: "??",
+        title: sanity.title,
+        sub: sanity.description ?? sanity.tagline ?? "",
+        tags: [] as string[],
+      }
+    : FALLBACK.find((f) => f.slug === params.slug);
+
   if (!family) notFound();
 
   return (
@@ -43,11 +63,13 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                 <Link href="/contact" className="btn-primary">Open a case →</Link>
                 <Link href="/services" className="btn-ghost">All services</Link>
               </div>
-              <div className="flex flex-wrap gap-2 mt-6">
-                {family.tags.map((t) => (
-                  <span key={t} className="pill">{t}</span>
-                ))}
-              </div>
+              {family.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {family.tags.map((t) => (
+                    <span key={t} className="pill">{t}</span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="lg:col-span-5">
               <div className="card p-6">
