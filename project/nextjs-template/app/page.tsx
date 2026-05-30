@@ -3,6 +3,7 @@ import { Hex, Placeholder } from "@/components/Primitives";
 import UnicornAura from "@/components/UnicornAura";
 import VoicesMarquee from "@/components/parallax/VoicesMarquee";
 import InsightsRow from "@/components/parallax/InsightsRow";
+import FadeIn from "@/components/FadeIn";
 import { getServiceFamilies, getSectors, getTestimonials, getArticles, getSiteSettings } from "@/lib/sanity";
 
 // Icon map keyed by service slug — controls appearance while content comes from Sanity
@@ -221,30 +222,33 @@ export default async function Home() {
       {/* SERVICES */}
       <section className="py-24">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
+          <FadeIn className="flex flex-wrap items-end justify-between gap-6 mb-14">
             <div>
               <div className="label mb-4">[ Services / 5 practice families ]</div>
               <h2 className="display text-5xl lg:text-6xl">Forensic services<br /><span className="text-accent">end to end.</span></h2>
             </div>
             <Link href="/services" className="mono text-sm uppercase tracking-wider text-accent hover:underline">All services →</Link>
-          </div>
+          </FadeIn>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {serviceFamilies.map((s) => (
-              <Link key={s.num} href={s.href} className="card card-hover p-7 block">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="mono text-accent text-xs">{s.num}</div>
-                  {s.icon}
-                </div>
-                <h3 className="text-xl mb-3 font-medium">{s.title}</h3>
-                <p className="text-sm text-mute leading-relaxed mb-6">{s.sub}</p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {s.tags.map((t) => (
-                    <span key={t} className="pill">{t}</span>
-                  ))}
-                </div>
-                <div className="mono text-xs text-accent uppercase tracking-wider">{s.cta}</div>
-              </Link>
+            {serviceFamilies.map((s, i) => (
+              <FadeIn key={s.num} delay={i * 60}>
+                <Link href={s.href} className="card card-hover p-7 block h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="mono text-accent text-xs">{s.num}</div>
+                    {s.icon}
+                  </div>
+                  <h3 className="text-xl mb-3 font-medium">{s.title}</h3>
+                  <p className="text-sm text-mute leading-relaxed mb-6">{s.sub}</p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {s.tags.map((t) => (
+                      <span key={t} className="pill">{t}</span>
+                    ))}
+                  </div>
+                  <div className="mono text-xs text-accent uppercase tracking-wider">{s.cta}</div>
+                </Link>
+              </FadeIn>
             ))}
+            <FadeIn delay={serviceFamilies.length * 60}>
             <Link href="/contact" className="card card-hover card-accent p-7 text-ink block">
               <div className="flex items-start justify-between mb-6">
                 <div className="mono text-xs opacity-70">→ Not sure?</div>
@@ -254,6 +258,7 @@ export default async function Home() {
               <p className="text-sm leading-relaxed mb-6 opacity-80">30-minute scoping call. Free, examiner-led. We&rsquo;ll match you to the right practice family — or tell you if it isn&rsquo;t us.</p>
               <div className="mono text-xs uppercase tracking-wider font-medium">Open scoping call →</div>
             </Link>
+            </FadeIn>
           </div>
         </div>
       </section>
@@ -262,7 +267,7 @@ export default async function Home() {
       <section id="ai-methodology" className="py-24 border-t border-line relative overflow-hidden scroll-mt-20">
         <div className="absolute inset-0 ph-grid opacity-30 pointer-events-none" />
         <div className="max-w-page mx-auto px-6 lg:px-10 relative">
-          <div className="grid lg:grid-cols-12 gap-10 items-end mb-14">
+          <FadeIn className="grid lg:grid-cols-12 gap-10 items-end mb-14">
             <div className="lg:col-span-8">
               <div className="flex items-center gap-3 mb-5 flex-wrap">
                 <span className="label">[ Proprietary · CE/VectorAI ]</span>
@@ -274,8 +279,8 @@ export default async function Home() {
             <div className="lg:col-span-4">
               <p className="text-mute leading-relaxed">CE/VectorAI is the examiner-supervised AI methodology we&rsquo;re building — designed to compress weeks of forensic discovery into days, with every artefact kept chain-of-custody clean and court-admissible. Grounded in years of redacted casework no public model can legally access.</p>
             </div>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          </FadeIn>
+          <FadeIn className="grid md:grid-cols-2 lg:grid-cols-4 gap-4" delay={100}>
             <div className="card p-7">
               <div className="flex items-center justify-between mb-8">
                 <div className="mono text-accent text-xs">STAGE 01 · TRIAGE</div>
@@ -316,8 +321,8 @@ export default async function Home() {
               <h3 className="text-lg font-medium mb-3">Examiner signs.</h3>
               <p className="text-sm text-mute leading-relaxed">Every inference reviewed and signed by a certified examiner. Reports compile from the chain-of-custody log — never from the model itself.</p>
             </div>
-          </div>
-          <div className="card card-hover mt-12 p-8 lg:p-10 grid lg:grid-cols-12 gap-8 items-center">
+          </FadeIn>
+          <FadeIn delay={200}><div className="card card-hover mt-12 p-8 lg:p-10 grid lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7">
               <div className="label mb-4">[ For investors ]</div>
               <h3 className="display text-2xl lg:text-3xl mb-3">Examiner-led IP. <span className="text-accent">A casework moat the foundation models can&rsquo;t touch.</span></h3>
@@ -327,14 +332,14 @@ export default async function Home() {
               <Link href="/contact" className="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium inline-flex justify-center">Request investor brief →</Link>
               <Link href="/contact" className="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex justify-center">Schedule a call</Link>
             </div>
-          </div>
+          </div></FadeIn>
         </div>
       </section>
 
       {/* TRAINING CALLOUT */}
       <section className="py-16 border-t border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="card overflow-hidden grid lg:grid-cols-2">
+          <FadeIn><div className="card overflow-hidden grid lg:grid-cols-2">
             <div className="p-10 lg:p-14">
               <div className="label mb-6">[ Cyber Eye Academy ]</div>
               <h2 className="display text-4xl lg:text-5xl mb-6">
@@ -356,14 +361,14 @@ export default async function Home() {
               </div>
             </div>
             <Placeholder label="classroom · hands-on forensic lab" className="aspect-[5/4] lg:aspect-auto border-l border-line" />
-          </div>
+          </div></FadeIn>
         </div>
       </section>
 
       {/* SECTORS */}
       <section className="py-24 border-y border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="grid lg:grid-cols-12 gap-10 mb-14">
+          <FadeIn className="grid lg:grid-cols-12 gap-10 mb-14">
             <div className="lg:col-span-5">
               <div className="label mb-4">[ Sectors ]</div>
               <h2 className="display text-5xl lg:text-6xl">Who we<br /><span className="text-accent">serve.</span></h2>
@@ -373,8 +378,8 @@ export default async function Home() {
                 Our examiners are trained for adversarial environments — courtrooms, boardrooms, and active threat scenarios. We work shoulder-to-shoulder with investigators on cases where the evidence has to stand up to the toughest cross-examination.
               </p>
             </div>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+          </FadeIn>
+          <FadeIn delay={100} className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
             {sectors.map((s) => (
               <Link key={s.slug} href={`/sectors/${s.slug}`} className="card card-hover p-6 block">
                 <div className="mono text-xs text-accent mb-12">{s.num}</div>
@@ -382,14 +387,14 @@ export default async function Home() {
                 <p className="text-xs text-mute leading-relaxed">{s.sub}</p>
               </Link>
             ))}
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* FEATURED CASE FILE */}
       <section className="py-24 relative">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="grid lg:grid-cols-12 gap-10 items-center">
+          <FadeIn className="grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6">
               <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-line">
                 <div className="absolute inset-0 ph ph-grid" data-label="case file · redacted exhibit" />
@@ -426,20 +431,20 @@ export default async function Home() {
               </div>
               <Link href="/knowledge" className="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control inline-flex">Read the full case file →</Link>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
       <section className="py-24 border-y border-line bg-surface/30 overflow-hidden">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="flex items-end justify-between mb-14">
+          <FadeIn className="flex items-end justify-between mb-14">
             <div>
               <div className="label mb-4">[ Voices · 6 ]</div>
               <h2 className="display text-5xl">What clients <span className="text-accent">say.</span></h2>
             </div>
             <div className="label hidden md:block">→ drift · hover to pause</div>
-          </div>
+          </FadeIn>
         </div>
         <VoicesMarquee testimonials={testimonials} />
       </section>
@@ -452,7 +457,7 @@ export default async function Home() {
       {/* FINAL CTA */}
       <section className="py-24">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="card relative overflow-hidden">
+          <FadeIn><div className="card relative overflow-hidden">
             <div className="absolute inset-0 ph-grid opacity-40" />
             <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-accent/20 blur-3xl" />
             <div className="relative p-12 lg:p-20 text-center">
@@ -466,7 +471,7 @@ export default async function Home() {
                 <a href="tel:+918045678910" className="btn-ghost">+91 80 4567 8910</a>
               </div>
             </div>
-          </div>
+          </div></FadeIn>
         </div>
       </section>
     </>
