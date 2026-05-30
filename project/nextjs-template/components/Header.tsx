@@ -75,6 +75,7 @@ export default function Header() {
                 href="/services"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'services'}
+                onClick={closeMenu}
               >
                 Services <sup className="text-accent">5</sup>
                 <span className="caret" aria-hidden="true" />
@@ -117,6 +118,7 @@ export default function Header() {
                 href="/sectors"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'sectors'}
+                onClick={closeMenu}
               >
                 Sectors
                 <span className="caret" aria-hidden="true" />
@@ -159,6 +161,7 @@ export default function Header() {
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'knowledge'}
                 style={{ minWidth: 'max-content' }}
+                onClick={closeMenu}
               >
                 Knowledge Centre
                 <span className="caret" aria-hidden="true" />
@@ -196,6 +199,7 @@ export default function Header() {
                 href="/training"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'academy'}
+                onClick={closeMenu}
               >
                 Academy
                 <span className="caret" aria-hidden="true" />
@@ -238,6 +242,7 @@ export default function Header() {
                 href="/about"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'about'}
+                onClick={closeMenu}
               >
                 About
                 <span className="caret" aria-hidden="true" />
