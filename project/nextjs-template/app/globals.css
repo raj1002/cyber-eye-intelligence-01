@@ -730,6 +730,25 @@ body.nav-open .mobile-drawer { transform: translateX(0); }
 details[open] summary .chev { transform: rotate(45deg); }
 .chev { transition: transform 0.2s ease; }
 
+/* ─── Scroll fade-in ─────────────────────────────────────────────────────── */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  will-change: opacity, transform;
+}
+.fade-in--up    { transform: translateY(24px); }
+.fade-in--down  { transform: translateY(-24px); }
+.fade-in--left  { transform: translateX(24px); }
+.fade-in--right { transform: translateX(-24px); }
+.fade-in--none  { transform: none; }
+.fade-in--visible {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { opacity: 1; transform: none; transition: none; }
+}
+
 /* Hero display styles */
 #hero-parallax .display {
   font-weight: 700;
