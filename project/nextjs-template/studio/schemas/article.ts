@@ -5,6 +5,7 @@ export const article = defineType({
   title: 'Article',
   type: 'document',
   fields: [
+    defineField({ name: 'slug', type: 'slug', options: { source: 'title' }, validation: (r) => r.required() }),
     defineField({ name: 'type', type: 'string' }),
     defineField({ name: 'readTime', type: 'string' }),
     defineField({ name: 'date', type: 'string' }),

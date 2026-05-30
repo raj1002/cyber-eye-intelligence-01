@@ -66,6 +66,7 @@ export interface SanityCourse {
 export interface SanityArticle {
   _id: string;
   _type: 'article';
+  slug?: { current: string };
   type?: string;
   readTime?: string;
   date?: string;
@@ -115,6 +116,31 @@ export interface SanityTeamMember {
   role?: string;
   bio?: string;
   order?: number;
+}
+
+export interface SanityPage {
+  _id: string;
+  _type: 'page';
+  title: string;
+  slug: { current: string };
+  description?: string;
+  body?: unknown[];
+  layout?: 'default' | 'wide' | 'narrow';
+  seoTitle?: string;
+  seoDescription?: string;
+  publishedAt?: string;
+}
+
+export interface SanitySettings {
+  _id: string;
+  _type: 'siteSettings';
+  heroHeading?: string;
+  heroSubheading?: string;
+  heroStats?: { value: string; label: string }[];
+  marqueeLogos?: string[];
+  featuredCaseQuote?: string;
+  featuredCaseAttribution?: string;
+  featuredCaseLabel?: string;
 }
 
 // ─── Helper functions ────────────────────────────────────────────────────────
@@ -213,13 +239,27 @@ export async function getArticles(): Promise<SanityArticle[]> {
   try {
     return await sanityClient.fetch<SanityArticle[]>(
       `*[_type == "article"] | order(publishedAt desc) {
-        _id, _type, type, readTime, date, title, label, body, publishedAt, seoTitle, seoDescription
+        _id, _type, slug, type, readTime, date, title, label, body, publishedAt, seoTitle, seoDescription
       }`,
       {},
       { next: { revalidate: 60 } }
     );
   } catch {
     return [];
+  }
+}
+
+export async function getArticleBySlug(slug: string): Promise<SanityArticle | null> {
+  try {
+    return await sanityClient.fetch<SanityArticle | null>(
+      `*[_type == "article" && slug.current == $slug][0] {
+        _id, _type, slug, type, readTime, date, title, label, body, publishedAt, seoTitle, seoDescription
+      }`,
+      { slug },
+      { next: { revalidate: 60 } }
+    );
+  } catch {
+    return null;
   }
 }
 
@@ -270,5 +310,48 @@ export async function getTeamMembers(): Promise<SanityTeamMember[]> {
     );
   } catch {
     return [];
+  }
+}
+
+export async function getPages(): Promise<SanityPage[]> {
+  try {
+    return await sanityClient.fetch<SanityPage[]>(
+      `*[_type == "page"] | order(publishedAt asc) {
+        _id, _type, title, slug, description, layout, seoTitle, seoDescription, publishedAt
+      }`,
+      {},
+      { next: { revalidate: 300 } }
+    );
+  } catch {
+    return [];
+  }
+}
+
+export async function getPageBySlug(slug: string): Promise<SanityPage | null> {
+  try {
+    return await sanityClient.fetch<SanityPage | null>(
+      `*[_type == "page" && slug.current == $slug][0] {
+        _id, _type, title, slug, description, body, layout, seoTitle, seoDescription, publishedAt
+      }`,
+      { slug },
+      { next: { revalidate: 300 } }
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function getSiteSettings(): Promise<SanitySettings | null> {
+  try {
+    return await sanityClient.fetch<SanitySettings | null>(
+      `*[_type == "siteSettings"][0] {
+        _id, _type, heroHeading, heroSubheading, heroStats, marqueeLogos,
+        featuredCaseQuote, featuredCaseAttribution, featuredCaseLabel
+      }`,
+      {},
+      { next: { revalidate: 300 } }
+    );
+  } catch {
+    return null;
   }
 }

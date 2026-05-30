@@ -3,56 +3,26 @@ import { Hex, Placeholder } from "@/components/Primitives";
 import UnicornAura from "@/components/UnicornAura";
 import VoicesMarquee from "@/components/parallax/VoicesMarquee";
 import InsightsRow from "@/components/parallax/InsightsRow";
+import { getServiceFamilies, getSectors, getTestimonials, getArticles, getSiteSettings } from "@/lib/sanity";
 
-const serviceFamilies = [
-  {
-    num: "01 / 05",
-    title: "Digital Forensics",
-    sub: "Evidence collection, incident response, data recovery, malware analysis, mobile & network forensics — with court-grade chain of custody.",
-    tags: ["Evidence", "IR", "Mobile", "Network"],
-    cta: "8 services →",
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6" stroke="#10B981" strokeWidth="1.2"/><circle cx="10" cy="10" r="2" fill="#10B981"/></svg>,
-    href: "/services#fam-digital-forensics",
-  },
-  {
-    num: "02 / 05",
-    title: "Digital Intelligence",
-    sub: "OSINT, SOCMINT, dark web monitoring, threat intelligence, data mining and predictive analytics — turning the open digital world into actionable signal.",
-    tags: ["OSINT", "SOCMINT", "Dark web", "Threat intel"],
-    cta: "7 services →",
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10c2-4 5-6 7-6s5 2 7 6c-2 4-5 6-7 6s-5-2-7-6z" stroke="#10B981" strokeWidth="1.2"/><circle cx="10" cy="10" r="2.5" fill="#10B981"/></svg>,
-    href: "/services#fam-digital-intelligence",
-  },
-  {
-    num: "03 / 05",
-    title: "Managed Security Services",
-    sub: "24/7 SOC, XDR, vulnerability management, EDR, SIEM, IAM, UEBA and compliance — across on-prem, cloud and hybrid infrastructures.",
-    tags: ["SOC 24/7", "XDR", "SIEM", "IAM"],
-    cta: "13 services →",
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="#10B981" strokeWidth="1.2"/><path d="M7 10l2 2 4-4" stroke="#10B981" strokeWidth="1.4"/></svg>,
-    href: "/services#fam-managed-security",
-  },
-  {
-    num: "04 / 05",
-    title: "Managed Digital Forensic Services",
-    sub: "On-premises forensic infrastructure, dedicated examiners, agile incident response and tailored training — delivered inside your facility.",
-    tags: ["On-prem lab", "Agile IR", "Training"],
-    cta: "5 services →",
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#10B981" strokeWidth="1.2"/><path d="M3 7h14M7 3v14" stroke="#10B981" strokeWidth="1.2"/></svg>,
-    href: "/services#fam-managed-forensics",
-  },
-  {
-    num: "05 / 05",
-    title: "Data Recovery",
-    sub: "Hard drive, file system, database, removable media, ransomware-encrypted, mobile and chain-of-custody forensic recovery — across all major brands and formats.",
-    tags: ["HDD / SSD", "RAID", "Ransomware", "Mobile"],
-    cta: "6 services →",
-    icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="5" rx="6" ry="2" stroke="#10B981" strokeWidth="1.2"/><path d="M4 5v10c0 1 3 2 6 2s6-1 6-2V5M4 10c0 1 3 2 6 2s6-1 6-2" stroke="#10B981" strokeWidth="1.2"/></svg>,
-    href: "/services#fam-data-recovery",
-  },
+// Icon map keyed by service slug — controls appearance while content comes from Sanity
+const SERVICE_ICONS: Record<string, React.ReactNode> = {
+  "digital-forensics": <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6" stroke="#10B981" strokeWidth="1.2"/><circle cx="10" cy="10" r="2" fill="#10B981"/></svg>,
+  "digital-intelligence": <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10c2-4 5-6 7-6s5 2 7 6c-2 4-5 6-7 6s-5-2-7-6z" stroke="#10B981" strokeWidth="1.2"/><circle cx="10" cy="10" r="2.5" fill="#10B981"/></svg>,
+  "managed-security": <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z" stroke="#10B981" strokeWidth="1.2"/><path d="M7 10l2 2 4-4" stroke="#10B981" strokeWidth="1.4"/></svg>,
+  "managed-forensics": <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#10B981" strokeWidth="1.2"/><path d="M3 7h14M7 3v14" stroke="#10B981" strokeWidth="1.2"/></svg>,
+  "data-recovery": <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="5" rx="6" ry="2" stroke="#10B981" strokeWidth="1.2"/><path d="M4 5v10c0 1 3 2 6 2s6-1 6-2V5M4 10c0 1 3 2 6 2s6-1 6-2" stroke="#10B981" strokeWidth="1.2"/></svg>,
+};
+
+const FALLBACK_SERVICES = [
+  { num: "01 / 05", title: "Digital Forensics", sub: "Evidence collection, incident response, data recovery, malware analysis, mobile & network forensics — with court-grade chain of custody.", tags: ["Evidence", "IR", "Mobile", "Network"], cta: "8 services →", icon: SERVICE_ICONS["digital-forensics"], href: "/services#fam-digital-forensics" },
+  { num: "02 / 05", title: "Digital Intelligence", sub: "OSINT, SOCMINT, dark web monitoring, threat intelligence, data mining and predictive analytics — turning the open digital world into actionable signal.", tags: ["OSINT", "SOCMINT", "Dark web", "Threat intel"], cta: "7 services →", icon: SERVICE_ICONS["digital-intelligence"], href: "/services#fam-digital-intelligence" },
+  { num: "03 / 05", title: "Managed Security Services", sub: "24/7 SOC, XDR, vulnerability management, EDR, SIEM, IAM, UEBA and compliance — across on-prem, cloud and hybrid infrastructures.", tags: ["SOC 24/7", "XDR", "SIEM", "IAM"], cta: "13 services →", icon: SERVICE_ICONS["managed-security"], href: "/services#fam-managed-security" },
+  { num: "04 / 05", title: "Managed Digital Forensic Services", sub: "On-premises forensic infrastructure, dedicated examiners, agile incident response and tailored training — delivered inside your facility.", tags: ["On-prem lab", "Agile IR", "Training"], cta: "5 services →", icon: SERVICE_ICONS["managed-forensics"], href: "/services#fam-managed-forensics" },
+  { num: "05 / 05", title: "Data Recovery", sub: "Hard drive, file system, database, removable media, ransomware-encrypted, mobile and chain-of-custody forensic recovery — across all major brands and formats.", tags: ["HDD / SSD", "RAID", "Ransomware", "Mobile"], cta: "6 services →", icon: SERVICE_ICONS["data-recovery"], href: "/services#fam-data-recovery" },
 ];
 
-const sectors = [
+const FALLBACK_SECTORS = [
   { num: "S/01", title: "Law Enforcement", sub: "Cyber cells, anti-fraud units, SIT support.", slug: "law-enforcement" },
   { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, expert witness, § 65B certification.", slug: "legal-litigation" },
   { num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct.", slug: "corporate-enterprise" },
@@ -60,7 +30,52 @@ const sectors = [
   { num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims, AML, KYC investigations.", slug: "bfsi-insurance" },
 ];
 
-export default function Home() {
+const FALLBACK_STATS = [
+  { value: "600+", label: "Cases closed" },
+  { value: "98%", label: "Admissibility rate" },
+  { value: "24/7", label: "Incident response" },
+  { value: "12", label: "Certified examiners" },
+];
+
+export default async function Home() {
+  const [rawServices, rawSectors, testimonials, articles, settings] = await Promise.all([
+    getServiceFamilies(),
+    getSectors(),
+    getTestimonials(),
+    getArticles(),
+    getSiteSettings(),
+  ]);
+
+  const total = rawServices.length;
+  const serviceFamilies = rawServices.length > 0
+    ? rawServices.map((s, i) => ({
+        num: `${String(i + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`,
+        title: s.title,
+        sub: s.tagline ?? s.description ?? '',
+        tags: (s.services ?? []).slice(0, 4).map((sv) => sv.title.split(' ')[0]),
+        cta: s.services?.length ? `${s.services.length} services →` : 'View →',
+        icon: SERVICE_ICONS[s.slug.current] ?? SERVICE_ICONS["digital-forensics"],
+        href: `/services#fam-${s.slug.current}`,
+      }))
+    : FALLBACK_SERVICES;
+
+  const sectors = rawSectors.length > 0
+    ? rawSectors.map((s, i) => ({
+        num: `S/${String(i + 1).padStart(2, '0')}`,
+        title: s.title,
+        sub: s.tagline ?? s.description ?? '',
+        slug: s.slug.current,
+      }))
+    : FALLBACK_SECTORS;
+
+  const heroStats = settings?.heroStats && settings.heroStats.length > 0
+    ? settings.heroStats
+    : FALLBACK_STATS;
+
+  const caseQuote = settings?.featuredCaseQuote ?? "Recovered 14 deleted chats from a wiped iPhone. Conviction secured in 9 months.";
+  const caseAttribution = settings?.featuredCaseAttribution ?? "Sr. Counsel, listed manufacturing company";
+  const caseLabel = settings?.featuredCaseLabel ?? "Mumbai · Corporate IP Theft";
+
   return (
     <>
       {/* HERO */}
@@ -152,22 +167,12 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 lg:mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pt-8 border-t border-line" id="hero-stats">
-            <div data-stat>
-              <div className="display text-3xl lg:text-4xl num" data-value="600" data-suffix="+">600<span className="text-accent">+</span></div>
-              <div className="label mt-2">Cases closed</div>
-            </div>
-            <div data-stat>
-              <div className="display text-3xl lg:text-4xl num" data-value="98" data-suffix="%">98<span className="text-accent">%</span></div>
-              <div className="label mt-2">Admissibility rate</div>
-            </div>
-            <div data-stat>
-              <div className="display text-3xl lg:text-4xl num" data-value="24" data-suffix="/7">24<span className="text-accent">/7</span></div>
-              <div className="label mt-2">Incident response</div>
-            </div>
-            <div data-stat>
-              <div className="display text-3xl lg:text-4xl num" data-value="12">12</div>
-              <div className="label mt-2">Certified examiners</div>
-            </div>
+            {heroStats.map((stat) => (
+              <div key={stat.label} data-stat>
+                <div className="display text-3xl lg:text-4xl num">{stat.value}</div>
+                <div className="label mt-2">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -381,11 +386,11 @@ export default function Home() {
             <div className="lg:col-span-6">
               <div className="label mb-6">[ Case File · #CE-2025-014 ]</div>
               <blockquote className="display text-3xl lg:text-4xl leading-tight mb-8">
-                &ldquo;Recovered 14 deleted chats from a wiped iPhone. Conviction secured in <span className="text-accent">9 months</span>.&rdquo;
+                &ldquo;{caseQuote}&rdquo;
               </blockquote>
               <div className="text-mute mb-10">
-                — Sr. Counsel, listed manufacturing company<br />
-                <span className="label">Mumbai · Corporate IP Theft</span>
+                — {caseAttribution}<br />
+                <span className="label">{caseLabel}</span>
               </div>
               <div className="grid grid-cols-3 gap-6 pb-8 border-b border-line mb-8">
                 <div>
@@ -418,12 +423,12 @@ export default function Home() {
             <div className="label hidden md:block">→ drift · hover to pause</div>
           </div>
         </div>
-        <VoicesMarquee />
+        <VoicesMarquee testimonials={testimonials} />
       </section>
 
       {/* INSIGHTS */}
       <section className="py-24">
-        <InsightsRow />
+        <InsightsRow articles={articles} />
       </section>
 
       {/* FINAL CTA */}

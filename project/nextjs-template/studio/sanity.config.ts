@@ -10,6 +10,8 @@ import { whitepaper } from './schemas/whitepaper';
 import { blog } from './schemas/blog';
 import { testimonial } from './schemas/testimonial';
 import { teamMember } from './schemas/teamMember';
+import { page } from './schemas/page';
+import { siteSettings } from './schemas/siteSettings';
 
 export default defineConfig({
   name: 'cyber-eye-intelligence',
@@ -18,6 +20,6 @@ export default defineConfig({
   dataset: 'production',
   plugins: [structureTool(), visionTool()],
   schema: {
-    types: [service, sector, caseFile, course, article, whitepaper, blog, testimonial, teamMember],
+    types: [service, sector, caseFile, course, article, whitepaper, blog, testimonial, teamMember, page, siteSettings],
   },
 });
