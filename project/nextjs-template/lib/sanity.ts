@@ -1,8 +1,12 @@
 import { createClient } from 'next-sanity';
 
+const rawProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? '';
+const projectId = /^[a-z0-9-]+$/.test(rawProjectId) ? rawProjectId : 'f36piw8r';
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production';
+
 export const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'f36piw8r',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
+  projectId,
+  dataset,
   apiVersion: '2024-05-01',
   useCdn: true,
 });
