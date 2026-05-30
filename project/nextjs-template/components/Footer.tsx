@@ -99,8 +99,8 @@ export default function Footer() {
                   <circle cx="10" cy="7" r="2" fill="#10B981"/>
                 </svg>
               </div>
-              <div className="text-sm mb-1">WeWork Lightbridge, Powai</div>
-              <p className="text-xs text-mute mb-3">Mumbai 400076</p>
+              <div className="text-sm mb-1">6th Floor, Light Bridge, H.B.P</div>
+              <p className="text-xs text-mute mb-3">Saki Vihar Road, Powai, Mumbai 400072</p>
               <div className="mono text-xs text-accent uppercase tracking-wider">Open in Google Maps →</div>
             </div>
           </a>
@@ -119,7 +119,6 @@ export default function Footer() {
             <p className="text-mute text-sm max-w-xs leading-relaxed mb-8">Digital forensics, intelligence and managed security. Mumbai · Bengaluru · Delhi.</p>
             <div className="flex flex-wrap gap-2">
               <span className="pill">ISO 17025 aligned</span>
-              <span className="pill">CERT-In empanelled</span>
             </div>
           </div>
           <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -179,7 +178,7 @@ export default function Footer() {
               </ul>
               <div className="label mb-2 mt-6">24/7</div>
               <p className="text-sm text-mute leading-relaxed">
-                <a href="tel:+918045678910" className="text-white hover:text-accent transition-colors">+91 80 4567 8910</a>
+                <a href="tel:+919833565665" className="text-white hover:text-accent transition-colors">+91 98335 65665</a>
               </p>
             </div>
           </div>
@@ -187,7 +186,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-line pt-8 flex flex-wrap justify-between gap-4 label">
-          <div>© 2026 Cyber Eye Intelligence Pvt Ltd · CIN: U72200MH2018PTC000000</div>
+          <div>© 2026 Cyber Eye Intelligence LLP · LLPIN: ACT-8209 · GSTIN: 27AWFC0340D1ZN</div>
           <div className="flex gap-6">
             <Link href="/legal/privacy" className="nav-link">Privacy</Link>
             <Link href="/legal/terms" className="nav-link">Terms</Link>
