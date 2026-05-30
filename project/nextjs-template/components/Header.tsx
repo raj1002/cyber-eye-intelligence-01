@@ -1,28 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [navOpen, setNavOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const navRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
 
-  const closeMenu = useCallback(() => setOpenMenu(null), []);
+  const closeMenu = () => setOpenMenu(null);
 
-  const toggleMenu = (id: string) =>
-    setOpenMenu((prev) => (prev === id ? null : id));
-
-  // Close on outside click
+  // Close dropdown whenever the route changes
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
-        closeMenu();
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [closeMenu]);
+    closeMenu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   useEffect(() => {
     const t = document.documentElement.getAttribute('data-theme');
@@ -71,18 +64,21 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm" ref={navRef}>
+          <nav className="hidden lg:flex items-center gap-8 text-sm">
             {/* Services */}
-            <div className={`nav-item${openMenu === 'services' ? ' menu-open' : ''}`}>
-              <button
-                type="button"
-                onClick={() => toggleMenu('services')}
+            <div
+              className={`nav-item${openMenu === 'services' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('services')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/services"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'services'}
               >
                 Services <sup className="text-accent">5</sup>
                 <span className="caret" aria-hidden="true" />
-              </button>
+              </Link>
               <div className="nav-menu" role="menu">
                 <div className="menu-head">
                   <span className="label">Practice families</span>
@@ -112,16 +108,19 @@ export default function Header() {
             </div>
 
             {/* Sectors */}
-            <div className={`nav-item${openMenu === 'sectors' ? ' menu-open' : ''}`}>
-              <button
-                type="button"
-                onClick={() => toggleMenu('sectors')}
+            <div
+              className={`nav-item${openMenu === 'sectors' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('sectors')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/sectors"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'sectors'}
               >
                 Sectors
                 <span className="caret" aria-hidden="true" />
-              </button>
+              </Link>
               <div className="nav-menu" role="menu">
                 <div className="menu-head">
                   <span className="label">Who we serve</span>
@@ -150,17 +149,20 @@ export default function Header() {
             </div>
 
             {/* Knowledge Centre */}
-            <div className={`nav-item${openMenu === 'knowledge' ? ' menu-open' : ''}`}>
-              <button
-                type="button"
-                onClick={() => toggleMenu('knowledge')}
+            <div
+              className={`nav-item${openMenu === 'knowledge' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('knowledge')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/knowledge"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'knowledge'}
                 style={{ minWidth: 'max-content' }}
               >
                 Knowledge Centre
                 <span className="caret" aria-hidden="true" />
-              </button>
+              </Link>
               <div className="nav-menu" role="menu" style={{ minWidth: 300 }}>
                 <div className="menu-head">
                   <span className="label">Resources</span>
@@ -185,16 +187,19 @@ export default function Header() {
             </div>
 
             {/* Academy */}
-            <div className={`nav-item${openMenu === 'academy' ? ' menu-open' : ''}`}>
-              <button
-                type="button"
-                onClick={() => toggleMenu('academy')}
+            <div
+              className={`nav-item${openMenu === 'academy' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('academy')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/training"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'academy'}
               >
                 Academy
                 <span className="caret" aria-hidden="true" />
-              </button>
+              </Link>
               <div className="nav-menu" role="menu" style={{ minWidth: 320 }}>
                 <div className="menu-head">
                   <span className="label">Cyber Eye Academy</span>
@@ -224,16 +229,19 @@ export default function Header() {
             </div>
 
             {/* About */}
-            <div className={`nav-item${openMenu === 'about' ? ' menu-open' : ''}`}>
-              <button
-                type="button"
-                onClick={() => toggleMenu('about')}
+            <div
+              className={`nav-item${openMenu === 'about' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('about')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/about"
                 className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
                 aria-expanded={openMenu === 'about'}
               >
                 About
                 <span className="caret" aria-hidden="true" />
-              </button>
+              </Link>
               <div className="nav-menu" role="menu" style={{ minWidth: 300, left: 'auto', right: 0 }}>
                 <div className="menu-head">
                   <span className="label">The firm</span>
