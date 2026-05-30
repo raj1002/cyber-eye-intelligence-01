@@ -1,11 +1,13 @@
 import { Placeholder } from "@/components/Primitives";
+import { getTeamMembers } from "@/lib/sanity";
 
 export const metadata = {
   title: "About — Cyber Eye Intelligence",
   description: "Founded in 2018 by three forensic examiners. Fully accredited lab. Examiner-led, never sold.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const teamMembers = await getTeamMembers();
   return (
     <>
       {/* Hero */}
@@ -90,6 +92,26 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Team */}
+      {teamMembers.length > 0 && (
+        <section className="py-16 border-b border-line">
+          <div className="max-w-page mx-auto px-6 lg:px-10">
+            <div className="label mb-6">[ The team ]</div>
+            <h2 className="display text-5xl mb-12">Named examiners. <span className="text-accent">No middlemen.</span></h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {teamMembers.map((member) => (
+                <div key={member._id} className="card p-7">
+                  <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
+                  <h3 className="text-lg font-medium mb-1">{member.name}</h3>
+                  {member.role && <div className="label mb-3">{member.role}</div>}
+                  {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Accreditations */}
       <section className="py-16">
