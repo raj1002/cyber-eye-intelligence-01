@@ -20,10 +20,16 @@ export default function UnicornAura({
   showGrid?: boolean;
 }) {
   useEffect(() => {
-    // Guard against double-init across client navigations
     const w = window as unknown as { UnicornStudio?: { isInitialized: boolean; init: () => void } };
-    if (w.UnicornStudio?.isInitialized) return;
-    w.UnicornStudio = { isInitialized: false, init: () => {} };
+
+    if (w.UnicornStudio?.isInitialized) {
+      // Script already loaded — re-init to pick up the freshly rendered DOM element
+      w.UnicornStudio.init();
+      return;
+    }
+
+    // Script injection already in progress — don't inject twice
+    if (w.UnicornStudio) return;
 
     const s = document.createElement("script");
     s.src =
