@@ -1,13 +1,21 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [navOpen, setNavOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const pathname = usePathname();
 
   const closeMenu = () => setOpenMenu(null);
+
+  // Close dropdown whenever the route changes
+  useEffect(() => {
+    closeMenu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   useEffect(() => {
     const t = document.documentElement.getAttribute('data-theme');
