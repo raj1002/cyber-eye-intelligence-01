@@ -1,10 +1,28 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function Header() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [navOpen, setNavOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  const closeMenu = useCallback(() => setOpenMenu(null), []);
+
+  const toggleMenu = (id: string) =>
+    setOpenMenu((prev) => (prev === id ? null : id));
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        closeMenu();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [closeMenu]);
 
   useEffect(() => {
     const t = document.documentElement.getAttribute('data-theme');
@@ -53,13 +71,18 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm">
+          <nav className="hidden lg:flex items-center gap-8 text-sm" ref={navRef}>
             {/* Services */}
-            <div className="nav-item">
-              <Link href="/services" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div className={`nav-item${openMenu === 'services' ? ' menu-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => toggleMenu('services')}
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'services'}
+              >
                 Services <sup className="text-accent">5</sup>
                 <span className="caret" aria-hidden="true" />
-              </Link>
+              </button>
               <div className="nav-menu" role="menu">
                 <div className="menu-head">
                   <span className="label">Practice families</span>
@@ -72,7 +95,7 @@ export default function Header() {
                   { idx: '04', href: '/services#fam-managed-forensics', title: 'Managed Forensics', desc: 'On-premises labs, dedicated examiners, agile IR.' },
                   { idx: '05', href: '/services#fam-data-recovery', title: 'Data Recovery', desc: 'Disk, RAID, mobile, cloud — physical & logical.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -82,18 +105,23 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/services">All services →</Link>
-                  <Link href="/contact">Open a case</Link>
+                  <Link href="/services" onClick={closeMenu}>All services →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Open a case</Link>
                 </div>
               </div>
             </div>
 
             {/* Sectors */}
-            <div className="nav-item">
-              <Link href="/sectors" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div className={`nav-item${openMenu === 'sectors' ? ' menu-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => toggleMenu('sectors')}
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'sectors'}
+              >
                 Sectors
                 <span className="caret" aria-hidden="true" />
-              </Link>
+              </button>
               <div className="nav-menu" role="menu">
                 <div className="menu-head">
                   <span className="label">Who we serve</span>
@@ -106,7 +134,7 @@ export default function Header() {
                   { idx: 'S/04', href: '/sectors/government', title: 'Government', desc: 'CERT-aligned, classified handling, audits.' },
                   { idx: 'S/05', href: '/sectors/bfsi-insurance', title: 'BFSI & Insurance', desc: 'Fraud, AML, customer-data investigations.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -116,17 +144,23 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/sectors">All sectors →</Link>
+                  <Link href="/sectors" onClick={closeMenu}>All sectors →</Link>
                 </div>
               </div>
             </div>
 
             {/* Knowledge Centre */}
-            <div className="nav-item">
-              <Link href="/knowledge" className="nav-link nav-trigger mono uppercase text-xs tracking-wider" style={{ minWidth: 'max-content' }}>
+            <div className={`nav-item${openMenu === 'knowledge' ? ' menu-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => toggleMenu('knowledge')}
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'knowledge'}
+                style={{ minWidth: 'max-content' }}
+              >
                 Knowledge Centre
                 <span className="caret" aria-hidden="true" />
-              </Link>
+              </button>
               <div className="nav-menu" role="menu" style={{ minWidth: 300 }}>
                 <div className="menu-head">
                   <span className="label">Resources</span>
@@ -138,7 +172,7 @@ export default function Header() {
                   { idx: 'K/03', href: '/knowledge?tab=whitepapers', title: 'Whitepapers', desc: 'Standards, methodology, compliance.' },
                   { idx: 'K/04', href: '/knowledge?tab=blogs', title: 'FAQ', desc: 'Common forensic questions answered.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -151,11 +185,16 @@ export default function Header() {
             </div>
 
             {/* Academy */}
-            <div className="nav-item">
-              <Link href="/training" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div className={`nav-item${openMenu === 'academy' ? ' menu-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => toggleMenu('academy')}
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'academy'}
+              >
                 Academy
                 <span className="caret" aria-hidden="true" />
-              </Link>
+              </button>
               <div className="nav-menu" role="menu" style={{ minWidth: 320 }}>
                 <div className="menu-head">
                   <span className="label">Cyber Eye Academy</span>
@@ -168,7 +207,7 @@ export default function Header() {
                   { idx: 'A/04', href: '/training#audience-corporate', title: 'For Corporate', desc: 'Insider threat, ransomware tabletop, IR.' },
                   { idx: 'A/05', href: '/training', title: 'Schedule & Cohorts', desc: 'Upcoming dates · in-person, hybrid, online.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -178,18 +217,23 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/training">Course catalogue →</Link>
-                  <Link href="/contact">Enrol</Link>
+                  <Link href="/training" onClick={closeMenu}>Course catalogue →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Enrol</Link>
                 </div>
               </div>
             </div>
 
             {/* About */}
-            <div className="nav-item">
-              <Link href="/about" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div className={`nav-item${openMenu === 'about' ? ' menu-open' : ''}`}>
+              <button
+                type="button"
+                onClick={() => toggleMenu('about')}
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'about'}
+              >
                 About
                 <span className="caret" aria-hidden="true" />
-              </Link>
+              </button>
               <div className="nav-menu" role="menu" style={{ minWidth: 300, left: 'auto', right: 0 }}>
                 <div className="menu-head">
                   <span className="label">The firm</span>
@@ -200,7 +244,7 @@ export default function Header() {
                   { idx: 'B/02', href: '/careers', title: 'Hiring', desc: "Open roles. We're growing the examiner bench." },
                   { idx: 'B/03', href: '/contact', title: 'Contact Us', desc: 'Mumbai · Bengaluru · Delhi. 24/7 incident line.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -210,7 +254,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/contact">Open a case →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Open a case →</Link>
                 </div>
               </div>
             </div>
