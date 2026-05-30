@@ -611,8 +611,6 @@ html, body { transition: background-color 0.35s ease, color 0.35s ease; }
   transition: transform 0.25s ease, color 0.15s ease;
   opacity: 0.65;
 }
-.nav-item:hover .nav-trigger .caret,
-.nav-item:focus-within .nav-trigger .caret,
 .nav-item.menu-open .nav-trigger .caret { transform: rotate(225deg) translate(-1px, -1px); opacity: 1; }
 
 .nav-menu {
@@ -650,8 +648,6 @@ html, body { transition: background-color 0.35s ease, color 0.35s ease; }
   content: "";
   position: absolute; left: 0; right: 0; top: -14px; height: 14px;
 }
-.nav-item:hover > .nav-menu,
-.nav-item:focus-within > .nav-menu,
 .nav-item.menu-open > .nav-menu { opacity: 1; visibility: visible; transform: translateY(0); }
 
 .nav-menu .menu-head {
