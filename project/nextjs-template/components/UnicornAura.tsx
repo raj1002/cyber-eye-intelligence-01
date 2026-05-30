@@ -1,17 +1,17 @@
 "use client";
 
+import Script from "next/script";
 import { useEffect } from "react";
 
-/**
- * Unicorn Studio background animation, tinted via CSS in globals.css.
- * Place inside a `position: relative` parent (e.g. the hero <section>).
- *
- * Usage:
- *   <section className="relative overflow-hidden">
- *     <UnicornAura projectId="bKN5upvoulAmWvInmHza" />
- *     ...content (must be z-indexed above)...
- *   </section>
- */
+const SCRIPT_SRC =
+  "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
+
+type USApi = { init: () => void; destroy?: () => void };
+
+function getUS(): USApi | undefined {
+  return (window as unknown as { UnicornStudio?: USApi }).UnicornStudio;
+}
+
 export default function UnicornAura({
   projectId,
   showGrid = true,
@@ -20,35 +20,28 @@ export default function UnicornAura({
   showGrid?: boolean;
 }) {
   useEffect(() => {
-    const w = window as unknown as { UnicornStudio?: { isInitialized: boolean; init: () => void } };
+    // Script may already be loaded from a previous mount — re-init immediately
+    const us = getUS();
+    if (us) us.init();
 
-    if (w.UnicornStudio?.isInitialized) {
-      // Script already loaded — re-init to pick up the freshly rendered DOM element
-      w.UnicornStudio.init();
-      return;
-    }
-
-    // Script injection already in progress — don't inject twice
-    if (w.UnicornStudio) return;
-
-    const s = document.createElement("script");
-    s.src =
-      "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
-    s.async = true;
-    s.onload = () => {
-      if (w.UnicornStudio && !w.UnicornStudio.isInitialized) {
-        w.UnicornStudio.init();
-        w.UnicornStudio.isInitialized = true;
-      }
+    return () => {
+      // Destroy on unmount so the next mount gets a clean canvas slot
+      getUS()?.destroy?.();
     };
-    document.head.appendChild(s);
   }, []);
 
   return (
-    <div className="aura-wrap" aria-hidden="true">
-      <div data-us-project={projectId} />
-      <div className="aura-tint" />
-      {showGrid && <div className="absolute inset-0 ph-grid opacity-30" />}
-    </div>
+    <>
+      <Script
+        src={SCRIPT_SRC}
+        strategy="afterInteractive"
+        onLoad={() => getUS()?.init()}
+      />
+      <div className="aura-wrap" aria-hidden="true">
+        <div data-us-project={projectId} />
+        <div className="aura-tint" />
+        {showGrid && <div className="absolute inset-0 ph-grid opacity-30" />}
+      </div>
+    </>
   );
 }
