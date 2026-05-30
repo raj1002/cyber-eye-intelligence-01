@@ -1,4 +1,5 @@
 import { Placeholder } from "@/components/Primitives";
+import FadeIn from "@/components/FadeIn";
 import { getTeamMembers } from "@/lib/sanity";
 
 export const metadata = {
@@ -39,21 +40,21 @@ export default async function AboutPage() {
       {/* Stats */}
       <section className="py-16 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="grid md:grid-cols-4 gap-4">
+          <FadeIn className="grid md:grid-cols-4 gap-4">
             <div className="card p-6"><div className="display text-4xl num">2018</div><div className="label mt-2">Founded</div></div>
             <div className="card p-6"><div className="display text-4xl num">600<span className="text-accent">+</span></div><div className="label mt-2">Cases handled</div></div>
             <div className="card p-6"><div className="display text-4xl num">2,400<span className="text-accent">+</span></div><div className="label mt-2">Officers trained</div></div>
             <div className="card p-6"><div className="display text-4xl num">12</div><div className="label mt-2">Certified examiners</div></div>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Three Rules */}
       <section className="py-16 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="label mb-6">[ How we operate ]</div>
-          <h2 className="display text-5xl mb-12">Three <span className="text-accent">rules.</span></h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <FadeIn><div className="label mb-6">[ How we operate ]</div>
+          <h2 className="display text-5xl mb-12">Three <span className="text-accent">rules.</span></h2></FadeIn>
+          <FadeIn delay={80} className="grid md:grid-cols-3 gap-4">
             {[
               { t: "Court-first methodology.", d: "Every step documented. Every artefact hashed. Every report defensible — even when nothing ever reaches a courtroom." },
               { t: "Examiner-led, never sold.", d: "You speak to the analyst handling your case. Quotes are scoped by examiners, not commercial leads." },
@@ -65,16 +66,16 @@ export default async function AboutPage() {
                 <p className="text-mute leading-relaxed">{v.d}</p>
               </div>
             ))}
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Why choose us */}
       <section className="py-16 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="label mb-6">[ Why choose us ]</div>
-          <h2 className="display text-5xl mb-12">The brief on <span className="text-accent">Cyber Eye.</span></h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <FadeIn><div className="label mb-6">[ Why choose us ]</div>
+          <h2 className="display text-5xl mb-12">The brief on <span className="text-accent">Cyber Eye.</span></h2></FadeIn>
+          <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { code: "01", t: "Court-admissible by design", d: "§ 65B certification, hashed exhibits and twin-examiner sign-off on every engagement — not just the contested ones." },
               { code: "02", t: "Named examiners, not account managers", d: "You know who's handling your case. Their name goes on the report. Their phone rings if the opposing expert calls." },
@@ -89,7 +90,7 @@ export default async function AboutPage() {
                 <p className="text-sm text-mute leading-relaxed">{r.d}</p>
               </div>
             ))}
-          </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -116,9 +117,9 @@ export default async function AboutPage() {
       {/* Accreditations */}
       <section className="py-16">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="label mb-6">[ Accreditations ]</div>
-          <h2 className="display text-5xl mb-12">Memberships &amp; <span className="text-accent">alignment.</span></h2>
-          <div className="grid md:grid-cols-4 gap-4">
+          <FadeIn><div className="label mb-6">[ Accreditations ]</div>
+          <h2 className="display text-5xl mb-12">Memberships &amp; <span className="text-accent">alignment.</span></h2></FadeIn>
+          <FadeIn delay={80} className="grid md:grid-cols-4 gap-4">
             {[
               { t: "ISO 17025 aligned", s: "Lab procedures" },
               { t: "CERT-In empanelled", s: "Auditor of Record" },
@@ -131,7 +132,7 @@ export default async function AboutPage() {
                 <div className="label mt-1">{b.s}</div>
               </div>
             ))}
-          </div>
+          </FadeIn>
         </div>
       </section>
     </>

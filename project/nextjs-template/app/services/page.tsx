@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServiceFamilies } from "@/lib/sanity";
 import PinnedScrub from "@/components/parallax/PinnedScrub";
+import FadeIn from "@/components/FadeIn";
 
 // Presentational mappings that don't belong in the CMS
 const COLS: Record<string, string> = {
@@ -168,7 +169,7 @@ export default async function ServicesPage() {
       {families.map((f) => (
         <section key={f.id} id={`fam-${f.id}`} className={`py-20 border-b border-line scroll-mt-20 ${BG[f.id] ?? ""}`}>
           <div className="max-w-page mx-auto px-6 lg:px-10">
-            <div className="grid lg:grid-cols-12 gap-10 mb-12">
+            <FadeIn className="grid lg:grid-cols-12 gap-10 mb-12">
               <div className="lg:col-span-5">
                 <div className="label mb-4">[ {f.label} ]</div>
                 <h2 className="display text-5xl lg:text-6xl mb-4">{f.title}<br /><span className="text-accent">{f.accent}</span></h2>
@@ -176,8 +177,8 @@ export default async function ServicesPage() {
               <div className="lg:col-span-7 lg:pt-4">
                 <p className="text-lg text-mute leading-relaxed">{f.desc}</p>
               </div>
-            </div>
-            <div className={`grid md:grid-cols-2 ${COLS[f.id] ?? "lg:grid-cols-3"} gap-3`}>
+            </FadeIn>
+            <FadeIn delay={80} className={`grid md:grid-cols-2 ${COLS[f.id] ?? "lg:grid-cols-3"} gap-3`}>
               {f.services.map((s) => (
                 <div key={s.code} className="card p-6">
                   <div className="mono text-accent text-xs mb-8">{s.code}</div>
@@ -192,11 +193,11 @@ export default async function ServicesPage() {
                   <p className="text-sm leading-relaxed opacity-80">A discovery call sets the scope, infrastructure and SLA. We&rsquo;ll tell you if you don&rsquo;t need this.</p>
                 </div>
               )}
-            </div>
-            <div className="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
+            </FadeIn>
+            <FadeIn delay={140}><div className="card mt-8 p-7 flex flex-wrap items-center justify-between gap-4">
               <p className="text-mute max-w-2xl">{f.tagline}</p>
               <Link href="/contact" className="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 font-medium">Engage this family →</Link>
-            </div>
+            </div></FadeIn>
           </div>
         </section>
       ))}

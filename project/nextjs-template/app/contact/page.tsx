@@ -2,6 +2,7 @@
 
 import { useFormState, useFormStatus } from 'react-dom';
 import { Section, Pulse } from '@/components/Primitives';
+import FadeIn from '@/components/FadeIn';
 import { submitContact } from './actions';
 
 function SubmitButton() {
@@ -29,7 +30,7 @@ export default function ContactPage() {
       </section>
 
       <Section className="py-16">
-        <div className="grid lg:grid-cols-12 gap-10">
+        <FadeIn className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-7">
             {state?.success ? (
               <div className="card p-8 lg:p-10 space-y-4">
@@ -129,7 +130,7 @@ export default function ContactPage() {
               <p className="text-sm text-mute">Bengaluru · Delhi · Gurugram</p>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </Section>
     </>
   );
