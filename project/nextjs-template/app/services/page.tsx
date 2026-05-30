@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getServiceFamilies } from "@/lib/sanity";
+import PinnedScrub from "@/components/parallax/PinnedScrub";
 
 // Presentational mappings that don't belong in the CMS
 const COLS: Record<string, string> = {
@@ -200,27 +201,7 @@ export default async function ServicesPage() {
         </section>
       ))}
 
-      {/* Engagement flow */}
-      <section className="py-24 border-t border-line">
-        <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="label mb-4">[ Process / 4 stages ]</div>
-          <h2 className="display text-5xl mb-12">How an engagement <span className="text-accent">works.</span></h2>
-          <div className="grid md:grid-cols-4 gap-4">
-            {[
-              { n: "01", t: "Intake", d: "Free 30-min triage call. NDA, scope, custody handoff plan." },
-              { n: "02", t: "Acquire", d: "Evidence preserved with chain of custody, twin-witnessed." },
-              { n: "03", t: "Examine", d: "Lab analysis with twin-examiner review and sign-off." },
-              { n: "04", t: "Report", d: "Court-ready report. Expert testimony. Defensible exhibits." },
-            ].map((s) => (
-              <div key={s.n} className="card p-6">
-                <div className="mono text-accent text-xs mb-8">{s.n}</div>
-                <h4 className="text-xl font-medium mb-2">{s.t}</h4>
-                <p className="text-sm text-mute leading-relaxed">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PinnedScrub />
     </>
   );
 }
