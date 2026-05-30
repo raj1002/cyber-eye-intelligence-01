@@ -2,6 +2,34 @@
 
 import { useEffect } from "react";
 
+// Official CDN first; jsDelivr as fallback if the primary ever fails
+const PRIMARY_SRC = "https://cdn.unicornstudio.app/unicornstudio.umd.js";
+const FALLBACK_SRC =
+  "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.25/dist/unicornStudio.umd.js";
+
+type US = { isInitialized?: boolean; init: () => void };
+
+function getUS(): US | undefined {
+  return (window as unknown as { UnicornStudio?: US }).UnicornStudio;
+}
+
+function injectScript(src: string, onLoad: () => void, onError: () => void) {
+  if (document.querySelector(`script[src="${src}"]`)) {
+    // Script already in DOM — fire onLoad once it's ready (or immediately)
+    if (getUS()) { onLoad(); return; }
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`)!;
+    existing.addEventListener("load", onLoad, { once: true });
+    existing.addEventListener("error", onError, { once: true });
+    return;
+  }
+  const s = document.createElement("script");
+  s.src = src;
+  s.async = true;
+  s.addEventListener("load", onLoad, { once: true });
+  s.addEventListener("error", onError, { once: true });
+  document.head.appendChild(s);
+}
+
 export default function UnicornAura({
   projectId,
   showGrid = true,
@@ -10,33 +38,29 @@ export default function UnicornAura({
   showGrid?: boolean;
 }) {
   useEffect(() => {
-    const w = window as unknown as {
-      UnicornStudio?: { isInitialized: boolean; init: () => void };
-    };
-
-    // Script already loaded from a prior mount — re-init for the fresh DOM element
-    if (w.UnicornStudio?.isInitialized) {
-      w.UnicornStudio.init();
+    // Already loaded from a prior navigation — just re-init for the fresh DOM element
+    const us = getUS();
+    if (us) {
+      us.init();
       return;
     }
 
-    // Script tag already injected (loading in progress) — don't duplicate it
-    if (document.querySelector(`script[src="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js"]`)) {
-      return;
-    }
-
-    // First visit — load the library
-    const s = document.createElement("script");
-    s.src =
-      "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
-    s.async = true;
-    s.onload = () => {
-      if (w.UnicornStudio && !w.UnicornStudio.isInitialized) {
-        w.UnicornStudio.init();
-        w.UnicornStudio.isInitialized = true;
+    const callInit = () => {
+      const lib = getUS();
+      if (lib) {
+        if (!lib.isInitialized) lib.init();
+        else lib.init(); // always call; lib handles idempotency
       }
     };
-    document.head.appendChild(s);
+
+    // Try primary CDN; fall back to jsDelivr on error
+    injectScript(
+      PRIMARY_SRC,
+      callInit,
+      () => injectScript(FALLBACK_SRC, callInit, () => {
+        console.warn("UnicornStudio: both CDN sources failed to load");
+      })
+    );
   }, []);
 
   return (
