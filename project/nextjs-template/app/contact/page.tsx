@@ -38,7 +38,7 @@ export default function ContactPage() {
                 </div>
                 <h2 className="display text-3xl mb-2">Enquiry received.</h2>
                 <p className="text-mute">A senior examiner will contact you within 4 hours during business hours (or via our 24/7 line for urgent matters).</p>
-                <p className="text-sm text-mute mt-4">For immediate assistance, call <a href="tel:+918045678910" className="text-white hover:text-accent transition-colors">+91 80 4567 8910</a>.</p>
+                <p className="text-sm text-mute mt-4">For immediate assistance, call <a href="tel:+919833565665" className="text-white hover:text-accent transition-colors">+91 98335 65665</a>.</p>
               </div>
             ) : (
               <form className="card p-8 lg:p-10 space-y-5" action={formAction}>
@@ -108,22 +108,22 @@ export default function ContactPage() {
                 <div className="label">[ 24/7 Incident Line ]</div>
                 <Pulse />
               </div>
-              <a href="tel:+918045678910" className="display text-3xl mb-2 block">+91 80 4567 8910</a>
+              <a href="tel:+919833565665" className="display text-3xl mb-2 block">+91 98335 65665</a>
               <p className="text-sm text-mute">Active breach? Lost data? Time-sensitive seizure? Call now. Triage analyst on the line within 30 minutes.</p>
             </div>
             <div className="card p-6">
               <div className="label mb-3">Email</div>
-              <div className="text-lg mb-1">cases<span className="text-accent">@</span>cybereye.com</div>
+              <div className="text-lg mb-1">cases<span className="text-accent">@</span>cybereyeintelligence.com</div>
               <div className="text-sm text-mute mb-4">Encrypted attachments welcome. PGP key on request.</div>
-              <div className="label mb-3 mt-6">Press & media</div>
-              <div className="text-lg">press<span className="text-accent">@</span>cybereye.com</div>
+              <div className="label mb-3 mt-6">Enquiries</div>
+              <div className="text-lg">enquiry<span className="text-accent">@</span>cybereyeintelligence.com</div>
             </div>
             <div className="card p-6">
               <div className="label mb-3">Mumbai (HQ)</div>
               <p className="text-sm text-mute">
-                Lab 04, Floor 12, Maker Maxity<br />
-                Bandra Kurla Complex<br />
-                Mumbai 400051 · India
+                6th Floor, Light Bridge, H.B.P<br />
+                Saki Vihar Road, Powai, Thane<br />
+                Mumbai, Maharashtra 400072 · India
               </p>
               <div className="label mb-3 mt-6">Satellite labs</div>
               <p className="text-sm text-mute">Bengaluru · Delhi · Gurugram</p>
