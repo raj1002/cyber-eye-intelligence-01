@@ -1,15 +1,38 @@
 "use client";
 
-import Script from "next/script";
 import { useEffect } from "react";
 
-const SCRIPT_SRC =
+const SRC =
   "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
 
-type USApi = { init: () => void; destroy?: () => void };
+type US = { init: () => void; destroy?: () => void };
+const getUS = () =>
+  (window as unknown as { UnicornStudio?: US }).UnicornStudio;
 
-function getUS(): USApi | undefined {
-  return (window as unknown as { UnicornStudio?: USApi }).UnicornStudio;
+/** Returns a promise that resolves once the UnicornStudio library is ready. */
+function loadUS(): Promise<void> {
+  // Already on window — resolve immediately
+  if (getUS()) return Promise.resolve();
+
+  // Script tag already injected (e.g. previous mount) — wait for it
+  const existing = document.querySelector<HTMLScriptElement>(`script[src="${SRC}"]`);
+  if (existing) {
+    return new Promise((resolve) => {
+      const iv = setInterval(() => {
+        if (getUS()) { clearInterval(iv); resolve(); }
+      }, 50);
+    });
+  }
+
+  // First time — inject script
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = SRC;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("UnicornStudio failed to load"));
+    document.head.appendChild(s);
+  });
 }
 
 export default function UnicornAura({
@@ -20,28 +43,23 @@ export default function UnicornAura({
   showGrid?: boolean;
 }) {
   useEffect(() => {
-    // Script may already be loaded from a previous mount — re-init immediately
-    const us = getUS();
-    if (us) us.init();
+    let alive = true;
+
+    loadUS()
+      .then(() => { if (alive) getUS()?.init(); })
+      .catch(() => {});
 
     return () => {
-      // Destroy on unmount so the next mount gets a clean canvas slot
+      alive = false;
       getUS()?.destroy?.();
     };
   }, []);
 
   return (
-    <>
-      <Script
-        src={SCRIPT_SRC}
-        strategy="afterInteractive"
-        onLoad={() => getUS()?.init()}
-      />
-      <div className="aura-wrap" aria-hidden="true">
-        <div data-us-project={projectId} />
-        <div className="aura-tint" />
-        {showGrid && <div className="absolute inset-0 ph-grid opacity-30" />}
-      </div>
-    </>
+    <div className="aura-wrap" aria-hidden="true">
+      <div data-us-project={projectId} />
+      <div className="aura-tint" />
+      {showGrid && <div className="absolute inset-0 ph-grid opacity-30" />}
+    </div>
   );
 }
