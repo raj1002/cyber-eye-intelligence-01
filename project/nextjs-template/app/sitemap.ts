@@ -13,18 +13,19 @@ const FALLBACK_SECTOR_SLUGS = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const [sanityServices, sanitySectors] = await Promise.all([
-    getServiceFamilies(),
-    getSectors(),
-  ]);
+  let serviceSlugs = FALLBACK_SERVICE_SLUGS;
+  let sectorSlugs = FALLBACK_SECTOR_SLUGS;
 
-  const serviceSlugs = sanityServices.length > 0
-    ? sanityServices.map((s) => s.slug.current)
-    : FALLBACK_SERVICE_SLUGS;
-
-  const sectorSlugs = sanitySectors.length > 0
-    ? sanitySectors.map((s) => s.slug.current)
-    : FALLBACK_SECTOR_SLUGS;
+  try {
+    const [sanityServices, sanitySectors] = await Promise.all([
+      getServiceFamilies(),
+      getSectors(),
+    ]);
+    if (sanityServices.length > 0) serviceSlugs = sanityServices.map((s) => s.slug.current);
+    if (sanitySectors.length > 0) sectorSlugs = sanitySectors.map((s) => s.slug.current);
+  } catch {
+    // fall through to static fallbacks
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
