@@ -439,6 +439,12 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+.marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marq 30s linear infinite;
+}
+.marquee:hover { animation-play-state: paused; }
 @keyframes voiceDrift {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }

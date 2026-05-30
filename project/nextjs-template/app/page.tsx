@@ -186,14 +186,16 @@ export default async function Home() {
           <div className="marquee whitespace-nowrap">
             {[0, 1].map((i) => (
               <div key={i} className="flex gap-16 items-center mono text-mute text-lg uppercase tracking-widest" aria-hidden={i > 0 ? true : undefined}>
-                <span>Mumbai Police</span><span className="text-accent">◇</span>
-                <span>State Cyber Cell</span><span className="text-accent">◇</span>
-                <span>HDFC Securities</span><span className="text-accent">◇</span>
-                <span>Khaitan &amp; Co</span><span className="text-accent">◇</span>
-                <span>SBI Cyber Defence</span><span className="text-accent">◇</span>
-                <span>Tata Consultancy</span><span className="text-accent">◇</span>
-                <span>CERT-In</span><span className="text-accent">◇</span>
-                <span>Reliance Legal</span><span className="text-accent">◇</span>
+                <span>State Police Cyber Cell</span><span className="text-accent">◇</span>
+                <span>Economic Offences Wing</span><span className="text-accent">◇</span>
+                <span>High Court Litigation Practice</span><span className="text-accent">◇</span>
+                <span>Listed Corporate Group</span><span className="text-accent">◇</span>
+                <span>National Investigation Agency</span><span className="text-accent">◇</span>
+                <span>Private Equity Fund</span><span className="text-accent">◇</span>
+                <span>Scheduled Commercial Bank</span><span className="text-accent">◇</span>
+                <span>Insurance Regulatory Body</span><span className="text-accent">◇</span>
+                <span>Central Govt. Ministry</span><span className="text-accent">◇</span>
+                <span>Disputes Law Firm</span><span className="text-accent">◇</span>
               </div>
             ))}
           </div>
