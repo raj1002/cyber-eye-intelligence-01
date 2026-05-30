@@ -235,8 +235,8 @@ export default function Header() {
                 </svg>
               )}
             </button>
-            <a href="tel:+918045678910" className="hidden md:inline-flex btn-ghost text-xs px-4 py-2">
-              +91 80 4567 8910
+            <a href="tel:+919833565665" className="hidden md:inline-flex btn-ghost text-xs px-4 py-2">
+              +91 98335 65665
             </a>
             <Link href="/contact" className="hidden lg:inline-flex btn-primary text-xs px-4 py-2">
               Open a Case →
@@ -392,7 +392,7 @@ export default function Header() {
         </div>
         <div style={{ margin: '16px 12px 4px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link href="/contact" onClick={() => setNavOpen(false)} className="btn-primary text-center justify-center">Open a case →</Link>
-          <a href="tel:+918045678910" className="btn-ghost text-center justify-center">+91 80 4567 8910</a>
+          <a href="tel:+919833565665" className="btn-ghost text-center justify-center">+91 98335 65665</a>
         </div>
       </aside>
     </>
