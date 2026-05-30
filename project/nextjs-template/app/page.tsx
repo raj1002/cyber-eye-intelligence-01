@@ -178,24 +178,40 @@ export default async function Home() {
       </section>
 
       {/* LOGO MARQUEE */}
-      <section className="border-y border-line py-6 overflow-hidden">
+      <section className="border-y border-line py-6 overflow-hidden space-y-3">
         <div className="max-w-page mx-auto px-6 lg:px-10 mb-4">
           <div className="label">Trusted by police, prosecutors &amp; enterprise legal teams</div>
         </div>
+        {/* Row 1 — left to right */}
         <div className="relative overflow-hidden">
-          <div className="marquee whitespace-nowrap">
+          <div className="marquee">
             {[0, 1].map((i) => (
-              <div key={i} className="flex gap-16 items-center mono text-mute text-lg uppercase tracking-widest" aria-hidden={i > 0 ? true : undefined}>
+              <div key={i} className="flex gap-16 items-center mono text-mute text-lg uppercase tracking-widest pr-16" aria-hidden={i > 0 ? true : undefined}>
                 <span>State Police Cyber Cell</span><span className="text-accent">◇</span>
                 <span>Economic Offences Wing</span><span className="text-accent">◇</span>
                 <span>High Court Litigation Practice</span><span className="text-accent">◇</span>
                 <span>Listed Corporate Group</span><span className="text-accent">◇</span>
                 <span>National Investigation Agency</span><span className="text-accent">◇</span>
-                <span>Private Equity Fund</span><span className="text-accent">◇</span>
                 <span>Scheduled Commercial Bank</span><span className="text-accent">◇</span>
-                <span>Insurance Regulatory Body</span><span className="text-accent">◇</span>
                 <span>Central Govt. Ministry</span><span className="text-accent">◇</span>
                 <span>Disputes Law Firm</span><span className="text-accent">◇</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Row 2 — right to left */}
+        <div className="relative overflow-hidden">
+          <div className="marquee-reverse">
+            {[0, 1].map((i) => (
+              <div key={i} className="flex gap-16 items-center mono text-stone text-base uppercase tracking-widest pr-16" aria-hidden={i > 0 ? true : undefined}>
+                <span>Insurance Regulatory Body</span><span className="text-accent">◇</span>
+                <span>Private Equity Fund</span><span className="text-accent">◇</span>
+                <span>Anti-Corruption Bureau</span><span className="text-accent">◇</span>
+                <span>NBFC &amp; Fintech Firm</span><span className="text-accent">◇</span>
+                <span>Family Office</span><span className="text-accent">◇</span>
+                <span>Mid-Market Law Firm</span><span className="text-accent">◇</span>
+                <span>Public Sector Undertaking</span><span className="text-accent">◇</span>
+                <span>District &amp; Sessions Court</span><span className="text-accent">◇</span>
               </div>
             ))}
           </div>

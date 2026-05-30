@@ -442,9 +442,14 @@
 .marquee {
   display: inline-flex;
   white-space: nowrap;
-  animation: marq 30s linear infinite;
+  animation: marq 80s linear infinite;
 }
-.marquee:hover { animation-play-state: paused; }
+.marquee-reverse {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marq 80s linear infinite reverse;
+}
+.marquee:hover, .marquee-reverse:hover { animation-play-state: paused; }
 @keyframes voiceDrift {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
