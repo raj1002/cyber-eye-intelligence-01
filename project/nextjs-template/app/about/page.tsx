@@ -144,7 +144,8 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Accreditations */}
+      {/* Accreditations — hidden until ready */}
+      {false && (
       <section className="py-16">
         <div className="max-w-page mx-auto px-6 lg:px-10">
           <FadeIn><div className="label mb-6">[ Accreditations ]</div>
@@ -165,6 +166,7 @@ export default async function AboutPage() {
           </FadeIn>
         </div>
       </section>
+      )}
     </>
   );
 }
