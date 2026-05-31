@@ -479,7 +479,7 @@ export default async function Home() {
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link href="/contact" className="btn-primary">Open a case →</Link>
-                <a href="tel:+918045678910" className="btn-ghost">+91 80 4567 8910</a>
+                <a href="tel:+919833565665" className="btn-ghost">+91 98335 65665</a>
               </div>
             </div>
           </div></FadeIn>
