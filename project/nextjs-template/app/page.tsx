@@ -366,7 +366,7 @@ export default async function Home() {
                 <Link href="/training" className="pill pill-on">Course catalogue →</Link>
               </div>
               <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-line">
-                <div><div className="display text-2xl num"><CountUp to={4} /></div><div className="label mt-1">Courses</div></div>
+                <div><div className="display text-2xl num"><CountUp to={14} /></div><div className="label mt-1">Courses</div></div>
                 <div><div className="display text-2xl num"><CountUp to={120} suffix="+" /></div><div className="label mt-1">Officers trained</div></div>
                 <div><div className="display text-2xl num"><CountUp to={4.9} suffix="" /></div><div className="label mt-1">Avg rating</div></div>
               </div>
