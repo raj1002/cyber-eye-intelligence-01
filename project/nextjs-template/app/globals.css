@@ -376,7 +376,7 @@
       radial-gradient(ellipse 80% 60% at 70% -10%, rgba(16,185,129,0.22) 0%, transparent 55%),
       radial-gradient(ellipse 55% 45% at 20% 60%, rgba(16,185,129,0.10) 0%, transparent 60%),
       radial-gradient(ellipse 40% 30% at 85% 80%, rgba(16,185,129,0.08) 0%, transparent 55%);
-    animation: aura-pulse 8s ease-in-out infinite alternate;
+    animation: aura-pulse 80s linear infinite alternate;
   }
   @keyframes aura-pulse {
     0%   { opacity: 0.7; transform: scale(1); }
