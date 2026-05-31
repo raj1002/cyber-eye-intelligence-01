@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Hex } from "@/components/Primitives";
 import FadeIn from "@/components/FadeIn";
+import CountUp from "@/components/CountUp";
 import { getSectors } from "@/lib/sanity";
 
 const FALLBACK = [
@@ -78,10 +79,10 @@ export default async function SectorsPage() {
             </div>
             <div className="relative md:col-span-5 border-t md:border-t-0 md:border-l border-line p-8 lg:p-12 flex flex-col justify-between gap-8">
               <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                <div><div className="display text-3xl num">120<span className="text-accent">+</span></div><div className="label mt-1.5">Redacted files</div></div>
-                <div><div className="display text-3xl num">06</div><div className="label mt-1.5">Sectors covered</div></div>
-                <div><div className="display text-3xl num">98<span className="text-accent">%</span></div><div className="label mt-1.5">Admissibility</div></div>
-                <div><div className="display text-3xl num">11<span className="text-accent">y</span></div><div className="label mt-1.5">Of precedent</div></div>
+                <div><div className="display text-3xl num"><CountUp to={40} suffix="+" /></div><div className="label mt-1.5">Redacted files</div></div>
+                <div><div className="display text-3xl num"><CountUp to={5} /></div><div className="label mt-1.5">Sectors covered</div></div>
+                <div><div className="display text-3xl num"><CountUp to={100} suffix="%" /></div><div className="label mt-1.5">Admissibility</div></div>
+                <div><div className="display text-3xl num"><CountUp to={8} suffix="m" /></div><div className="label mt-1.5">Of operation</div></div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <span className="pill">Law Enforcement</span>
