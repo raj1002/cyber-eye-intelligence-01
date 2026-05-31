@@ -1,14 +1,24 @@
 import { Placeholder } from "@/components/Primitives";
 import FadeIn from "@/components/FadeIn";
+import CountUp from "@/components/CountUp";
 import { getTeamMembers } from "@/lib/sanity";
 
 export const metadata = {
   title: "About — Cyber Eye Intelligence",
-  description: "Founded in 2018 by three forensic examiners. Fully accredited lab. Examiner-led, never sold.",
+  description: "Founded in 2025 by certified forensic examiners. Fully accredited lab. Examiner-led, never sold.",
 };
+
+const FALLBACK_TEAM = [
+  { _id: 'f1', name: 'Arjun Mehta', role: 'Founder & Lead Examiner', bio: 'Certified forensic examiner with experience across police labs, Big Four practices and contested courtrooms. Leads all DFIR engagements.' },
+  { _id: 'f2', name: 'Priya Nair', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
+  { _id: 'f3', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
+  { _id: 'f4', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
+  { _id: 'f5', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
+];
 
 export default async function AboutPage() {
   const teamMembers = await getTeamMembers();
+  const team = teamMembers.length > 0 ? teamMembers : FALLBACK_TEAM;
   return (
     <>
       {/* Hero */}
@@ -21,13 +31,13 @@ export default async function AboutPage() {
           <div className="grid lg:grid-cols-12 gap-10">
             <div className="lg:col-span-7 space-y-6 text-lg text-mute leading-relaxed">
               <p>
-                Cyber Eye Intelligence was founded in 2018 by three forensic examiners who had spent a decade between police labs, Big Four practices and contested courtrooms. Each had walked out of an engagement where good evidence was undone by sloppy custody, or a case lost on a technicality that an extra hour of imaging would have prevented.
+                Cyber Eye Intelligence was founded in 2025 by certified forensic examiners who had spent years across police labs, Big Four practices and contested courtrooms. Each had walked out of an engagement where good evidence was undone by sloppy custody, or a case lost on a technicality that an extra hour of imaging would have prevented.
               </p>
               <p>
                 We started Cyber Eye to do the work the way it should be done — slowly when it matters, fast when lives are on the line, and always documented to a standard that survives the most hostile cross-examination.
               </p>
               <p>
-                Today we run a fully accredited lab out of Mumbai with satellite operations in Bengaluru and Delhi. Every engagement is led by a named examiner. No sales filter, no account managers, no &ldquo;we&apos;ll loop in the team&rdquo;.
+                We operate out of Mumbai with satellite operations in Bengaluru and Delhi. Every engagement is led by a named examiner. No sales filter, no account managers, no &ldquo;we&apos;ll loop in the team&rdquo;.
               </p>
             </div>
             <div className="lg:col-span-5">
@@ -41,10 +51,30 @@ export default async function AboutPage() {
       <section className="py-16 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
           <FadeIn className="grid md:grid-cols-4 gap-4">
-            <div className="card p-6"><div className="display text-4xl num">2018</div><div className="label mt-2">Founded</div></div>
-            <div className="card p-6"><div className="display text-4xl num">600<span className="text-accent">+</span></div><div className="label mt-2">Cases handled</div></div>
-            <div className="card p-6"><div className="display text-4xl num">2,400<span className="text-accent">+</span></div><div className="label mt-2">Officers trained</div></div>
-            <div className="card p-6"><div className="display text-4xl num">12</div><div className="label mt-2">Certified examiners</div></div>
+            <div className="card p-6">
+              <div className="display text-4xl num">
+                <CountUp to={2025} duration={1200} />
+              </div>
+              <div className="label mt-2">Founded</div>
+            </div>
+            <div className="card p-6">
+              <div className="display text-4xl num">
+                <CountUp to={40} suffix="+" />
+              </div>
+              <div className="label mt-2">Cases handled</div>
+            </div>
+            <div className="card p-6">
+              <div className="display text-4xl num">
+                <CountUp to={120} suffix="+" />
+              </div>
+              <div className="label mt-2">Officers trained</div>
+            </div>
+            <div className="card p-6">
+              <div className="display text-4xl num">
+                <CountUp to={5} />
+              </div>
+              <div className="label mt-2">Certified examiners</div>
+            </div>
           </FadeIn>
         </div>
       </section>
@@ -80,9 +110,9 @@ export default async function AboutPage() {
               { code: "01", t: "Court-admissible by design", d: "§ 65B certification, hashed exhibits and twin-examiner sign-off on every engagement — not just the contested ones." },
               { code: "02", t: "Named examiners, not account managers", d: "You know who's handling your case. Their name goes on the report. Their phone rings if the opposing expert calls." },
               { code: "03", t: "Turnaround with integrity", d: "CE/VectorAI-assisted triage compresses discovery. Speed without cutting corners on chain of custody." },
-              { code: "04", t: "Cross-sector depth", d: "Police labs, HC litigation, listed-company boardrooms and government audit — we've operated in each, not just studied them." },
+              { code: "04", t: "Cross-sector depth", d: "Police labs, HC litigation, listed-company boardrooms and government audit — our team has operated in each, not just studied them." },
               { code: "05", t: "Discretion is structural", d: "Encrypted intake, sealed handling, redacted case files. We advise clients we can never publicly name — and they stay." },
-              { code: "06", t: "Training as a force multiplier", d: "2,400+ officers trained through the Academy. Your team learns the same methods our examiners use in the lab." },
+              { code: "06", t: "Training as a force multiplier", d: "120+ officers trained through the Academy. Your team learns the same methods our examiners use in the lab." },
             ].map((r) => (
               <div key={r.code} className="card p-7">
                 <div className="mono text-accent text-xs mb-8">{r.code}</div>
@@ -95,24 +125,24 @@ export default async function AboutPage() {
       </section>
 
       {/* Team */}
-      {teamMembers.length > 0 && (
-        <section className="py-16 border-b border-line">
-          <div className="max-w-page mx-auto px-6 lg:px-10">
+      <section className="py-16 border-b border-line">
+        <div className="max-w-page mx-auto px-6 lg:px-10">
+          <FadeIn>
             <div className="label mb-6">[ The team ]</div>
             <h2 className="display text-5xl mb-12">Named examiners. <span className="text-accent">No middlemen.</span></h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {teamMembers.map((member) => (
-                <div key={member._id} className="card p-7">
-                  <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
-                  <h3 className="text-lg font-medium mb-1">{member.name}</h3>
-                  {member.role && <div className="label mb-3">{member.role}</div>}
-                  {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+          </FadeIn>
+          <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {team.map((member, i) => (
+              <div key={member._id} className={`card p-7${i === 4 ? ' md:col-span-2 lg:col-span-1' : ''}`}>
+                <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
+                <h3 className="text-lg font-medium mb-1">{member.name}</h3>
+                {member.role && <div className="label mb-3">{member.role}</div>}
+                {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
+              </div>
+            ))}
+          </FadeIn>
+        </div>
+      </section>
 
       {/* Accreditations */}
       <section className="py-16">
@@ -123,7 +153,7 @@ export default async function AboutPage() {
             {[
               { t: "ISO 17025 aligned", s: "Lab procedures" },
               { t: "CERT-In empanelled", s: "Auditor of Record" },
-              { t: "HTCIA member", s: "Since 2019" },
+              { t: "HTCIA member", s: "Since 2025" },
               { t: "IACIS member", s: "CFCE certified" },
             ].map((b) => (
               <div key={b.t} className="card p-8 text-center">

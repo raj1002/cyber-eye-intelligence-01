@@ -4,6 +4,7 @@ import UnicornAura from "@/components/UnicornAura";
 import VoicesMarquee from "@/components/parallax/VoicesMarquee";
 import InsightsRow from "@/components/parallax/InsightsRow";
 import FadeIn from "@/components/FadeIn";
+import CountUp from "@/components/CountUp";
 import { getServiceFamilies, getSectors, getTestimonials, getArticles, getSiteSettings } from "@/lib/sanity";
 
 // Icon map keyed by service slug — controls appearance while content comes from Sanity
@@ -32,10 +33,10 @@ const FALLBACK_SECTORS = [
 ];
 
 const FALLBACK_STATS = [
-  { value: "600+", label: "Cases closed" },
-  { value: "98%", label: "Admissibility rate" },
+  { value: "40+", label: "Cases closed" },
+  { value: "100%", label: "Admissibility rate" },
   { value: "24/7", label: "Incident response" },
-  { value: "12", label: "Certified examiners" },
+  { value: "5", label: "Certified examiners" },
 ];
 
 export default async function Home() {
@@ -168,12 +169,22 @@ export default async function Home() {
             </div>
           </div>
           <div className="mt-12 lg:mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 pt-8 border-t border-line" id="hero-stats">
-            {heroStats.map((stat) => (
-              <div key={stat.label} data-stat>
-                <div className="display text-3xl lg:text-4xl num">{stat.value}</div>
-                <div className="label mt-2">{stat.label}</div>
-              </div>
-            ))}
+            {heroStats.map((stat) => {
+              // Parse numeric value and suffix for CountUp; non-numeric (e.g. "24/7") renders static
+              const match = stat.value.match(/^(\d+(?:\.\d+)?)(\D*)$/);
+              return (
+                <div key={stat.label} data-stat>
+                  <div className="display text-3xl lg:text-4xl num">
+                    {match ? (
+                      <CountUp to={parseFloat(match[1])} suffix={match[2]} />
+                    ) : (
+                      stat.value
+                    )}
+                  </div>
+                  <div className="label mt-2">{stat.label}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -355,9 +366,9 @@ export default async function Home() {
                 <Link href="/training" className="pill pill-on">Course catalogue →</Link>
               </div>
               <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-line">
-                <div><div className="display text-2xl num">14</div><div className="label mt-1">Courses</div></div>
-                <div><div className="display text-2xl num">2,400+</div><div className="label mt-1">Officers trained</div></div>
-                <div><div className="display text-2xl num">4.9</div><div className="label mt-1">Avg rating</div></div>
+                <div><div className="display text-2xl num"><CountUp to={4} /></div><div className="label mt-1">Courses</div></div>
+                <div><div className="display text-2xl num"><CountUp to={120} suffix="+" /></div><div className="label mt-1">Officers trained</div></div>
+                <div><div className="display text-2xl num"><CountUp to={4.9} suffix="" /></div><div className="label mt-1">Avg rating</div></div>
               </div>
             </div>
             <Placeholder label="classroom · hands-on forensic lab" className="aspect-[5/4] lg:aspect-auto border-l border-line" />
