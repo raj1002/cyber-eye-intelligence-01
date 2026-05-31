@@ -1,13 +1,24 @@
 import { Placeholder } from "@/components/Primitives";
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
+import { getTeamMembers } from "@/lib/sanity";
 
 export const metadata = {
   title: "About — Cyber Eye Intelligence",
   description: "Founded in 2025 by certified forensic examiners. Fully accredited lab. Examiner-led, never sold.",
 };
 
+const FALLBACK_TEAM = [
+  { _id: 'f1', name: 'Arjun Mehta', role: 'Founder & Lead Examiner', bio: 'Certified forensic examiner with experience across police labs, Big Four practices and contested courtrooms. Leads all DFIR engagements.' },
+  { _id: 'f2', name: 'Priya Nair', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
+  { _id: 'f3', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
+  { _id: 'f4', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
+  { _id: 'f5', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
+];
+
 export default async function AboutPage() {
+  const teamMembers = await getTeamMembers();
+  const team = teamMembers.length > 0 ? teamMembers : FALLBACK_TEAM;
   return (
     <>
       {/* Hero */}
@@ -107,6 +118,26 @@ export default async function AboutPage() {
                 <div className="mono text-accent text-xs mb-8">{r.code}</div>
                 <h3 className="text-lg font-medium mb-3">{r.t}</h3>
                 <p className="text-sm text-mute leading-relaxed">{r.d}</p>
+              </div>
+            ))}
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Team */}
+      <section className="py-16 border-b border-line">
+        <div className="max-w-page mx-auto px-6 lg:px-10">
+          <FadeIn>
+            <div className="label mb-6">[ The team ]</div>
+            <h2 className="display text-5xl mb-12">Named examiners. <span className="text-accent">No middlemen.</span></h2>
+          </FadeIn>
+          <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {team.map((member, i) => (
+              <div key={member._id} className={`card p-7${i === 4 ? ' md:col-span-2 lg:col-span-1' : ''}`}>
+                <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
+                <h3 className="text-lg font-medium mb-1">{member.name}</h3>
+                {member.role && <div className="label mb-3">{member.role}</div>}
+                {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
               </div>
             ))}
           </FadeIn>
