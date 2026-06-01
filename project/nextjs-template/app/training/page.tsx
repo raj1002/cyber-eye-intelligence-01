@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCourses } from "@/lib/sanity";
 
 const FALLBACK = [
@@ -82,6 +83,26 @@ export default async function TrainingPage() {
                 <span className="pill">CPD certified</span>
                 <span className="pill">Govt-approved</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Training classroom image */}
+      <section className="border-b border-line">
+        <div className="max-w-page mx-auto px-6 lg:px-10 py-12">
+          <div className="relative w-full aspect-[16/7] rounded-[12px] overflow-hidden">
+            <Image
+              src="/images/training-classroom.jpg"
+              alt="Cyber Eye Academy — forensic training session in progress"
+              fill
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-8">
+              <span className="label text-white/70">[ Live forensic lab session ]</span>
             </div>
           </div>
         </div>
