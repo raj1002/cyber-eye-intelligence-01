@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
+import { img } from "@/lib/image-manifest";
 
 const caseFiles = [
   { slug: "ce-2025-014", id: "CE/2025/014", sector: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions court.", quote: "Recovered 14 deleted chats from a wiped iPhone. Conviction secured in 9 months.", client: "Sr. Counsel, listed manufacturing company", location: "Mumbai · Corporate IP Theft" },
@@ -33,7 +34,7 @@ export default function CaseFileDetailPage({ params }: { params: { slug: string 
           <div className="grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6">
               <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-line">
-                <Placeholder label="case file · redacted exhibit" className="absolute inset-0" />
+                <Image {...img("case-detail-hero")} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                 <div className="absolute top-4 left-4 w-5 h-5 border-t border-l border-accent z-10" />
                 <div className="absolute bottom-4 right-4 w-5 h-5 border-b border-r border-accent z-10" />
                 <div className="absolute bottom-3 left-3 right-3 z-10 flex justify-between mono text-[10px] uppercase tracking-widest text-stone">

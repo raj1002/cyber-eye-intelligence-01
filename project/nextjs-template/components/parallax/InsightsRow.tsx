@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRef } from 'react';
 import type { SanityArticle } from '@/lib/sanity';
+import { img, articleImageBySlug } from '@/lib/image-manifest';
 
 const FALLBACK: SanityArticle[] = [
   { _id: '1', _type: 'article', type: "Tutorial", readTime: "6 min", date: "Apr 28, 2026", title: "Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes.", label: "article · ios 18 acquisitions" },
@@ -44,7 +46,7 @@ export default function InsightsRow({ articles }: { articles?: SanityArticle[] }
             const meta = [a.type, a.readTime, a.date].filter(Boolean).join(' · ');
             return (
               <Link key={a._id} href={href} className="insight-card group">
-                <div className="ph aspect-[5/3] rounded-card mb-5 card-hover" data-label={a.label ?? 'article'} />
+                {(() => { const label = a.label ?? ''; const slot = articleImageBySlug[label] ?? articleImageBySlug[a.slug?.current ?? '']; return slot ? <Image {...img(slot)} className="aspect-[5/3] rounded-card mb-5 card-hover object-cover w-full" sizes="320px" /> : null; })()}
                 <div className="label mb-3">{meta}</div>
                 <h3 className="text-xl font-medium leading-snug group-hover:text-accent transition">{a.title}</h3>
               </Link>

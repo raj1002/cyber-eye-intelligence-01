@@ -1,4 +1,7 @@
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
+import { img, type ImageSlot } from "@/lib/image-manifest";
+
+const TEAM_SLOTS: ImageSlot[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07","team-r08"];
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
 import { getTeamMembers } from "@/lib/sanity";
@@ -43,7 +46,7 @@ export default async function AboutPage() {
               </p>
             </div>
             <div className="lg:col-span-5">
-              <Placeholder label="founders · lab interior" className="aspect-[4/5] rounded-card card" />
+              <Image {...img("about-founders")} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />
             </div>
           </div>
         </div>
@@ -136,7 +139,7 @@ export default async function AboutPage() {
           <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {team.map((member, i) => (
               <div key={member._id} className="card p-7">
-                <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
+                <Image {...img(TEAM_SLOTS[i] ?? "team-r01")} className="w-16 h-16 rounded-card object-cover mb-5" sizes="64px" />
                 <h3 className="text-lg font-medium mb-1">{member.name}</h3>
                 {member.role && <div className="label mb-3">{member.role}</div>}
                 {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}

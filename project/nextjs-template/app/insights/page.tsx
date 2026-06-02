@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
 import { getArticles } from "@/lib/sanity";
+import { img, articleImageBySlug } from "@/lib/image-manifest";
 
 const FALLBACK = [
   { slug: "whatsapp-ios18", type: "Tutorial", readTime: "6 min", date: "Apr 28, 2026", title: "Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes." },
@@ -46,7 +47,7 @@ export default async function InsightsPage() {
         <div className="max-w-page mx-auto px-6 lg:px-10">
           {featured && (
             <Link href="/contact" className="card card-hover overflow-hidden grid md:grid-cols-2 mb-12 block">
-              <Placeholder label={`featured · ${featured.slug}`} className="aspect-[5/4] md:aspect-auto" />
+              {articleImageBySlug[featured.slug] ? <Image {...img(articleImageBySlug[featured.slug])} className="aspect-[5/4] md:aspect-auto object-cover w-full" sizes="(max-width: 768px) 100vw, 50vw" /> : <Image {...img("insight-featured-hero")} className="aspect-[5/4] md:aspect-auto object-cover w-full" sizes="(max-width: 768px) 100vw, 50vw" />}
               <div className="p-10 flex flex-col justify-center">
                 <div className="label mb-4">[ Featured · {featured.type} · {featured.readTime} ]</div>
                 <h2 className="display text-3xl lg:text-4xl mb-6">{featured.title}</h2>
@@ -61,7 +62,7 @@ export default async function InsightsPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {rest.map((a) => (
               <Link key={a.slug} href="/contact" className="group block">
-                <Placeholder label={`article · ${a.slug}`} className="aspect-[5/4] rounded-card mb-5 card-hover" />
+                {articleImageBySlug[a.slug] && <Image {...img(articleImageBySlug[a.slug])} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, 33vw" />}
                 <div className="label mb-2">{a.type} · {a.readTime} · {a.date}</div>
                 <h3 className="text-xl leading-snug group-hover:text-accent transition">{a.title}</h3>
               </Link>
