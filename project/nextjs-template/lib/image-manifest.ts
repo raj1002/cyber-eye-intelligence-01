@@ -54,7 +54,8 @@ export const caseImageByLabel: Record<string, ImageSlot> = {
 
 // Derived from case ID: "CE/2025/014" → "case-ce2025-014"
 export function caseImageFromId(id: string): ImageSlot | undefined {
-  const key = "case-" + id.toLowerCase().replace(/\//g, "").replace(/\./g, "-");
+  const parts = id.toLowerCase().split("/");
+  const key = "case-" + (parts[0] ?? "") + (parts[1] ?? "") + "-" + (parts[2] ?? "");
   return key in imageManifest ? (key as ImageSlot) : undefined;
 }
 
