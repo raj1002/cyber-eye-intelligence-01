@@ -10,6 +10,8 @@ export const imageManifest = {
   "team-r06":                    { src: "/images/team-r06.jpg",                    alt: "Forensic Apprentice",                                                    width: 800,  height: 800  },
   "team-r07":                    { src: "/images/team-r07.jpg",                    alt: "Legal Head",                                                             width: 800,  height: 800  },
   "team-r08":                    { src: "/images/team-r08.jpg",                    alt: "Marketing Head",                                                         width: 800,  height: 800  },
+  "team-r09":                    { src: "/images/team-r09.jpg",                    alt: "Co-Founder & Business Strategy Lead",                                     width: 800,  height: 800  },
+  "team-r10":                    { src: "/images/team-r10.jpg",                    alt: "Co-Founder & Finance Head",                                               width: 800,  height: 800  },
   "case-detail-hero":            { src: "/images/case-detail-hero.jpg",            alt: "Forensic evidence table with numbered exhibit bags",                     width: 1920, height: 1080 },
   "case-ce2025-014":             { src: "/images/case-ce2025-014.jpg",             alt: "Mobile device forensic extraction — deleted data recovery",              width: 1000, height: 800  },
   "case-ce2025-008":             { src: "/images/case-ce2025-008.jpg",             alt: "BEC fraud email header analysis across jurisdictions",                   width: 1000, height: 800  },
