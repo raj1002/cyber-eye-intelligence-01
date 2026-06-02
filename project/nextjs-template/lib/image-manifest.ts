@@ -74,6 +74,13 @@ export const articleImageBySlug: Record<string, ImageSlot> = {
   "article · ai forensics":        "article-ai-forensics",
   "article · signal android":      "article-signal-android",
   "article · § 65b ruling":        "article-65b-sc",
+  // Sanity seeded short labels
+  "article · ios 18":              "article-ios18-apfs",
+  "article · bec":                 "article-bec-header",
+  "article · m365":                "article-m365-logs",
+  "article · ai":                  "article-ai-forensics",
+  "article · signal":              "article-signal-android",
+  "article · 65b":                 "article-65b-sc",
   // Fallback data slugs
   "whatsapp-ios18":       "article-ios18-apfs",
   "bec-header-forensics": "article-bec-header",
