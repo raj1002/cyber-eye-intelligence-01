@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { img, type ImageSlot } from "@/lib/image-manifest";
 
-const TEAM_SLOTS: (ImageSlot | null)[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07",null,null];
+const TEAM_SLOTS: (ImageSlot | null)[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07","team-r08","team-r09"];
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
 import { getTeamMembers } from "@/lib/sanity";
