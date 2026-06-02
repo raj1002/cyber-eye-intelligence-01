@@ -1,17 +1,45 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-/**
- * Unicorn Studio background animation, tinted via CSS in globals.css.
- * Place inside a `position: relative` parent (e.g. the hero <section>).
- *
- * Usage:
- *   <section className="relative overflow-hidden">
- *     <UnicornAura projectId="bKN5upvoulAmWvInmHza" />
- *     ...content (must be z-indexed above)...
- *   </section>
- */
+// Official CDN first; jsDelivr as fallback if the primary ever fails
+const PRIMARY_SRC = "https://cdn.unicornstudio.app/unicornstudio.umd.js";
+const FALLBACK_SRC =
+  "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.25/dist/unicornStudio.umd.js";
+
+type US = { isInitialized?: boolean; init: () => void };
+
+function getUS(): US | undefined {
+  return (window as unknown as { UnicornStudio?: US }).UnicornStudio;
+}
+
+function hasWebGL(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function injectScript(src: string, onLoad: () => void, onError: () => void) {
+  if (document.querySelector(`script[src="${src}"]`)) {
+    if (getUS()) { onLoad(); return; }
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`)!;
+    existing.addEventListener("load", onLoad, { once: true });
+    existing.addEventListener("error", onError, { once: true });
+    return;
+  }
+  const s = document.createElement("script");
+  s.src = src;
+  s.async = true;
+  s.addEventListener("load", onLoad, { once: true });
+  s.addEventListener("error", onError, { once: true });
+  document.head.appendChild(s);
+}
+
 export default function UnicornAura({
   projectId,
   showGrid = true,
@@ -19,28 +47,53 @@ export default function UnicornAura({
   projectId: string;
   showGrid?: boolean;
 }) {
-  useEffect(() => {
-    // Guard against double-init across client navigations
-    const w = window as unknown as { UnicornStudio?: { isInitialized: boolean; init: () => void } };
-    if (w.UnicornStudio?.isInitialized) return;
-    w.UnicornStudio = { isInitialized: false, init: () => {} };
+  // null = loading, true = webgl loaded, false = use CSS fallback
+  const [webglReady, setWebglReady] = useState<boolean | null>(null);
 
-    const s = document.createElement("script");
-    s.src =
-      "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js";
-    s.async = true;
-    s.onload = () => {
-      if (w.UnicornStudio && !w.UnicornStudio.isInitialized) {
-        w.UnicornStudio.init();
-        w.UnicornStudio.isInitialized = true;
+  useEffect(() => {
+    // No WebGL = skip the library entirely and use CSS fallback
+    if (!hasWebGL()) {
+      setWebglReady(false);
+      return;
+    }
+
+    const callInit = () => {
+      const lib = getUS();
+      if (lib) {
+        lib.init();
+        setWebglReady(true);
+      } else {
+        setWebglReady(false);
       }
     };
-    document.head.appendChild(s);
+
+    const onBothFailed = () => {
+      console.warn("UnicornStudio: both CDN sources failed to load");
+      setWebglReady(false);
+    };
+
+    const us = getUS();
+    if (us) {
+      us.init();
+      setWebglReady(true);
+      return;
+    }
+
+    injectScript(
+      PRIMARY_SRC,
+      callInit,
+      () => injectScript(FALLBACK_SRC, callInit, onBothFailed)
+    );
   }, []);
 
   return (
     <div className="aura-wrap" aria-hidden="true">
-      <div data-us-project={projectId} />
+      {/* CSS fallback: shown when WebGL unavailable or library fails to load */}
+      {webglReady === false && <div className="aura-css-fallback" />}
+
+      {/* Unicorn Studio canvas: rendered when WebGL is available */}
+      {webglReady !== false && <div data-us-project={projectId} />}
+
       <div className="aura-tint" />
       {showGrid && <div className="absolute inset-0 ph-grid opacity-30" />}
     </div>

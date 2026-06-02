@@ -1,10 +1,21 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [navOpen, setNavOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const pathname = usePathname();
+
+  const closeMenu = () => setOpenMenu(null);
+
+  // Close dropdown whenever the route changes
+  useEffect(() => {
+    closeMenu();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   useEffect(() => {
     const t = document.documentElement.getAttribute('data-theme');
@@ -55,8 +66,17 @@ export default function Header() {
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-8 text-sm">
             {/* Services */}
-            <div className="nav-item">
-              <Link href="/services" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div
+              className={`nav-item${openMenu === 'services' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('services')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/services"
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'services'}
+                onClick={closeMenu}
+              >
                 Services <sup className="text-accent">5</sup>
                 <span className="caret" aria-hidden="true" />
               </Link>
@@ -72,7 +92,7 @@ export default function Header() {
                   { idx: '04', href: '/services#fam-managed-forensics', title: 'Managed Forensics', desc: 'On-premises labs, dedicated examiners, agile IR.' },
                   { idx: '05', href: '/services#fam-data-recovery', title: 'Data Recovery', desc: 'Disk, RAID, mobile, cloud — physical & logical.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -82,15 +102,24 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/services">All services →</Link>
-                  <Link href="/contact">Open a case</Link>
+                  <Link href="/services" onClick={closeMenu}>All services →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Open a case</Link>
                 </div>
               </div>
             </div>
 
             {/* Sectors */}
-            <div className="nav-item">
-              <Link href="/sectors" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div
+              className={`nav-item${openMenu === 'sectors' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('sectors')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/sectors"
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'sectors'}
+                onClick={closeMenu}
+              >
                 Sectors
                 <span className="caret" aria-hidden="true" />
               </Link>
@@ -106,7 +135,7 @@ export default function Header() {
                   { idx: 'S/04', href: '/sectors/government', title: 'Government', desc: 'CERT-aligned, classified handling, audits.' },
                   { idx: 'S/05', href: '/sectors/bfsi-insurance', title: 'BFSI & Insurance', desc: 'Fraud, AML, customer-data investigations.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -116,14 +145,24 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/sectors">All sectors →</Link>
+                  <Link href="/sectors" onClick={closeMenu}>All sectors →</Link>
                 </div>
               </div>
             </div>
 
             {/* Knowledge Centre */}
-            <div className="nav-item">
-              <Link href="/knowledge" className="nav-link nav-trigger mono uppercase text-xs tracking-wider" style={{ minWidth: 'max-content' }}>
+            <div
+              className={`nav-item${openMenu === 'knowledge' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('knowledge')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/knowledge"
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'knowledge'}
+                style={{ minWidth: 'max-content' }}
+                onClick={closeMenu}
+              >
                 Knowledge Centre
                 <span className="caret" aria-hidden="true" />
               </Link>
@@ -138,7 +177,7 @@ export default function Header() {
                   { idx: 'K/03', href: '/knowledge?tab=whitepapers', title: 'Whitepapers', desc: 'Standards, methodology, compliance.' },
                   { idx: 'K/04', href: '/knowledge?tab=blogs', title: 'FAQ', desc: 'Common forensic questions answered.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -151,8 +190,17 @@ export default function Header() {
             </div>
 
             {/* Academy */}
-            <div className="nav-item">
-              <Link href="/training" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div
+              className={`nav-item${openMenu === 'academy' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('academy')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/training"
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'academy'}
+                onClick={closeMenu}
+              >
                 Academy
                 <span className="caret" aria-hidden="true" />
               </Link>
@@ -168,7 +216,7 @@ export default function Header() {
                   { idx: 'A/04', href: '/training#audience-corporate', title: 'For Corporate', desc: 'Insider threat, ransomware tabletop, IR.' },
                   { idx: 'A/05', href: '/training', title: 'Schedule & Cohorts', desc: 'Upcoming dates · in-person, hybrid, online.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -178,15 +226,24 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/training">Course catalogue →</Link>
-                  <Link href="/contact">Enrol</Link>
+                  <Link href="/training" onClick={closeMenu}>Course catalogue →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Enrol</Link>
                 </div>
               </div>
             </div>
 
             {/* About */}
-            <div className="nav-item">
-              <Link href="/about" className="nav-link nav-trigger mono uppercase text-xs tracking-wider">
+            <div
+              className={`nav-item${openMenu === 'about' ? ' menu-open' : ''}`}
+              onMouseEnter={() => setOpenMenu('about')}
+              onMouseLeave={closeMenu}
+            >
+              <Link
+                href="/about"
+                className="nav-link nav-trigger mono uppercase text-xs tracking-wider"
+                aria-expanded={openMenu === 'about'}
+                onClick={closeMenu}
+              >
                 About
                 <span className="caret" aria-hidden="true" />
               </Link>
@@ -200,7 +257,7 @@ export default function Header() {
                   { idx: 'B/02', href: '/careers', title: 'Hiring', desc: "Open roles. We're growing the examiner bench." },
                   { idx: 'B/03', href: '/contact', title: 'Contact Us', desc: 'Mumbai · Bengaluru · Delhi. 24/7 incident line.' },
                 ].map(item => (
-                  <Link key={item.idx} href={item.href} className="menu-link">
+                  <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
                       <span className="ttl">{item.title}</span>
@@ -210,7 +267,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <div className="menu-foot">
-                  <Link href="/contact">Open a case →</Link>
+                  <Link href="/contact" onClick={closeMenu}>Open a case →</Link>
                 </div>
               </div>
             </div>
@@ -235,8 +292,8 @@ export default function Header() {
                 </svg>
               )}
             </button>
-            <a href="tel:+918045678910" className="hidden md:inline-flex btn-ghost text-xs px-4 py-2">
-              +91 80 4567 8910
+            <a href="tel:+919833565665" className="hidden md:inline-flex btn-ghost text-xs px-4 py-2">
+              +91 98335 65665
             </a>
             <Link href="/contact" className="hidden lg:inline-flex btn-primary text-xs px-4 py-2">
               Open a Case →
@@ -392,7 +449,7 @@ export default function Header() {
         </div>
         <div style={{ margin: '16px 12px 4px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           <Link href="/contact" onClick={() => setNavOpen(false)} className="btn-primary text-center justify-center">Open a case →</Link>
-          <a href="tel:+918045678910" className="btn-ghost text-center justify-center">+91 80 4567 8910</a>
+          <a href="tel:+919833565665" className="btn-ghost text-center justify-center">+91 98335 65665</a>
         </div>
       </aside>
     </>
