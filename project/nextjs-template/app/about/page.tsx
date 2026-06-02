@@ -14,6 +14,8 @@ const FALLBACK_TEAM = [
   { _id: 'f3', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
   { _id: 'f4', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
   { _id: 'f5', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
+  { _id: 'f6', name: 'Aditi Sharma', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
+  { _id: 'f7', name: 'Rohan Kapoor', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
 ];
 
 export default async function AboutPage() {
@@ -133,7 +135,7 @@ export default async function AboutPage() {
           </FadeIn>
           <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {team.map((member, i) => (
-              <div key={member._id} className={`card p-7${i === 4 ? ' md:col-span-2 lg:col-span-1' : ''}`}>
+              <div key={member._id} className="card p-7">
                 <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
                 <h3 className="text-lg font-medium mb-1">{member.name}</h3>
                 {member.role && <div className="label mb-3">{member.role}</div>}
