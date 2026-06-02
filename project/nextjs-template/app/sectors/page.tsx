@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Hex } from "@/components/Primitives";
+import FadeIn from "@/components/FadeIn";
+import CountUp from "@/components/CountUp";
 import { getSectors } from "@/lib/sanity";
 
 const FALLBACK = [
@@ -42,7 +44,7 @@ export default async function SectorsPage() {
       {/* Sectors grid */}
       <section className="py-16">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <FadeIn className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {sectors.map((s) => (
               <Link key={s.slug} href={`/sectors/${s.slug}`} className="card card-hover p-8 block">
                 <div className="mono text-xs text-accent mb-12">{s.num}</div>
@@ -57,14 +59,14 @@ export default async function SectorsPage() {
               <p className="leading-relaxed mb-6 opacity-80">Healthcare, education, media, manufacturing — we support adversarial casework across sectors.</p>
               <div className="mono text-sm font-medium">Contact us →</div>
             </Link>
-          </div>
+          </FadeIn>
         </div>
       </section>
 
       {/* Case files callout */}
       <section className="pb-24">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <Link href="/knowledge" className="card card-hover relative overflow-hidden grid md:grid-cols-12 block group">
+          <FadeIn><Link href="/knowledge" className="card card-hover relative overflow-hidden grid md:grid-cols-12 block group">
             <div className="absolute inset-0 ph-grid opacity-30 pointer-events-none" />
             <div className="relative md:col-span-7 p-8 lg:p-12">
               <div className="flex items-center gap-3 mb-6">
@@ -77,10 +79,10 @@ export default async function SectorsPage() {
             </div>
             <div className="relative md:col-span-5 border-t md:border-t-0 md:border-l border-line p-8 lg:p-12 flex flex-col justify-between gap-8">
               <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                <div><div className="display text-3xl num">120<span className="text-accent">+</span></div><div className="label mt-1.5">Redacted files</div></div>
-                <div><div className="display text-3xl num">06</div><div className="label mt-1.5">Sectors covered</div></div>
-                <div><div className="display text-3xl num">98<span className="text-accent">%</span></div><div className="label mt-1.5">Admissibility</div></div>
-                <div><div className="display text-3xl num">11<span className="text-accent">y</span></div><div className="label mt-1.5">Of precedent</div></div>
+                <div><div className="display text-3xl num"><CountUp to={40} suffix="+" /></div><div className="label mt-1.5">Redacted files</div></div>
+                <div><div className="display text-3xl num"><CountUp to={5} /></div><div className="label mt-1.5">Sectors covered</div></div>
+                <div><div className="display text-3xl num"><CountUp to={100} suffix="%" /></div><div className="label mt-1.5">Admissibility</div></div>
+                <div><div className="display text-3xl num"><CountUp to={8} suffix="m" /></div><div className="label mt-1.5">Of operation</div></div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <span className="pill">Law Enforcement</span>
@@ -90,7 +92,7 @@ export default async function SectorsPage() {
                 <span className="pill">BFSI</span>
               </div>
             </div>
-          </Link>
+          </Link></FadeIn>
         </div>
       </section>
     </>
