@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { img, type ImageSlot } from "@/lib/image-manifest";
 
-const TEAM_SLOTS: ImageSlot[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07","team-r08"];
+const TEAM_SLOTS: ImageSlot[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07","team-r08","team-r09","team-r10"];
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
 import { getTeamMembers } from "@/lib/sanity";
@@ -13,12 +13,14 @@ export const metadata = {
 
 const FALLBACK_TEAM = [
   { _id: 'f1', name: 'Arjun Mehta', role: 'Founder & Lead Examiner', bio: 'Certified forensic examiner with experience across police labs, Big Four practices and contested courtrooms. Leads all DFIR engagements.' },
-  { _id: 'f2', name: 'Priya Nair', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
-  { _id: 'f3', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
-  { _id: 'f4', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
-  { _id: 'f5', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
-  { _id: 'f6', name: 'Aditi Sharma', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
-  { _id: 'f7', name: 'Rohan Kapoor', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
+  { _id: 'f2', name: 'Neha Kapoor', role: 'Co-Founder & Business Strategy Lead', bio: 'Former director of operations at a top-tier digital forensics firm. Shapes business strategy, market positioning and partnership architecture for growth.' },
+  { _id: 'f3', name: 'Sanjay Varma', role: 'Co-Founder & Finance Head', bio: 'Chartered accountant with expertise in professional services and deep-tech firm finances. Oversees P&L, fundraising, investor relations and regulatory compliance.' },
+  { _id: 'f4', name: 'Priya Nair', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
+  { _id: 'f5', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
+  { _id: 'f6', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
+  { _id: 'f7', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
+  { _id: 'f8', name: 'Aditi Sharma', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
+  { _id: 'f9', name: 'Rohan Kapoor', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
 ];
 
 export default async function AboutPage() {
