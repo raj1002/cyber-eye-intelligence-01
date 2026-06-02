@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
 import { getSectors, getSectorBySlug } from "@/lib/sanity";
+import { img, sectorImageBySlug } from "@/lib/image-manifest";
 
 const FALLBACK = [
   { slug: "law-enforcement", num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, specialist training for investigators." },
@@ -64,7 +65,7 @@ export default async function SectorDetailPage({ params }: { params: { slug: str
               </div>
             </div>
             <div className="lg:col-span-5">
-              <Placeholder label={`${sector.title} · sector`} className="aspect-[4/5] rounded-card" />
+              {sectorImageBySlug[sector.slug] && <Image {...img(sectorImageBySlug[sector.slug])} alt={img(sectorImageBySlug[sector.slug]).alt} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />}
             </div>
           </div>
         </div>
