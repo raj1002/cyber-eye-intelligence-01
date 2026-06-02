@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
 import { getCaseFiles } from "@/lib/sanity";
+import { img, caseImageFromId, caseImageByLabel } from "@/lib/image-manifest";
 
 const FALLBACK = [
   { id: "CE/2025/014", sector: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions.", imgLabel: "case · IP theft" },
@@ -55,7 +56,7 @@ export default async function CaseFilesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {caseFiles.map((c) => (
               <Link key={c.id} href="/contact" className="group block">
-                <Placeholder label={c.imgLabel} className="aspect-[5/4] rounded-card mb-5 card-hover" />
+                {(() => { const slot = caseImageFromId(c.id) ?? caseImageByLabel[c.imgLabel]; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : null; })()}
                 <div className="flex items-center gap-3 label mb-3">
                   <span className="text-accent">{c.id}</span><span>·</span><span>{c.sector}</span>
                 </div>

@@ -70,6 +70,8 @@ Each row = one image to upload and one placeholder to replace.
 | `team-r06` | 137 (sixth card) | `<Placeholder label="examiner" ...>` | `team-r06.jpg` | 800×800 | 1:1 |
 | `team-r07` | 137 (seventh card) | `<Placeholder label="examiner" ...>` | `team-r07.jpg` | 800×800 | 1:1 |
 | `team-r08` | 137 (eighth card) | `<Placeholder label="examiner" ...>` | `team-r08.jpg` | 800×800 | 1:1 |
+| `team-r09` | 137 (ninth card) | `<Placeholder label="examiner" ...>` | `team-r09.jpg` | 800×800 | 1:1 |
+| `team-r10` | 137 (tenth card) | `<Placeholder label="examiner" ...>` | `team-r10.jpg` | 800×800 | 1:1 |
 
 > Line 161 (`label=""`) is hidden behind `{false && ...}` — skip it entirely.
 
@@ -156,12 +158,12 @@ Line 139 — insights tab (`ph aspect-[5/3]`, `data-label={a.label}`) — reuses
 |---|---|
 | Home | 2 |
 | About — founders hero | 1 |
-| Team headshots | 8 |
+| Team headshots | 10 |
 | Case file cards | 9 |
 | Case detail hero (shared) | 1 |
 | Sector portraits | 5 |
 | Article / insight images | 7 |
-| **Total new files** | **33** |
+| **Total new files** | **35** |
 
 ---
 
@@ -181,6 +183,8 @@ public/
     ├── team-r06.jpg
     ├── team-r07.jpg
     ├── team-r08.jpg
+    ├── team-r09.jpg
+    ├── team-r10.jpg
     ├── case-detail-hero.jpg
     ├── case-ce2025-014.jpg
     ├── case-ce2025-008.jpg
@@ -224,6 +228,8 @@ export const imageManifest = {
   "team-r06":                 { src: "/images/team-r06.jpg",                 alt: "Forensic Apprentice",                                          width: 800,  height: 800  },
   "team-r07":                 { src: "/images/team-r07.jpg",                 alt: "Legal Head",                                                   width: 800,  height: 800  },
   "team-r08":                 { src: "/images/team-r08.jpg",                 alt: "Marketing Head",                                               width: 800,  height: 800  },
+  "team-r09":                 { src: "/images/team-r09.jpg",                 alt: "Co-Founder & Business Strategy Lead",                          width: 800,  height: 800  },
+  "team-r10":                 { src: "/images/team-r10.jpg",                 alt: "Co-Founder & Finance Head",                                    width: 800,  height: 800  },
   "case-detail-hero":         { src: "/images/case-detail-hero.jpg",         alt: "Forensic evidence table with numbered exhibit bags",            width: 1920, height: 1080 },
   "case-ce2025-014":          { src: "/images/case-ce2025-014.jpg",          alt: "Mobile device forensic extraction — deleted data recovery",     width: 1000, height: 800  },
   "case-ce2025-008":          { src: "/images/case-ce2025-008.jpg",          alt: "BEC fraud email header analysis across jurisdictions",          width: 1000, height: 800  },

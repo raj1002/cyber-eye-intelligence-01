@@ -1,4 +1,7 @@
-import { Placeholder } from "@/components/Primitives";
+import Image from "next/image";
+import { img, type ImageSlot } from "@/lib/image-manifest";
+
+const TEAM_SLOTS: (ImageSlot | null)[] = ["team-r01","team-r02","team-r03","team-r04","team-r05","team-r06","team-r07",null,null];
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
 import { getTeamMembers } from "@/lib/sanity";
@@ -9,13 +12,15 @@ export const metadata = {
 };
 
 const FALLBACK_TEAM = [
-  { _id: 'f1', name: 'Arjun Mehta', role: 'Founder & Lead Examiner', bio: 'Certified forensic examiner with experience across police labs, Big Four practices and contested courtrooms. Leads all DFIR engagements.' },
-  { _id: 'f2', name: 'Priya Nair', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
-  { _id: 'f3', name: 'Rahul Desai', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
-  { _id: 'f4', name: 'Sneha Iyer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
-  { _id: 'f5', name: 'Vikram Rao', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
-  { _id: 'f6', name: 'Aditi Sharma', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
-  { _id: 'f7', name: 'Rohan Kapoor', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
+  { _id: 'f1', name: 'Abhishek Mane', role: 'Certified Forensic Examiner', bio: 'Certified forensic examiner with experience across police labs and contested courtrooms. Leads all DFIR engagements.' },
+  { _id: 'f2', name: 'Kiran Pawar', role: 'Digital Intelligence Lead', bio: 'Specialist in OSINT, SOCMINT and dark web investigations. Previously with a national cybercrime unit.' },
+  { _id: 'f3', name: 'Parag Zalke', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
+  { _id: 'f4', name: 'Akshad Veer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
+  { _id: 'f5', name: 'Lakhan Handebag', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
+  { _id: 'f6', name: 'Pooja R. Mankoj', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
+  { _id: 'f7', name: 'Avin Chakravarthy', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
+  { _id: 'f8', name: 'Madhubala A. Waghmare', role: 'Co-Founder & Head of Finance', bio: 'Co-founder and Head of Finance. Oversees P&L, fundraising, investor relations and regulatory compliance.' },
+  { _id: 'f9', name: 'Raj K. Shailey', role: 'Co-Founder & Head of Business Strategy', bio: 'Co-founder and Head of Business Strategy. Shapes business strategy, market positioning and partnership architecture for growth.' },
 ];
 
 export default async function AboutPage() {
@@ -43,7 +48,7 @@ export default async function AboutPage() {
               </p>
             </div>
             <div className="lg:col-span-5">
-              <Placeholder label="founders · lab interior" className="aspect-[4/5] rounded-card card" />
+              <Image {...img("about-founders")} alt={img("about-founders").alt} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />
             </div>
           </div>
         </div>
@@ -134,41 +139,20 @@ export default async function AboutPage() {
             <h2 className="display text-5xl mb-12">Named examiners. <span className="text-accent">No middlemen.</span></h2>
           </FadeIn>
           <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {team.map((member, i) => (
-              <div key={member._id} className="card p-7">
-                <Placeholder label="examiner" className="aspect-square w-16 mb-5 rounded-card" />
-                <h3 className="text-lg font-medium mb-1">{member.name}</h3>
-                {member.role && <div className="label mb-3">{member.role}</div>}
-                {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
-              </div>
-            ))}
+            {team.map((member, i) => {
+              const slot = TEAM_SLOTS[i] ?? null;
+              return (
+                <div key={member._id} className="card p-7">
+                  {slot && <Image {...img(slot)} alt={img(slot).alt} className="w-16 h-16 rounded-card object-cover mb-5" sizes="64px" />}
+                  <h3 className="text-lg font-medium mb-1">{member.name}</h3>
+                  {member.role && <div className="label mb-3">{member.role}</div>}
+                  {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
+                </div>
+              );
+            })}
           </FadeIn>
         </div>
       </section>
-
-      {/* Accreditations — hidden until ready */}
-      {false && (
-      <section className="py-16">
-        <div className="max-w-page mx-auto px-6 lg:px-10">
-          <FadeIn><div className="label mb-6">[ Accreditations ]</div>
-          <h2 className="display text-5xl mb-12">Memberships &amp; <span className="text-accent">alignment.</span></h2></FadeIn>
-          <FadeIn delay={80} className="grid md:grid-cols-4 gap-4">
-            {[
-              { t: "ISO 17025 aligned", s: "Lab procedures" },
-              { t: "CERT-In empanelled", s: "Auditor of Record" },
-              { t: "HTCIA member", s: "Since 2025" },
-              { t: "IACIS member", s: "CFCE certified" },
-            ].map((b) => (
-              <div key={b.t} className="card p-8 text-center">
-                <Placeholder label="" className="aspect-square w-20 mx-auto mb-4 rounded-pill" />
-                <div className="font-medium">{b.t}</div>
-                <div className="label mt-1">{b.s}</div>
-              </div>
-            ))}
-          </FadeIn>
-        </div>
-      </section>
-      )}
     </>
   );
 }

@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import { img, articleImageBySlug, caseImageByLabel, caseImageFromId } from '@/lib/image-manifest';
 
 export interface KnowledgeCaseFile {
   id: string;
@@ -114,7 +116,7 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {visibleCases.map((c) => (
                   <Link key={c.id} href="/contact" className="group block">
-                    <div className="ph aspect-[5/4] rounded-card mb-5 card-hover" data-label={c.imgLabel} />
+                    {(() => { const slot = caseImageFromId(c.id) ?? caseImageByLabel[c.imgLabel]; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, 33vw" /> : null; })()}
                     <div className="flex items-center gap-3 label mb-3">
                       <span className="text-accent">{c.id}</span><span>·</span><span>{c.label}</span>
                     </div>
@@ -136,7 +138,7 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {articles.map((a, i) => (
                 <Link key={i} href="/contact" className="group block">
-                  <div className="ph aspect-[5/3] rounded-card mb-5 card-hover" data-label={a.label} />
+                  {(() => { const slot = articleImageBySlug[a.label ?? '']; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/3] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, 33vw" /> : null; })()}
                   <div className="label mb-3">{a.type} · {a.readTime} · {a.date}</div>
                   <h3 className="text-xl font-medium leading-snug group-hover:text-accent transition">{a.title}</h3>
                 </Link>
