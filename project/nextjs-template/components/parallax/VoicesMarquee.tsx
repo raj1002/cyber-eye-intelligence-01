@@ -21,12 +21,9 @@ export default function VoicesMarquee({ testimonials }: { testimonials?: SanityT
           <div key={`${t._id}-${i}`} className="voice-card" aria-hidden={i >= data.length ? true : undefined}>
             <div className="text-accent text-5xl leading-none mb-4">&ldquo;</div>
             <p className="text-lg leading-relaxed mb-8">{t.quote}</p>
-            <div className="flex items-center gap-3 pt-6 border-t border-line">
-              <div className="w-10 h-10 rounded-pill bg-surface2 border border-line flex-shrink-0" />
-              <div>
-                <div className="text-sm">{t.author}</div>
-                <div className="label">{t.firm}</div>
-              </div>
+            <div className="pt-6 border-t border-line">
+              <div className="text-sm">{t.author}</div>
+              <div className="label">{t.firm}</div>
             </div>
           </div>
         ))}
