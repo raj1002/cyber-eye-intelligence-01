@@ -65,7 +65,7 @@ export default async function SectorDetailPage({ params }: { params: { slug: str
               </div>
             </div>
             <div className="lg:col-span-5">
-              {sectorImageBySlug[sector.slug] && <Image {...img(sectorImageBySlug[sector.slug])} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />}
+              {sectorImageBySlug[sector.slug] && <Image {...img(sectorImageBySlug[sector.slug])} alt={img(sectorImageBySlug[sector.slug]).alt} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />}
             </div>
           </div>
         </div>

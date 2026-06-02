@@ -34,7 +34,7 @@ export default function CaseFileDetailPage({ params }: { params: { slug: string 
           <div className="grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6">
               <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-line">
-                <Image {...img("case-detail-hero")} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+                <Image {...img("case-detail-hero")} alt={img("case-detail-hero").alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                 <div className="absolute top-4 left-4 w-5 h-5 border-t border-l border-accent z-10" />
                 <div className="absolute bottom-4 right-4 w-5 h-5 border-b border-r border-accent z-10" />
                 <div className="absolute bottom-3 left-3 right-3 z-10 flex justify-between mono text-[10px] uppercase tracking-widest text-stone">

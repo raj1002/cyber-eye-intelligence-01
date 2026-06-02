@@ -56,7 +56,7 @@ export default async function CaseFilesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {caseFiles.map((c) => (
               <Link key={c.id} href="/contact" className="group block">
-                {(() => { const slot = caseImageFromId(c.id) ?? caseImageByLabel[c.imgLabel]; return slot ? <Image {...img(slot)} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : null; })()}
+                {(() => { const slot = caseImageFromId(c.id) ?? caseImageByLabel[c.imgLabel]; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : null; })()}
                 <div className="flex items-center gap-3 label mb-3">
                   <span className="text-accent">{c.id}</span><span>·</span><span>{c.sector}</span>
                 </div>

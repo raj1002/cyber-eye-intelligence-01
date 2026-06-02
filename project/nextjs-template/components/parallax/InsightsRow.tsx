@@ -46,7 +46,7 @@ export default function InsightsRow({ articles }: { articles?: SanityArticle[] }
             const meta = [a.type, a.readTime, a.date].filter(Boolean).join(' · ');
             return (
               <Link key={a._id} href={href} className="insight-card group">
-                {(() => { const label = a.label ?? ''; const slot = articleImageBySlug[label] ?? articleImageBySlug[a.slug?.current ?? '']; return slot ? <Image {...img(slot)} className="aspect-[5/3] rounded-card mb-5 card-hover object-cover w-full" sizes="320px" /> : null; })()}
+                {(() => { const label = a.label ?? ''; const slot = articleImageBySlug[label] ?? articleImageBySlug[a.slug?.current ?? '']; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/3] rounded-card mb-5 card-hover object-cover w-full" sizes="320px" /> : null; })()}
                 <div className="label mb-3">{meta}</div>
                 <h3 className="text-xl font-medium leading-snug group-hover:text-accent transition">{a.title}</h3>
               </Link>

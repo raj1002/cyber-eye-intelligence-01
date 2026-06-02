@@ -373,7 +373,7 @@ export default async function Home() {
                 <div><div className="display text-2xl num"><CountUp to={4.9} suffix="" /></div><div className="label mt-1">Avg rating</div></div>
               </div>
             </div>
-            <Image {...img("home-classroom")} className="aspect-[5/4] lg:aspect-auto border-l border-line object-cover w-full" sizes="(max-width: 1024px) 100vw, 50vw" />
+            <Image {...img("home-classroom")} alt={img("home-classroom").alt} className="aspect-[5/4] lg:aspect-auto border-l border-line object-cover w-full" sizes="(max-width: 1024px) 100vw, 50vw" />
           </div></FadeIn>
         </div>
       </section>
@@ -410,7 +410,7 @@ export default async function Home() {
           <FadeIn className="grid lg:grid-cols-12 gap-10 items-center">
             <div className="lg:col-span-6">
               <div className="relative aspect-[4/3] rounded-card overflow-hidden border border-line">
-                <Image {...img("home-case-featured")} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+                <Image {...img("home-case-featured")} alt={img("home-case-featured").alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                 <div className="absolute top-4 left-4 w-5 h-5 border-t border-l border-accent z-10" />
                 <div className="absolute bottom-4 right-4 w-5 h-5 border-b border-r border-accent z-10" />
                 <div className="absolute bottom-3 left-3 right-3 z-10 flex justify-between mono text-[10px] uppercase tracking-widest text-stone">

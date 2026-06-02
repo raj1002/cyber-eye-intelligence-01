@@ -46,7 +46,7 @@ export default async function AboutPage() {
               </p>
             </div>
             <div className="lg:col-span-5">
-              <Image {...img("about-founders")} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />
+              <Image {...img("about-founders")} alt={img("about-founders").alt} className="aspect-[4/5] rounded-card object-cover w-full" sizes="(max-width: 1024px) 100vw, 42vw" />
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default async function AboutPage() {
           <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {team.map((member, i) => (
               <div key={member._id} className="card p-7">
-                <Image {...img(TEAM_SLOTS[i] ?? "team-r01")} className="w-16 h-16 rounded-card object-cover mb-5" sizes="64px" />
+                <Image {...img(TEAM_SLOTS[i] ?? "team-r01")} alt={img(TEAM_SLOTS[i] ?? "team-r01").alt} className="w-16 h-16 rounded-card object-cover mb-5" sizes="64px" />
                 <h3 className="text-lg font-medium mb-1">{member.name}</h3>
                 {member.role && <div className="label mb-3">{member.role}</div>}
                 {member.bio && <p className="text-sm text-mute leading-relaxed">{member.bio}</p>}
@@ -148,30 +148,6 @@ export default async function AboutPage() {
           </FadeIn>
         </div>
       </section>
-
-      {/* Accreditations — hidden until ready */}
-      {false && (
-      <section className="py-16">
-        <div className="max-w-page mx-auto px-6 lg:px-10">
-          <FadeIn><div className="label mb-6">[ Accreditations ]</div>
-          <h2 className="display text-5xl mb-12">Memberships &amp; <span className="text-accent">alignment.</span></h2></FadeIn>
-          <FadeIn delay={80} className="grid md:grid-cols-4 gap-4">
-            {[
-              { t: "ISO 17025 aligned", s: "Lab procedures" },
-              { t: "CERT-In empanelled", s: "Auditor of Record" },
-              { t: "HTCIA member", s: "Since 2025" },
-              { t: "IACIS member", s: "CFCE certified" },
-            ].map((b) => (
-              <div key={b.t} className="card p-8 text-center">
-                <Placeholder label="" className="aspect-square w-20 mx-auto mb-4 rounded-pill" />
-                <div className="font-medium">{b.t}</div>
-                <div className="label mt-1">{b.s}</div>
-              </div>
-            ))}
-          </FadeIn>
-        </div>
-      </section>
-      )}
     </>
   );
 }
