@@ -81,12 +81,10 @@ export const articleImageBySlug: Record<string, ImageSlot> = {
   "article · ai":                  "article-ai-forensics",
   "article · signal":              "article-signal-android",
   "article · 65b":                 "article-65b-sc",
-  // Content pipeline articles
-  "article · § 65b ruling":        "article-65b-sc",
+  // Content pipeline article labels (new, no duplicates)
   "article · digital forensics":   "article-ios18-apfs",
   "article · mobile forensics":    "article-ios18-apfs",
   "article · chain of custody":    "article-m365-logs",
-  "article · bec headers":         "article-bec-header",
   "article · ransomware":          "article-ai-forensics",
   "article · osint india":         "article-signal-android",
   "article · forensics training":  "article-bec-header",
