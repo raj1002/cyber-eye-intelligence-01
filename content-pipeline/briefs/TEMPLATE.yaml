@@ -1,0 +1,85 @@
+# Content Brief Template
+# Copy this file, rename it to your-topic-slug.yaml, fill in every field, then
+# paste it into a Claude Code session and say:
+#   "Generate an article from content-pipeline/briefs/your-topic-slug.yaml"
+# Claude will write the article following the RULEBOOK and save it to content-pipeline/.
+
+topic: ""
+# The subject in plain English. Be specific.
+# Example: "How Indian courts evaluate WhatsApp screenshots as evidence"
+
+primaryKeyword: ""
+# The exact phrase you want to rank for. Should reflect real search queries.
+# Example: "WhatsApp evidence India court"
+
+secondaryKeywords:
+  - ""
+  - ""
+  - ""
+# 3–5 related phrases, long-tail variants, or PAA questions.
+# Example: "WhatsApp chat admissibility India", "section 65B WhatsApp", "how to authenticate WhatsApp messages"
+
+targetFeaturedSnippet: ""
+# The PAA / featured snippet question you want to own.
+# Frame as a question a real user would type.
+# Example: "Are WhatsApp screenshots admissible in Indian courts?"
+
+cluster: ""
+# Which content cluster does this belong to? (see RULEBOOK Section 7)
+# Options: digital-forensics | cyber-investigations | incident-response | legal-compliance | training-academy
+
+pillarLink: ""
+# The slug of the pillar article this cluster page should link back to.
+# Example: "digital-forensics-india-complete-guide"
+
+type: ""
+# Article type — controls tone and structure.
+# Options: Tutorial | Field notes | Reference | Opinion | Case law | Guide
+
+targetAudience: ""
+# Primary reader persona.
+# Options: police | legal | corporate | bfsi | government | broad
+
+intent: ""
+# What the reader wants to do after reading.
+# Options: educational | how-to | reference | opinion | comparison
+
+keyPoints:
+  - ""
+  - ""
+  - ""
+  - ""
+  - ""
+# 4–6 specific points the article MUST cover. These become H2 sections.
+# Be precise — not "explain the process" but "step-by-step iPhone logical extraction using Cellebrite UFED 7.x"
+
+indianLawsToReference:
+  - ""
+# Specific laws, sections, or regulations to cite.
+# Example: "§ 65B Indian Evidence Act", "IT Act 2000 § 43A", "BSA 2023"
+
+toolsToMention:
+  - ""
+# Forensic tools, platforms or software relevant to the topic.
+# Example: "Cellebrite UFED", "AXIOM", "Magnet RAM Capture"
+
+courtsOrCasesToReference:
+  - ""
+# Indian court cases, tribunal rulings, or institutional guidelines to cite.
+# Example: "Arjun Panditrao Khotkar v. Kailash Kushanrao Goratyal (2020 SC)"
+
+internalLinksToInclude:
+  - slug: ""
+    anchorText: ""
+# At least 2 internal links. Use exact slugs from published articles or site pages.
+# Example:
+#   - slug: "section-65b-certificate-digital-evidence-india"
+#     anchorText: "Section 65B certificate requirements"
+#   - slug: "/contact"
+#     anchorText: "speak to a forensic examiner"
+
+estimatedWordCount: 1600
+# Target word count. See RULEBOOK Section 4.5 for minimums by type.
+
+notes: ""
+# Any extra context, angles to avoid, client-sensitive areas, or specific case references.
