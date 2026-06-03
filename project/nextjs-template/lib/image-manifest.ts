@@ -81,6 +81,13 @@ export const articleImageBySlug: Record<string, ImageSlot> = {
   "article · ai":                  "article-ai-forensics",
   "article · signal":              "article-signal-android",
   "article · 65b":                 "article-65b-sc",
+  // Content pipeline article labels (new, no duplicates)
+  "article · digital forensics":   "article-ios18-apfs",
+  "article · mobile forensics":    "article-ios18-apfs",
+  "article · chain of custody":    "article-m365-logs",
+  "article · ransomware":          "article-ai-forensics",
+  "article · osint india":         "article-signal-android",
+  "article · forensics training":  "article-bec-header",
   // Fallback data slugs
   "whatsapp-ios18":       "article-ios18-apfs",
   "bec-header-forensics": "article-bec-header",
