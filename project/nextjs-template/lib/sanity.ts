@@ -91,6 +91,7 @@ export interface SanityWhitepaper {
 export interface SanityBlog {
   _id: string;
   _type: 'blog';
+  slug?: { current: string };
   date?: string;
   title: string;
   readTime?: string;
@@ -279,13 +280,27 @@ export async function getBlogs(): Promise<SanityBlog[]> {
   try {
     return await sanityClient.fetch<SanityBlog[]>(
       `*[_type == "blog"] | order(publishedAt desc) {
-        _id, _type, date, title, readTime, body, seoTitle, seoDescription, publishedAt
+        _id, _type, slug, date, title, readTime, body, seoTitle, seoDescription, publishedAt
       }`,
       {},
       { next: { revalidate: 60 } }
     );
   } catch {
     return [];
+  }
+}
+
+export async function getBlogBySlug(slug: string): Promise<SanityBlog | null> {
+  try {
+    return await sanityClient.fetch<SanityBlog | null>(
+      `*[_type == "blog" && slug.current == $slug][0] {
+        _id, _type, slug, date, title, readTime, body, seoTitle, seoDescription, publishedAt
+      }`,
+      { slug },
+      { next: { revalidate: 60 } }
+    );
+  } catch {
+    return null;
   }
 }
 
