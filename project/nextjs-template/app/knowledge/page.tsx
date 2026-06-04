@@ -7,15 +7,15 @@ import KnowledgeContent, {
 } from './KnowledgeContent';
 
 const FALLBACK_CASES: KnowledgeCaseFile[] = [
-  { id: "CE/2025/014", sector: "corporate", label: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions.", imgLabel: "case · IP theft" },
-  { id: "CE/2025/008", sector: "bfsi", label: "BFSI · Email", title: "Traced ₹4.6 cr BEC fraud across 3 jurisdictions in 11 days.", sub: "Attribution to Lagos-based ring · funds frozen.", imgLabel: "case · BEC fraud" },
-  { id: "CE/2025/003", sector: "corporate", label: "Corporate · Insider", title: "Identified data exfiltration through personal cloud — termination upheld.", sub: "17 USB events · 2 SaaS exports · labour tribunal accepted.", imgLabel: "case · insider" },
-  { id: "CE/2024/097", sector: "corporate", label: "Corporate · Malware", title: "Mapped ransomware dwell time — 41 days. Insurer paid out under coverage.", sub: "Conti-affiliated · attribution upheld in arbitration.", imgLabel: "case · ransomware" },
-  { id: "CE/2024/082", sector: "legal", label: "Legal · Mobile", title: "Reconstructed 6-week location timeline in a contested custody matter.", sub: "Geofencing · cell-site verification · family court accepted.", imgLabel: "case · custody" },
-  { id: "CE/2024/061", sector: "ngo", label: "NGO · Cloud", title: "Reversed unauthorised mailbox rules — donor data breach contained in 36 h.", sub: "M365 audit log · attribution to compromised contractor.", imgLabel: "case · m365" },
-  { id: "CE/2024/048", sector: "law-enforcement", label: "Law Enforcement · Mobile", title: "Cell-site triangulation closed a 9-suspect narcotics syndicate.", sub: "23 devices imaged · 4 burner phones decrypted.", imgLabel: "case · narcotics ring" },
-  { id: "CE/2024/032", sector: "government", label: "Government · Insider", title: "Traced a ministry document leak to a single endpoint in 9 days.", sub: "USB telemetry · classified handling · auditor accepted.", imgLabel: "case · ministry leak" },
-  { id: "CE/2023/118", sector: "healthcare", label: "Healthcare · Malware", title: "Contained a hospital ransomware attack — restored ICU systems in 18 hours.", sub: "No patient data lost · CERT-In incident filing closed.", imgLabel: "case · hospital" },
+  { id: "CE/2025/014", slug: "ce-2025-014", sector: "corporate", label: "Corporate · Mobile", title: "Recovered 14 deleted chats from a wiped iPhone — conviction in 9 months.", sub: "2.4 TB examined · § 65B admitted · Mumbai sessions.", imgLabel: "case · IP theft" },
+  { id: "CE/2025/008", slug: "ce-2025-008", sector: "bfsi", label: "BFSI · Email", title: "Traced ₹4.6 cr BEC fraud across 3 jurisdictions in 11 days.", sub: "Attribution to Lagos-based ring · funds frozen.", imgLabel: "case · BEC fraud" },
+  { id: "CE/2025/003", slug: "ce-2025-003", sector: "corporate", label: "Corporate · Insider", title: "Identified data exfiltration through personal cloud — termination upheld.", sub: "17 USB events · 2 SaaS exports · labour tribunal accepted.", imgLabel: "case · insider" },
+  { id: "CE/2024/097", slug: "ce-2024-097", sector: "corporate", label: "Corporate · Malware", title: "Mapped ransomware dwell time — 41 days. Insurer paid out under coverage.", sub: "Conti-affiliated · attribution upheld in arbitration.", imgLabel: "case · ransomware" },
+  { id: "CE/2024/082", slug: "ce-2024-082", sector: "legal", label: "Legal · Mobile", title: "Reconstructed 6-week location timeline in a contested custody matter.", sub: "Geofencing · cell-site verification · family court accepted.", imgLabel: "case · custody" },
+  { id: "CE/2024/061", slug: "ce-2024-061", sector: "ngo", label: "NGO · Cloud", title: "Reversed unauthorised mailbox rules — donor data breach contained in 36 h.", sub: "M365 audit log · attribution to compromised contractor.", imgLabel: "case · m365" },
+  { id: "CE/2024/048", slug: "ce-2024-048", sector: "law-enforcement", label: "Law Enforcement · Mobile", title: "Cell-site triangulation closed a 9-suspect narcotics syndicate.", sub: "23 devices imaged · 4 burner phones decrypted.", imgLabel: "case · narcotics ring" },
+  { id: "CE/2024/032", slug: "ce-2024-032", sector: "government", label: "Government · Insider", title: "Traced a ministry document leak to a single endpoint in 9 days.", sub: "USB telemetry · classified handling · auditor accepted.", imgLabel: "case · ministry leak" },
+  { id: "CE/2023/118", slug: "ce-2023-118", sector: "healthcare", label: "Healthcare · Malware", title: "Contained a hospital ransomware attack — restored ICU systems in 18 hours.", sub: "No patient data lost · CERT-In incident filing closed.", imgLabel: "case · hospital" },
 ];
 
 const FALLBACK_ARTICLES: KnowledgeArticle[] = [
@@ -53,14 +53,18 @@ export default async function KnowledgePage() {
   ]);
 
   const caseFiles: KnowledgeCaseFile[] = sanityCases.length > 0
-    ? sanityCases.map((c) => ({
-        id: c.ref ?? c._id,
-        sector: c.sector ?? "",
-        label: c.label ?? c.sector ?? "",
-        title: c.title,
-        sub: c.sub ?? "",
-        imgLabel: c.imgLabel ?? "case file",
-      }))
+    ? sanityCases.map((c) => {
+        const id = c.ref ?? c._id;
+        return {
+          id,
+          slug: id.toLowerCase().replace(/\//g, "-"),
+          sector: c.sector ?? "",
+          label: c.label ?? c.sector ?? "",
+          title: c.title,
+          sub: c.sub ?? "",
+          imgLabel: c.imgLabel ?? "case file",
+        };
+      })
     : FALLBACK_CASES;
 
   const articles: KnowledgeArticle[] = sanityArticles.length > 0
@@ -80,6 +84,7 @@ export default async function KnowledgePage() {
         title: w.title,
         sub: w.sub ?? "",
         year: w.year ?? "",
+        pdfUrl: w.pdfUrl,
       }))
     : FALLBACK_WHITEPAPERS;
 
@@ -88,6 +93,7 @@ export default async function KnowledgePage() {
         date: b.date ?? (b.publishedAt ? new Date(b.publishedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : ""),
         title: b.title,
         readTime: b.readTime ?? "5 min",
+        slug: b.slug?.current,
       }))
     : FALLBACK_BLOGS;
 

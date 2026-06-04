@@ -8,6 +8,7 @@ import { img, articleImageBySlug, caseImageByLabel, caseImageFromId } from '@/li
 
 export interface KnowledgeCaseFile {
   id: string;
+  slug: string;
   sector: string;
   label: string;
   title: string;
@@ -29,12 +30,14 @@ export interface KnowledgeWhitepaper {
   title: string;
   sub: string;
   year: string;
+  pdfUrl?: string;
 }
 
 export interface KnowledgeBlog {
   date: string;
   title: string;
   readTime: string;
+  slug?: string;
 }
 
 interface Props {
@@ -116,7 +119,7 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {visibleCases.map((c) => (
-                  <Link key={c.id} href="/contact" className="group block">
+                  <Link key={c.id} href={`/case-files/${c.slug}`} className="group block">
                     {(() => { const slot = caseImageFromId(c.id) ?? caseImageByLabel[c.imgLabel]; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/4] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, 33vw" /> : null; })()}
                     <div className="flex items-center gap-3 label mb-3">
                       <span className="text-accent">{c.id}</span><span>·</span><span>{c.label}</span>
@@ -163,7 +166,10 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
                   </div>
                   <h3 className="text-2xl font-medium mb-3 leading-snug">{w.title}</h3>
                   <p className="text-mute leading-relaxed mb-8">{w.sub}</p>
-                  <Link href="/contact" className="mono text-xs text-accent uppercase tracking-wider">Download PDF →</Link>
+                  {w.pdfUrl
+                    ? <a href={w.pdfUrl} target="_blank" rel="noopener noreferrer" className="mono text-xs text-accent uppercase tracking-wider">Download PDF →</a>
+                    : <Link href="/contact" className="mono text-xs text-accent uppercase tracking-wider">Request PDF →</Link>
+                  }
                 </div>
               ))}
             </div>
@@ -178,7 +184,7 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
             <div className="label mb-10">[ Blog · Lab notes ]</div>
             <div className="space-y-4">
               {blogs.map((b, i) => (
-                <Link key={i} href="/contact" className="card card-hover p-7 flex items-center justify-between gap-6 group block">
+                <Link key={i} href={b.slug ? `/blogs/${b.slug}` : '/knowledge?tab=blogs'} className="card card-hover p-7 flex items-center justify-between gap-6 group block">
                   <div className="flex-1">
                     <div className="label mb-3">{b.date} · {b.readTime}</div>
                     <h3 className="text-xl font-medium group-hover:text-accent transition">{b.title}</h3>
