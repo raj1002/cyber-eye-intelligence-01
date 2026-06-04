@@ -21,6 +21,7 @@ export interface KnowledgeArticle {
   date: string;
   title: string;
   label: string;
+  slug?: string;
 }
 
 export interface KnowledgeWhitepaper {
@@ -137,7 +138,7 @@ function KnowledgeInner({ caseFiles, articles, whitepapers, blogs }: Props) {
             <div className="label mb-10">[ Insights · From the lab ]</div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {articles.map((a, i) => (
-                <Link key={i} href="/contact" className="group block">
+                <Link key={i} href={a.slug ? `/insights/${a.slug}` : '/insights'} className="group block">
                   {(() => { const slot = articleImageBySlug[a.label ?? '']; return slot ? <Image {...img(slot)} alt={img(slot).alt} className="aspect-[5/3] rounded-card mb-5 card-hover object-cover w-full" sizes="(max-width: 768px) 100vw, 33vw" /> : null; })()}
                   <div className="label mb-3">{a.type} · {a.readTime} · {a.date}</div>
                   <h3 className="text-xl font-medium leading-snug group-hover:text-accent transition">{a.title}</h3>
