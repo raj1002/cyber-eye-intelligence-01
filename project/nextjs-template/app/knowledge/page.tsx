@@ -19,12 +19,12 @@ const FALLBACK_CASES: KnowledgeCaseFile[] = [
 ];
 
 const FALLBACK_ARTICLES: KnowledgeArticle[] = [
-  { type: "Tutorial", readTime: "6 min", date: "Apr 28, 2026", title: "Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes.", label: "article · ios 18" },
-  { type: "Field notes", readTime: "8 min", date: "Apr 14, 2026", title: "BEC fraud: a five-step header forensics workflow for in-house counsel.", label: "article · bec" },
-  { type: "Reference", readTime: "11 min", date: "Mar 30, 2026", title: "Cloud forensics in M365: which logs actually survive a 90-day retention window?", label: "article · m365" },
-  { type: "Opinion", readTime: "4 min", date: "Mar 22, 2026", title: "Why \"AI-powered forensics\" is mostly marketing — and the two places it isn't.", label: "article · ai" },
-  { type: "Tutorial", readTime: "9 min", date: "Mar 10, 2026", title: "Carving Signal sealed-sender artefacts from Android 14 user data.", label: "article · signal" },
-  { type: "Case law", readTime: "5 min", date: "Feb 28, 2026", title: "SC ruling on § 65B: what it changes for digital evidence in 2026.", label: "article · 65b" },
+  { type: "Tutorial", readTime: "6 min", date: "Apr 28, 2026", title: "Recovering deleted WhatsApp messages on iOS 18 — what the new APFS encryption changes.", label: "article · ios 18 acquisitions", slug: "whatsapp-ios18" },
+  { type: "Field notes", readTime: "8 min", date: "Apr 14, 2026", title: "BEC fraud: a five-step header forensics workflow for in-house counsel.", label: "article · bec headers", slug: "bec-header-forensics" },
+  { type: "Reference", readTime: "11 min", date: "Mar 30, 2026", title: "Cloud forensics in M365: which logs actually survive a 90-day retention window?", label: "article · m365 logs", slug: "m365-retention" },
+  { type: "Opinion", readTime: "4 min", date: "Mar 22, 2026", title: "Why \"AI-powered forensics\" is mostly marketing — and the two places it isn't.", label: "article · ai forensics", slug: "ai-forensics-marketing" },
+  { type: "Tutorial", readTime: "9 min", date: "Mar 10, 2026", title: "Carving Signal sealed-sender artefacts from Android 14 user data.", label: "article · signal android", slug: "signal-android14" },
+  { type: "Case law", readTime: "5 min", date: "Feb 28, 2026", title: "SC ruling on § 65B: what it changes for digital evidence in 2026.", label: "article · § 65b ruling", slug: "65b-sc-ruling" },
 ];
 
 const FALLBACK_WHITEPAPERS: KnowledgeWhitepaper[] = [
@@ -70,6 +70,7 @@ export default async function KnowledgePage() {
         date: a.date ?? (a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : ""),
         title: a.title,
         label: a.label ?? `article · ${a._id}`,
+        slug: a.slug?.current,
       }))
     : FALLBACK_ARTICLES;
 
