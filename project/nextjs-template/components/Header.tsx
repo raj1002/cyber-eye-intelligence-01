@@ -169,14 +169,13 @@ export default function Header() {
               <div className="nav-menu" role="menu" style={{ minWidth: 300 }}>
                 <div className="menu-head">
                   <span className="label">Resources</span>
-                  <span className="count">05</span>
+                  <span className="count">04</span>
                 </div>
                 {[
                   { idx: 'K/01', href: '/knowledge?tab=insights', title: 'Field Notes & Articles', desc: 'Tutorials, references, post-mortems.' },
                   { idx: 'K/02', href: '/knowledge?tab=cases', title: 'Case Studies', desc: 'Redacted exhibits & outcomes.' },
                   { idx: 'K/03', href: '/knowledge?tab=whitepapers', title: 'Whitepapers', desc: 'Standards, methodology, compliance.' },
                   { idx: 'K/04', href: '/knowledge?tab=blogs', title: 'Blogs', desc: 'Lab notes, opinions, commentary.' },
-                  { idx: 'K/05', href: '/knowledge', title: 'All Knowledge', desc: 'Browse the full resource library.' },
                 ].map(item => (
                   <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
@@ -403,7 +402,6 @@ export default function Header() {
                 { idx: 'K/02', href: '/knowledge?tab=cases', label: 'Case Studies' },
                 { idx: 'K/03', href: '/knowledge?tab=whitepapers', label: 'Whitepapers' },
                 { idx: 'K/04', href: '/knowledge?tab=blogs', label: 'Blogs' },
-                { idx: 'K/05', href: '/knowledge', label: 'All Knowledge' },
               ].map(item => (
                 <Link key={item.idx} href={item.href} onClick={() => setNavOpen(false)}>
                   <span className="idx-mini">{item.idx}</span>{item.label}
