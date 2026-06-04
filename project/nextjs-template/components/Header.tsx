@@ -175,7 +175,7 @@ export default function Header() {
                   { idx: 'K/01', href: '/knowledge?tab=insights', title: 'Field Notes & Articles', desc: 'Tutorials, references, post-mortems.' },
                   { idx: 'K/02', href: '/knowledge?tab=cases', title: 'Case Studies', desc: 'Redacted exhibits & outcomes.' },
                   { idx: 'K/03', href: '/knowledge?tab=whitepapers', title: 'Whitepapers', desc: 'Standards, methodology, compliance.' },
-                  { idx: 'K/04', href: '/knowledge?tab=blogs', title: 'FAQ', desc: 'Common forensic questions answered.' },
+                  { idx: 'K/04', href: '/knowledge?tab=blogs', title: 'Blogs', desc: 'Lab notes, opinions, commentary.' },
                 ].map(item => (
                   <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
