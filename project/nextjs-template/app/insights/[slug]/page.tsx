@@ -42,7 +42,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       <section className="py-20 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
           <div className="label mb-6">
-            <Link href="/insights" className="hover:text-accent transition">Insights</Link>
+            <Link href="/knowledge?tab=insights" className="hover:text-accent transition">Insights</Link>
             {" / "}
             <span className="text-white">{article.title}</span>
           </div>
@@ -84,7 +84,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           </div>
 
           <div className="mt-16 pt-10 border-t border-line flex items-center justify-between">
-            <Link href="/insights" className="mono text-sm text-accent hover:underline">← Back to Insights</Link>
+            <Link href="/knowledge?tab=insights" className="mono text-sm text-accent hover:underline">← Back to Insights</Link>
             <Link href="/contact" className="btn-primary">Speak to an examiner →</Link>
           </div>
         </div>
