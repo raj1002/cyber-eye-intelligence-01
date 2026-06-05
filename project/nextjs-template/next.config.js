@@ -3,6 +3,16 @@ const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
 
+  async redirects() {
+    return [
+      {
+        source: '/insights',
+        destination: '/knowledge?tab=insights',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     const csp = [
       "default-src 'self'",
