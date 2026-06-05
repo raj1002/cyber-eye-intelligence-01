@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,6 +24,12 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-grotesk",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#050505",
+};
 
 export const metadata: Metadata = {
   title: "Cyber Eye Intelligence — Digital Forensics & Investigation",
