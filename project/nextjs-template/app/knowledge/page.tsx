@@ -67,14 +67,15 @@ export default async function KnowledgePage() {
       })
     : FALLBACK_CASES;
 
-  const articles: KnowledgeArticle[] = sanityArticles.length > 0
-    ? sanityArticles.map((a) => ({
+  const sanityArticlesWithSlugs = sanityArticles.filter((a) => a.slug?.current);
+  const articles: KnowledgeArticle[] = sanityArticlesWithSlugs.length > 0
+    ? sanityArticlesWithSlugs.map((a) => ({
         type: a.type ?? "Article",
         readTime: a.readTime ?? "5 min",
         date: a.date ?? (a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : ""),
         title: a.title,
         label: a.label ?? `article · ${a._id}`,
-        slug: a.slug?.current,
+        slug: a.slug!.current,
       }))
     : FALLBACK_ARTICLES;
 
@@ -88,12 +89,13 @@ export default async function KnowledgePage() {
       }))
     : FALLBACK_WHITEPAPERS;
 
-  const blogs: KnowledgeBlog[] = sanityBlogs.length > 0
-    ? sanityBlogs.map((b) => ({
+  const sanityBlogsWithSlugs = sanityBlogs.filter((b) => b.slug?.current);
+  const blogs: KnowledgeBlog[] = sanityBlogsWithSlugs.length > 0
+    ? sanityBlogsWithSlugs.map((b) => ({
         date: b.date ?? (b.publishedAt ? new Date(b.publishedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : ""),
         title: b.title,
         readTime: b.readTime ?? "5 min",
-        slug: b.slug?.current,
+        slug: b.slug!.current,
       }))
     : FALLBACK_BLOGS;
 
