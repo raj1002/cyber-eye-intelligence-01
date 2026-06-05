@@ -34,9 +34,9 @@ const FALLBACK_WHITEPAPERS: KnowledgeWhitepaper[] = [
 ];
 
 const FALLBACK_BLOGS: KnowledgeBlog[] = [
-  { date: "May 12, 2026", title: "What the Bombay HC's WhatsApp admissibility ruling means for your next matter.", readTime: "4 min" },
-  { date: "Apr 5, 2026", title: "We trained 200 UP Police cyber-crime investigators. Here's what they didn't know.", readTime: "6 min" },
-  { date: "Mar 1, 2026", title: "Cellebrite UFED vs. GrayKey in 2026: a practitioner's honest comparison.", readTime: "8 min" },
+  { date: "May 12, 2026", title: "What the Bombay HC's WhatsApp admissibility ruling means for your next matter.", readTime: "4 min", slug: "bombay-hc-whatsapp-ruling" },
+  { date: "Apr 5, 2026", title: "We trained 200 UP Police cyber-crime investigators. Here's what they didn't know.", readTime: "6 min", slug: "up-police-cyber-training" },
+  { date: "Mar 1, 2026", title: "Cellebrite UFED vs. GrayKey in 2026: a practitioner's honest comparison.", readTime: "8 min", slug: "cellebrite-vs-graykey-2026" },
 ];
 
 export const metadata = {
