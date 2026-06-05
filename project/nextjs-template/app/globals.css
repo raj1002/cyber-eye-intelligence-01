@@ -603,14 +603,14 @@ html[data-theme="light"] .insights-arrow { border-color: #DAD8D2; color: #0A0A0A
 html[data-theme="light"] .insights-arrow:hover { border-color: #0F8060; color: #0F8060; }
 html[data-theme="light"] .insights-arrow:disabled:hover { border-color: #DAD8D2; color: #0A0A0A; }
 html[data-theme="light"] .aura-wrap [data-us-project] {
-  filter: hue-rotate(110deg) saturate(0.35) brightness(1.15) contrast(0.85);
-  opacity: 0.55;
+  filter: hue-rotate(110deg) saturate(0.25) brightness(1.2) contrast(0.80);
+  opacity: 0.35;
   mix-blend-mode: multiply;
 }
 html[data-theme="light"] .aura-tint {
   background:
-    radial-gradient(120% 80% at 75% 20%, rgba(15,128,96,0.10), transparent 60%),
-    linear-gradient(180deg, rgba(247,246,242,0.10) 0%, rgba(247,246,242,0.30) 60%, rgba(247,246,242,0.85) 100%);
+    radial-gradient(120% 80% at 75% 20%, rgba(15,128,96,0.12), transparent 55%),
+    linear-gradient(180deg, rgba(247,246,242,0.30) 0%, rgba(247,246,242,0.60) 55%, rgba(247,246,242,0.92) 100%);
 }
 
 /* Theme transition */

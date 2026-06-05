@@ -83,9 +83,9 @@ export default async function Home() {
   return (
     <>
       {/* HERO */}
-      <section id="hero-parallax" className="relative overflow-hidden">
+      <section id="hero-parallax" className="relative overflow-hidden min-h-[calc(100svh-4rem)] flex flex-col justify-center">
         <UnicornAura projectId="bKN5upvoulAmWvInmHza" />
-        <div className="max-w-page mx-auto px-6 lg:px-10 pt-14 pb-16 lg:pt-20 lg:pb-24 relative">
+        <div className="max-w-page mx-auto px-6 lg:px-10 pt-14 pb-16 lg:pt-20 lg:pb-24 relative w-full">
           <div className="grid lg:grid-cols-12 gap-10 items-end">
             <div className="lg:col-span-7">
               <div className="hero-eyebrow flex items-center gap-3 mb-6 lg:mb-8">
