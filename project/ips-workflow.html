@@ -1,0 +1,2741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Client Dossier — IPS Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --ink: #10202b;
+    --ink-2: #1a2f3d;
+    --paper: #faf7f0;
+    --paper-2: #f1ece0;
+    --brass: #a8763f;
+    --brass-2: #c79256;
+    --sage: #6f8a76;
+    --rust: #a44f3e;
+    --line: #d8cfbb;
+    --text: #1c231f;
+    --text-dim: #5a6259;
+    --card: #ffffff;
+    --shadow: 0 1px 2px rgba(16,32,43,0.06);
+    --radius: 3px;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eae3d3; --ink-2: #d9cfb8; --paper: #0d1614; --paper-2: #16211e;
+      --brass: #d9a869; --brass-2: #e8bd85; --sage: #8fae95; --rust: #c97561;
+      --line: #2c3733; --text: #eee9dc; --text-dim: #a7ab9f; --card: #131c19;
+      --shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eae3d3; --ink-2: #d9cfb8; --paper: #0d1614; --paper-2: #16211e;
+    --brass: #d9a869; --brass-2: #e8bd85; --sage: #8fae95; --rust: #c97561;
+    --line: #2c3733; --text: #eee9dc; --text-dim: #a7ab9f; --card: #131c19;
+    --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--paper);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  h1, h2, h3, .serif { font-family: 'Source Serif 4', Georgia, serif; }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  #shell {
+    display: flex;
+    min-height: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Sidebar (the case-file spine) ---------- */
+  #spine {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 860px) {
+    #shell { flex-direction: column; }
+    #spine { width: 100%; height: auto; position: relative; padding: 18px; }
+  }
+  .brandmark {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .brandmark .seal {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--brass-2); flex-shrink: 0;
+  }
+  #firmname {
+    font-size: 15px; font-weight: 600; color: var(--paper);
+    letter-spacing: 0.01em;
+  }
+  .tagline { font-size: 11.5px; color: #b9c2b3; margin: 0 0 26px; line-height: 1.5; }
+
+  .client-picker { margin-bottom: 22px; }
+  .client-picker label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.09em; color: #8fa090; display: block; margin-bottom: 6px; }
+  select#clientSelect {
+    width: 100%; padding: 9px 10px; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.16); color: var(--paper); border-radius: var(--radius);
+    font-size: 13.5px; font-family: inherit;
+  }
+  .newclient-btn {
+    width: 100%; margin-top: 8px; padding: 9px 10px;
+    background: transparent; border: 1px dashed rgba(255,255,255,0.3);
+    color: #cfd8c9; border-radius: var(--radius); cursor: pointer; font-size: 13px;
+    font-family: inherit;
+  }
+  .newclient-btn:hover { border-color: var(--brass-2); color: var(--brass-2); }
+
+  .stagelist { list-style: none; padding: 0; margin: 0; flex: 1; }
+  .stagelist li {
+    display: flex; gap: 12px; padding: 13px 6px; cursor: pointer;
+    border-left: 2px solid transparent; margin-left: -6px; padding-left: 12px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .stagelist li:hover { background: rgba(255,255,255,0.04); }
+  .stagelist li.active { border-left-color: var(--brass-2); background: rgba(255,255,255,0.05); }
+  .stagelist .num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7d8c77;
+    width: 18px; flex-shrink: 0; padding-top: 1px;
+  }
+  .stagelist li.active .num, .stagelist li.done .num { color: var(--brass-2); }
+  .stagelist .label { font-size: 13.5px; line-height: 1.35; }
+  .stagelist .sub { font-size: 11px; color: #8b968a; margin-top: 2px; }
+  .stagelist li.locked { opacity: 0.4; cursor: not-allowed; }
+
+  .spine-foot { font-size: 10.5px; color: #6d7a68; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+  /* ---------- Main content ---------- */
+  #main { flex: 1; min-width: 0; padding: 36px 44px 80px; }
+  @media (max-width: 860px) { #main { padding: 22px 18px 60px; } }
+  @media (max-width: 640px) { #main { padding: 16px 14px 50px; } }
+
+  .stage-head { margin-bottom: 28px; }
+  .stage-eyebrow { font-size: 12px; color: var(--brass); font-weight: 600; margin: 0 0 6px; }
+  .stage-title { font-size: 26px; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+  .stage-desc { font-size: 14.5px; color: var(--text-dim); max-width: 640px; line-height: 1.6; margin: 0; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow);
+  }
+  .card h3 { font-size: 15px; margin: 0 0 4px; color: var(--ink); font-weight: 600; }
+  .card .hint { font-size: 12.5px; color: var(--text-dim); margin: 0 0 16px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text); margin-bottom: 5px; }
+  .field .fhint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+  input[type=text], input[type=number], textarea, select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius);
+    font-size: 13.5px; font-family: inherit; background: var(--paper); color: var(--text);
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--brass-2); outline-offset: 1px; border-color: var(--brass); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .row2, .row3 { grid-template-columns: 1fr; } }
+  .checkrow { display: flex; align-items: center; gap: 8px; }
+  .checkrow input { width: auto; }
+  .checkrow label { margin: 0; font-size: 13px; }
+
+  button.primary {
+    background: var(--ink); color: var(--paper); border: none; padding: 11px 22px;
+    border-radius: var(--radius); font-size: 13.5px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  button.primary:hover { background: var(--ink-2); }
+  button.secondary {
+    background: transparent; color: var(--ink); border: 1px solid var(--line); padding: 10px 20px;
+    border-radius: var(--radius); font-size: 13.5px; cursor: pointer; font-family: inherit;
+  }
+  button.secondary:hover { border-color: var(--brass); color: var(--brass); }
+  button.ghost {
+    background: transparent; border: none; color: var(--text-dim); cursor: pointer;
+    font-size: 12.5px; padding: 4px 6px; text-decoration: underline; font-family: inherit;
+  }
+  .actions { display: flex; gap: 10px; margin-top: 22px; align-items: center; }
+  .savenote { font-size: 12px; color: var(--sage); margin-left: 4px; }
+
+  .goal-row {
+    display: grid; grid-template-columns: 2fr 1fr 0.8fr 1fr auto; gap: 10px; align-items: end;
+    padding: 12px 0; border-bottom: 1px solid var(--line);
+  }
+  @media (max-width: 760px) { .goal-row { grid-template-columns: 1fr 1fr; } }
+  .goal-row:last-child { border-bottom: none; }
+  .remove-goal { background: none; border: none; color: var(--rust); cursor: pointer; font-size: 18px; line-height: 1; padding: 6px; }
+
+  table.ledger { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.ledger th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); padding: 8px 10px; border-bottom: 1.5px solid var(--ink); font-weight: 600; }
+  table.ledger td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.ledger tr:last-child td { border-bottom: none; }
+  table.ledger td textarea, table.ledger td input { font-size: 12.5px; padding: 6px 8px; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge.low { background: #f3e3d8; color: var(--rust); }
+  .badge.moderate { background: #f1ecd8; color: #8a7326; }
+  .badge.high { background: #e2ecdf; color: var(--sage); }
+  :root[data-theme="dark"] .badge.low, @media (prefers-color-scheme: dark) { }
+  .bucket-block { margin-bottom: 22px; }
+  .bucket-block h4 { font-size: 14px; margin: 0 0 10px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .bucket-block h4 .tag { font-size: 10.5px; font-weight: 500; color: var(--text-dim); background: var(--paper-2); padding: 2px 8px; border-radius: 20px; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+  .empty-state h3 { color: var(--ink); font-size: 18px; margin-bottom: 8px; }
+
+  .split-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .split-panel { grid-template-columns: 1fr; } }
+
+  .quote-pull {
+    border-left: 3px solid var(--brass); padding: 10px 14px; margin: 10px 0;
+    background: var(--paper-2); font-size: 13px; font-style: italic; color: var(--text);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .quote-pull .attrib { display: block; font-style: normal; font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  .chart-wrap { max-width: 320px; margin: 0 auto; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 6px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: var(--paper); padding: 10px 20px; border-radius: var(--radius);
+    font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.25s ease;
+    z-index: 100; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(16,32,43,0.55); z-index: 200;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--card); border-radius: var(--radius); padding: 26px 28px;
+    max-width: 400px; width: 100%; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  }
+  .modal-box h3 { margin: 0 0 6px; font-size: 17px; color: var(--ink); }
+  .modal-box p { margin: 0 0 16px; font-size: 13px; color: var(--text-dim); }
+  .modal-box .actions { margin-top: 18px; }
+</style>
+</head>
+<body>
+<div id="shell">
+  <nav id="spine">
+    <div class="brandmark"><span class="seal"></span><span id="firmname">Loading…</span></div>
+    <p class="tagline" id="firmtag"></p>
+
+    <div class="client-picker">
+      <label for="clientSelect">Client file</label>
+      <select id="clientSelect"></select>
+      <button class="newclient-btn" onclick="app.newClient()">+ New client</button>
+    </div>
+
+    <ul class="stagelist" id="stagelist"></ul>
+
+    <button class="newclient-btn" style="margin-bottom:14px" onclick="app.openSettings()">⚙ Settings</button>
+    <div class="spine-foot">The Client Dossier — an IPS workflow tool</div>
+  </nav>
+
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay hidden" id="newClientModal">
+  <div class="modal-box">
+    <h3>New client file</h3>
+    <p>Give this client (or persona) a name. You can rename it later from Client Discovery.</p>
+    <div class="field">
+      <input type="text" id="newClientNameInput" placeholder="e.g. R. Menon" autocomplete="off">
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="app.confirmNewClient()">Create client</button>
+      <button class="secondary" onclick="app.cancelNewClient()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const app = {
+  db: null,
+  downloads: null,
+  firm: { name: "", philosophy: "", trackRecord: "" },
+  rmProfile: { name: "", designation: "", email: "", phone: "", intro: "" },
+  clients: {},       // id -> client object
+  currentClientId: null,
+  currentStage: 1,
+};
+
+function blankClient(name) {
+  const id = 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  return {
+    id, name: name || "New client", createdAt: Date.now(), stage: 1,
+    rm: Object.assign({ name: "", designation: "", email: "", phone: "", intro: "" }, app.rmProfile || {}),
+    discovery: {
+      age: "", occupation: "", monthlyIncome: "", monthlyExpenses: "", monthlyDebt: "",
+      dependents: "", dependentNotes: "",
+      assets: "", liabilities: "",
+      liquidityBuffer: "unknown", nearTermCashNeed: false, nearTermNotes: "",
+      incomeStability: "stable",
+      insuranceGap: false, insuranceNotes: "",
+      taxRegime: "unsure",
+      statedRisk: "moderate", riskNotes: "",
+      returnExpectation: "",
+      constraints: "", familyNotes: "", otherNotes: "",
+      goals: [ { name: "", amount: "", years: "" } ],
+    },
+    solution: null,   // filled by Stage 3 engine, then editable
+    finalized: false,
+  };
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   PERSISTENCE
+============================================================ */
+let saveTimer = null;
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    persistCurrentClient();
+    persistFirm();
+    persistRMDefault();
+  }, 500);
+}
+
+async function persistFirm() {
+  if (!app.db) return;
+  try { await app.db.doc('firm/profile').set(app.firm); } catch (e) { /* offline-safe */ }
+}
+
+async function persistRMDefault() {
+  if (!app.db) return;
+  try { await app.db.doc('firm/rmDefault').set(app.rmProfile); } catch (e) { /* offline-safe */ }
+}
+
+async function persistCurrentClient() {
+  if (!app.db || !app.currentClientId) return;
+  const c = app.clients[app.currentClientId];
+  if (!c) return;
+  try { await app.db.doc('clients/' + c.id).set(c); } catch (e) { /* offline-safe */ }
+}
+
+// Scrub any stale SGB references from saved solutions — runs on every client load
+function purgeSGBFromSolution(c) {
+  if (!c.solution) return;
+  const SGB_PATTERNS = [/sovereign gold bond/i, /\bsgb\b/i, /gold bond/i];
+  Object.values(c.solution.buckets || {}).forEach(bucket => {
+    (bucket.instruments || []).forEach(ins => {
+      const hasSGB = SGB_PATTERNS.some(rx => rx.test(ins.cat) || rx.test(ins.why));
+      if (hasSGB) {
+        ins.cat = 'Gold ETF (e.g. Nippon India Gold ETF, SBI ETF Gold) for demat holders; Gold Fund of Fund (e.g. SBI Gold Fund) for those without a demat account';
+        ins.why = 'Zero storage and making charges, direct price linkage to LBMA gold, fully liquid and tradeable on exchange. Gold ETF is the preferred route for clients with a demat account; Gold Fund of Fund achieves the same exposure without one, at a marginally higher expense ratio.';
+      }
+    });
+  });
+}
+
+async function loadAll() {
+  if (!app.db) { render(); return; }
+  try {
+    const firmSnap = await app.db.doc('firm/profile').get();
+    if (firmSnap && firmSnap.exists) app.firm = Object.assign(app.firm, firmSnap.data());
+  } catch (e) {}
+  try {
+    const rmSnap = await app.db.doc('firm/rmDefault').get();
+    if (rmSnap && rmSnap.exists) app.rmProfile = Object.assign(app.rmProfile, rmSnap.data());
+  } catch (e) {}
+  try {
+    const qsnap = await app.db.collection('clients').get();
+    const docs = (qsnap && qsnap.docs) || [];
+    for (const snap of docs) {
+      if (!snap.exists) continue;
+      const data = snap.data();
+      if (data && data.id) {
+        purgeSGBFromSolution(data);
+        app.clients[data.id] = data;
+      }
+    }
+  } catch (e) {}
+  const ids = Object.keys(app.clients);
+  if (ids.length && !app.currentClientId) {
+    app.currentClientId = ids.sort((a,b) => (app.clients[b].createdAt||0)-(app.clients[a].createdAt||0))[0];
+    app.currentStage = app.clients[app.currentClientId].stage || 1;
+  }
+  render();
+}
+
+/* ============================================================
+   CLIENT / NAV ACTIONS
+============================================================ */
+app.newClient = function() {
+  const modal = document.getElementById('newClientModal');
+  const input = document.getElementById('newClientNameInput');
+  input.value = '';
+  modal.classList.remove('hidden');
+  setTimeout(() => input.focus(), 30);
+};
+
+app.cancelNewClient = function() {
+  document.getElementById('newClientModal').classList.add('hidden');
+};
+
+app.confirmNewClient = function() {
+  const input = document.getElementById('newClientNameInput');
+  const name = (input.value || '').trim() || 'New client';
+  const c = blankClient(name);
+  app.clients[c.id] = c;
+  app.currentClientId = c.id;
+  app.currentStage = 1;
+  persistCurrentClient();
+  document.getElementById('newClientModal').classList.add('hidden');
+  render();
+};
+
+app.selectClient = function(id) {
+  app.currentClientId = id;
+  if (app.clients[id]) purgeSGBFromSolution(app.clients[id]);
+  app.currentStage = (app.clients[id] && app.clients[id].stage) || 1;
+  render();
+};
+
+app.goToStage = function(n) {
+  const c = app.clients[app.currentClientId];
+  if (!c) { toast("Create or select a client first."); return; }
+  if (n > 2 && !c.solution) { toast("Complete Client Discovery first."); return; }
+  app.currentStage = n;
+  render();
+};
+
+app.openSettings = function() {
+  app.currentStage = 'settings';
+  render();
+};
+
+app.updateFirm = function(field, value) {
+  app.firm[field] = value;
+  scheduleSave();
+};
+
+app.updateRMDefault = function(field, value) {
+  app.rmProfile[field] = value;
+  scheduleSave();
+};
+
+app.setClientRM = function(field, value) {
+  const c = app.clients[app.currentClientId];
+  if (!c) return;
+  c.rm[field] = value;
+  scheduleSave();
+};
+
+app.useDefaultRM = function() {
+  const c = app.clients[app.currentClientId];
+  if (!c) return;
+  c.rm = Object.assign({}, c.rm, app.rmProfile);
+  scheduleSave();
+  render();
+};
+
+app.setDiscovery = function(field, value) {
+  const c = app.clients[app.currentClientId];
+  if (!c) return;
+  c.discovery[field] = value;
+  scheduleSave();
+};
+
+app.addGoal = function() {
+  const c = app.clients[app.currentClientId];
+  c.discovery.goals.push({ name: "", amount: "", years: "" });
+  scheduleSave();
+  render();
+};
+app.removeGoal = function(i) {
+  const c = app.clients[app.currentClientId];
+  c.discovery.goals.splice(i, 1);
+  if (!c.discovery.goals.length) c.discovery.goals.push({ name: "", amount: "", years: "" });
+  scheduleSave();
+  render();
+};
+app.setGoalField = function(i, key, value) {
+  const c = app.clients[app.currentClientId];
+  c.discovery.goals[i][key] = value;
+  scheduleSave();
+};
+
+app.completeDiscovery = function() {
+  const c = app.clients[app.currentClientId];
+  const goals = c.discovery.goals.filter(g => g.name && g.amount && g.years);
+  if (!goals.length) { toast("Add at least one goal with a name, amount and horizon."); return; }
+  c.solution = generateSolution(c);
+  c.stage = 3;
+  persistCurrentClient();
+  app.currentStage = 3;
+  toast("Draft solution generated from discovery notes.");
+  render();
+};
+
+app.regenerateDraft = function() {
+  const c = app.clients[app.currentClientId];
+  const preserved = c.solution ? { advisorOverrideNote: c.solution.advisorOverrideNote } : {};
+  c.solution = Object.assign(generateSolution(c), preserved);
+  persistCurrentClient();
+  toast("Draft regenerated from current discovery notes. Manual edits below were reset.");
+  render();
+};
+
+app.finalizeSolution = function() {
+  const c = app.clients[app.currentClientId];
+  c.stage = 4;
+  c.finalized = true;
+  persistCurrentClient();
+  app.currentStage = 4;
+  render();
+};
+
+/* ============================================================
+   RULES ENGINE — Stage 3 "Backstage" logic
+   Transparent, editable heuristics — not a black box. Every number
+   the engine proposes is meant to be reviewed and can be overridden
+   by the advisor before Stage 4.
+============================================================ */
+const ORD = { Low: 0, Moderate: 1, High: 2 };
+
+function bucketGoals(goals) {
+  const out = { short: [], medium: [], long: [] };
+  goals.forEach(g => {
+    const y = Number(g.years) || 0;
+    if (y <= 3) out.short.push(g);
+    else if (y <= 8) out.medium.push(g);
+    else out.long.push(g);
+  });
+  return out;
+}
+
+function computeCapacity(d) {
+  let score = 50;
+  const factors = [];
+
+  // FIX #1: Validate income floor
+  const income = Number(d.monthlyIncome) || 0;
+  if (income === 0) { score -= 20; factors.push('No verifiable income provided — capacity severely limited until confirmed.'); }
+
+  if (d.liquidityBuffer === 'adequate') { score += 15; factors.push('Adequate emergency liquidity buffer supports higher capacity.'); }
+  else if (d.liquidityBuffer === 'inadequate') { score -= 15; factors.push('Inadequate liquidity buffer reduces capacity to absorb loss.'); }
+  else { factors.push('Liquidity buffer status not established — treated as neutral pending confirmation.'); }
+
+  if (d.incomeStability === 'stable') { score += 10; factors.push('Stable, salaried income supports higher capacity.'); }
+  else if (d.incomeStability === 'irregular') { score -= 10; factors.push('Irregular or lumpy income reduces capacity.'); }
+
+  const dep = Number(d.dependents) || 0;
+  if (dep > 2) { const pen = Math.min((dep - 2) * 5, 20); score -= pen; factors.push(dep + ' dependents beyond the first two reduce capacity.'); } // FIX #2: Cap at 20pp
+
+  const debt = Number(d.monthlyDebt) || 0;
+  if (income > 0) {
+    const ratio = debt / income;
+    if (ratio > 0.4) { score -= 15; factors.push('Debt servicing exceeds 40% of income — materially reduces capacity.'); }
+    else if (ratio > 0.2) { score -= 5; factors.push('Debt servicing is 20–40% of income — modestly reduces capacity.'); }
+  }
+  if (d.insuranceGap) { score -= 10; factors.push('An insurance gap was flagged — reduces capacity until closed.'); }
+  if (d.nearTermCashNeed) { score -= 10; factors.push('An unplanned near-term cash need was flagged — reduces capacity.'); }
+
+  score = Math.max(0, Math.min(100, score));
+  const label = score < 35 ? 'Low' : score < 65 ? 'Moderate' : 'High';
+  return { score, label, factors };
+}
+
+function reconcileRisk(statedRisk, capacity) {
+  const statedLabel = statedRisk.charAt(0).toUpperCase() + statedRisk.slice(1);
+  const bindingOrd = Math.min(ORD[statedLabel] ?? 1, ORD[capacity.label]);
+  const bindingLabel = Object.keys(ORD).find(k => ORD[k] === bindingOrd);
+  let which, explanation;
+  if (ORD[capacity.label] < ORD[statedLabel]) {
+    which = 'capacity';
+    explanation = `The client's stated risk tolerance (${statedLabel}) is higher than what the financial position can currently absorb (${capacity.label} capacity). Capacity is the binding constraint: the plan is built to the more conservative of the two, since a client cannot safely take more risk than their circumstances allow, regardless of comfort with volatility.`;
+  } else if (ORD[statedLabel] < ORD[capacity.label]) {
+    which = 'tolerance';
+    explanation = `The client's stated risk tolerance (${statedLabel}) is more conservative than their financial capacity would allow (${capacity.label} capacity). Tolerance is respected as the binding constraint here: there is no reason to push a client into more volatility than they are comfortable with simply because their finances could technically absorb it.`;
+  } else {
+    which = 'aligned';
+    explanation = `Stated risk tolerance and financial capacity are both ${statedLabel} — they are aligned, so no reconciliation is required.`;
+  }
+  return { bindingLabel, which, explanation };
+}
+
+/* ============================================================
+   DRAWDOWN & CALMAR ADDITIONS
+   Max drawdown per category: worst historical (Covid crash, as the
+   most recent severe test). Used to compute Calmar ratio and to
+   constrain the within-sleeve optimizer.
+============================================================ */
+const MAX_DD_BY_CAT = {
+  N50: -0.38, N500: -0.55, MA: -0.24, GOLD: 0.07,
+  SPX: -0.20, THM: -0.40, DEBT: -0.02, CASH: 0.00, AIF: -0.18,
+};
+
+function fundMaxDrawdown(f) {
+  // CAPM-based: Beta × category worst drawdown (bounded at 0 — gold doesn't drawdown in crashes)
+  const catDD = MAX_DD_BY_CAT[f.bmcat] || 0;
+  return Math.min(0, catDD * f.beta);
+}
+
+function portfolioMaxDrawdown(funds) {
+  return funds.reduce((sum, f) => sum + f.weight * fundMaxDrawdown(f), 0);
+}
+
+function calmarRatio(ret, maxDD) {
+  const absDD = Math.abs(maxDD);
+  return absDD > 0.001 ? (ret - RISK_FREE) / (absDD * 100) : 0;
+}
+
+function portfolioStatsJS(funds) {
+  let ret = 0, beta = 0;
+  funds.forEach(f => { ret += f.weight * f.ret; beta += f.weight * f.beta; });
+  let variance = 0;
+  funds.forEach(fi => funds.forEach(fj => {
+    variance += fi.weight * fj.weight * fi.sd * fj.sd * getCorr2(fi.bmcat, fj.bmcat);
+  }));
+  const sd = Math.sqrt(variance);
+  const sharpe = sd > 0 ? (ret - RISK_FREE) / sd : 0;
+  const treynor = beta > 0 ? (ret - RISK_FREE) / beta : 0;
+  const maxDD = portfolioMaxDrawdown(funds);
+  const calmar = calmarRatio(ret, maxDD);
+  return { ret, beta, sd, sharpe, treynor, maxDD, calmar };
+}
+
+/* ============================================================
+   WITHIN-SLEEVE OPTIMIZER
+   Optimises fund weights within a single named-fund array
+   (e.g. the equity sleeve of a bucket) to maximise Sharpe
+   and, separately, Calmar. Returns equal-weight, best-Sharpe
+   and best-Calmar weight vectors.
+============================================================ */
+function optimizeSleeve(funds, nTrials) {
+  nTrials = nTrials || 8000;
+  const n = funds.length;
+  if (n <= 1) {
+    const w = funds.map(() => 1/n);
+    const stats = portfolioStatsJS(funds.map((f,i) => Object.assign({},f,{weight:w[i]})));
+    return { equalWeight: w, sharpeWeight: w, calmarWeight: w,
+             equalStats: stats, sharpeStats: stats, calmarStats: stats };
+  }
+  const CAP = 0.35;
+  const MIN = 0.05;
+  let bestSharpe = { score: -Infinity, w: null, stats: null };
+  let bestCalmar = { score: -Infinity, w: null, stats: null };
+  const equalW = funds.map(() => 1/n);
+  const equalFunds = funds.map((f,i) => Object.assign({},f,{weight:equalW[i]}));
+  const equalStats = portfolioStatsJS(equalFunds);
+
+  for (let t = 0; t < nTrials; t++) {
+    let raw = funds.map(() => Math.random());
+    let sum = raw.reduce((a,b) => a+b, 0);
+    let w = raw.map(r => r/sum);
+    // apply cap and min floor iteratively
+    for (let iter = 0; iter < 5; iter++) {
+      w = w.map(x => Math.min(CAP, Math.max(MIN, x)));
+      const s = w.reduce((a,b) => a+b, 0);
+      w = w.map(x => x/s);
+    }
+    const wFunds = funds.map((f,i) => Object.assign({},f,{weight:w[i]}));
+    const stats = portfolioStatsJS(wFunds);
+    if (stats.sharpe > bestSharpe.score) bestSharpe = { score: stats.sharpe, w: w.slice(), stats };
+    if (stats.calmar > bestCalmar.score) bestCalmar = { score: stats.calmar, w: w.slice(), stats };
+  }
+  return {
+    equalWeight: equalW, sharpeWeight: bestSharpe.w, calmarWeight: bestCalmar.w,
+    equalStats, sharpeStats: bestSharpe.stats, calmarStats: bestCalmar.stats,
+  };
+}
+
+/* ============================================================
+   PRIORITY-AWARE BUCKET ALLOCATION
+   Derives equity/debt/gold/cash/alt percentages from:
+     1. Bucket time-horizon band (short / medium / long)
+     2. Binding risk capacity label (Low / Moderate / High)
+     3. Goal priorities within the bucket
+     4. Shortest remaining horizon within the bucket
+          (a medium bucket with a 4-year goal is treated more
+           conservatively than one whose shortest goal is 8 years)
+   Returns an allocation array with explicit rationale per row
+   that the advisor can defend line-by-line.
+============================================================ */
+const HORIZON_EQUITY_CEILING = {
+  short:  { Low: 5,  Moderate: 10, High: 15 },
+  medium: { Low: 30, Moderate: 45, High: 60 },
+  long:   { Low: 50, Moderate: 65, High: 80 },
+};
+
+function priorityAwareAllocation(bKey, goals, bindingLabel) {
+  // Sort goals by horizon (soonest first) — most conservative goal drives the floor
+  const sorted = goals.slice().sort((a,b) => (Number(a.years)||99) - (Number(b.years)||99));
+  const shortestYears = Number(sorted[0]?.years) || 1;
+  const highestPriority = sorted[0]?.priority || '';
+  const isPriority1 = /^#?1\b|^first\b|^critical\b|^urgent\b/i.test(String(highestPriority)); // FIX #6: Word boundaries prevent false positives
+
+  // Determine effective band from the SHORTEST goal's horizon, not bucket label
+  // (a bucket labelled "medium" whose soonest goal matures in 3.5 years should be
+  //  treated more like a short bucket for that goal's protection)
+  let effectiveBand = bKey;
+  if (bKey === 'long' && shortestYears <= 8) effectiveBand = 'medium';
+  if (bKey === 'medium' && shortestYears <= 3) effectiveBand = 'short';
+
+  let eqCeiling = HORIZON_EQUITY_CEILING[effectiveBand][bindingLabel];
+
+  // Priority tightening: Priority-1 goal with soonest horizon → pull equity down 10pp
+  // (capital you cannot afford to lose before the goal date)
+  if (isPriority1 && effectiveBand !== 'long') eqCeiling = Math.max(0, eqCeiling - 10);
+
+  // Multiple competing goals → pull down 5pp further (more lives riding on this bucket)
+  if (goals.length > 1 && effectiveBand !== 'long') eqCeiling = Math.max(0, eqCeiling - 5);
+
+  const eqMid = Math.round(eqCeiling * 0.85);  // target midpoint, range = ±5
+  const eqLo = Math.max(0, eqMid - 5);
+  const eqHi = eqMid + 5;
+
+  // Rationale is specific to what drove the equity ceiling
+  let eqRationale = `${bindingLabel} risk capacity with a ${effectiveBand}-term horizon sets an equity ceiling of ${eqCeiling}%.`;
+  if (effectiveBand !== bKey) eqRationale += ` The bucket is labelled ${bKey}-term but its soonest goal matures in ${shortestYears} years, so the allocation uses the ${effectiveBand}-term ceiling to protect that goal.`;
+  if (isPriority1 && effectiveBand !== 'long') eqRationale += ` Reduced a further 10pp because this bucket contains a Priority-1 goal — capital that cannot be exposed to a drawdown the client cannot afford to absorb.`;
+  if (goals.length > 1 && effectiveBand !== 'long') eqRationale += ` A further 5pp reduction for ${goals.length} competing goals sharing this bucket — conservative allocation protects the soonest-maturing goal from being undershooted.`;
+
+  // Build remaining allocation: Gold (medium+), Alternatives (long only), Cash (short+medium), Debt = remainder
+  const gold = effectiveBand === 'short' ? 0 : 5;
+  const alts = effectiveBand === 'long' && bindingLabel !== 'Low' ? 5 : 0;
+  const cash = effectiveBand === 'short' ? 20 : effectiveBand === 'medium' ? 5 : 0;
+  const debt = Math.max(0, 100 - eqMid - gold - alts - cash);
+
+  const rebalanceTrigger = isPriority1
+    ? '±3% drift threshold (tighter, because a Priority-1 goal cannot afford timing slippage)'
+    : '±5% drift threshold (standard)';
+  // FIX #8: Cap glide path step to prevent negatives
+  const glideStepPerYear = Math.min(Math.round(eqMid / shortestYears), Math.round(eqMid / 2));
+  const glide = shortestYears <= 5
+    ? `With the soonest goal ${shortestYears} years away, begin the glide path immediately: step equity down by ${glideStepPerYear}pp per year toward near-zero equity in the final 12 months.`
+    : `Begin stepping equity down toward the short-term allocation 2 years before the soonest goal date (in approximately ${shortestYears - 2} years).`;
+
+  const rows = [
+    { asset: 'Equity', range: `${eqLo}–${eqHi}%`, rationale: eqRationale },
+    { asset: 'Debt', range: `${debt - 5}–${debt + 5}%`, rationale: `Remainder after equity, gold and cash — anchors capital stability. Will rise further along the glide path as goals approach.` },
+  ];
+  if (gold > 0) rows.push({ asset: 'Gold', range: `${gold}%`, rationale: 'Modest inflation and diversification hedge; kept small relative to growth assets.' });
+  if (cash > 0) rows.push({ asset: 'Cash / Liquid', range: `${cash}–${cash + 5}%`, rationale: 'Same-week-access buffer for near-term withdrawal or an unplanned cash need.' });
+  if (alts > 0) rows.push({ asset: 'Alternatives', range: `${alts}%`, rationale: 'Optional — only once all core goal contributions are fully funded.' });
+
+  return { rows, rebalanceTrigger, glide };
+}
+
+/* ============================================================
+   REBALANCING POLICY — priority-aware, per-bucket
+============================================================ */
+function generateRebalancing(buckets) {
+  // buckets can be either the bucketGoals() output ({short:[],medium:[],long:[]})
+  // or the solution.buckets object ({bKey:{goals:[],allocation:[],...}})
+  // normalise to a flat goal list either way
+  let goalList = [];
+  if (Array.isArray(buckets.short)) {
+    goalList = [...(buckets.short||[]), ...(buckets.medium||[]), ...(buckets.long||[])];
+  } else {
+    Object.values(buckets).forEach(b => { if (b && b.goals) goalList.push(...b.goals); });
+  }
+  const hasP1 = goalList.some(g => /^1|#1|first|top|critical|urgent/i.test(String(g.priority||'')));
+  const nearTerm = goalList.some(g => Number(g.years) <= 5);
+  const trigger = hasP1
+    ? "Priority-1 goals: ±3% drift threshold. All other buckets: ±5% drift threshold. Annual calendar review in every case — whichever trigger fires first applies. Within 2 years of any goal date: monthly drift check for that bucket."
+    : "Annual calendar review, combined with a ±5% drift threshold on any bucket's equity–debt split — whichever comes first.";
+  return {
+    trigger,
+    fit: hasP1
+      ? 'Tighter monitoring on Priority-1 buckets reflects the asymmetry: a shortfall in a must-fund goal cannot be recovered the way a long-term goal can. The cost of catching a drift breach early is one rebalance trade; the cost of missing it is a shortfall the client cannot absorb.'
+      : 'This cadence is infrequent enough to be realistic for a busy client while ensuring a sharp market move does not silently breach the allocation the advisor has set.',
+    glide: nearTerm
+      ? 'For any goal within 5 years of its deadline, the glide path is already active — see each bucket\'s individual rebalancing trigger above. Within 2 years of any goal date, switch to a monthly drift check for that bucket: the exposure to a bad month is too large to let a quarterly review catch.'
+      : 'No goal is currently within a glide-path window; revisit as goals approach their final 2–3 years.',
+  };
+}
+
+function allocationFor(bucketName, bindingLabel, goals) {
+  // Prefer the new priority-aware version when goals are available
+  if (goals && goals.length) {
+    return priorityAwareAllocation(bucketName, goals, bindingLabel).rows;
+  }
+  // Fallback (no goals passed — shouldn't happen in normal flow)
+  if (bucketName === 'short') {
+    const opts = { Low: [0,5], Moderate: [5,10], High: [10,15] }[bindingLabel];
+    return [
+      { asset: 'Equity', range: opts[0] + '–' + opts[1] + '%', rationale: 'Minimal even at higher capacity — money needed within 3 years should not be exposed to drawdown risk.' },
+      { asset: 'Debt', range: (95-opts[1]) + '–' + (95-opts[0]) + '%', rationale: 'Anchors the bucket in capital stability for a near-term, non-negotiable need.' },
+      { asset: 'Cash / Liquid', range: '20–25%', rationale: 'Ensures same-week access for the nearest goals in this bucket.' },
+    ];
+  }
+  if (bucketName === 'medium') {
+    const t = { Low: [20,30,60,70], Moderate: [35,45,45,55], High: [50,60,35,40] }[bindingLabel];
+    return [
+      { asset: 'Equity', range: t[0] + '–' + t[1] + '%', rationale: 'Some growth is appropriate over a 3–8 year window, scaled to ' + bindingLabel.toLowerCase() + ' risk capacity.' },
+      { asset: 'Debt', range: t[2] + '–' + t[3] + '%', rationale: 'Provides the ballast this horizon needs; increases further as each goal approaches.' },
+      { asset: 'Gold', range: '5%', rationale: 'Modest inflation hedge appropriate for a medium-dated rupee goal.' },
+      { asset: 'Cash / Liquid', range: '5%', rationale: 'Buffer for the final 6–12 months before each goal date.' },
+    ];
+  }
+  const t = { Low: [40,50,40,45], Moderate: [55,65,25,35], High: [70,80,15,20] }[bindingLabel];
+  return [
+    { asset: 'Equity', range: t[0] + '–' + t[1] + '%', rationale: 'Longest horizon in the plan; capacity to recover from interim drawdowns is genuinely available here.' },
+    { asset: 'Debt', range: t[2] + '–' + t[3] + '%', rationale: 'Stability component, scaled to ' + bindingLabel.toLowerCase() + ' capacity.' },
+    { asset: 'Gold', range: bindingLabel === 'Low' ? '10%' : '5–10%', rationale: 'Diversification and inflation hedge over a long horizon.' },
+    { asset: 'Alternatives', range: '0–5%', rationale: "Optional, only once core buckets are funded — not essential to the plan's success." },
+  ];
+}
+
+function instrumentsFor(bucketName, d) {
+  const lowLit = /low literacy|simple|time-?poor|first[- ]time/i.test(d.constraints || '');
+  const noDirectEq = /no direct equity|not direct equity|avoid direct equity/i.test(d.constraints || '');
+  const base = {
+    short: [
+      { asset: 'Cash / Liquid', cat: 'Liquid mutual funds / sweep-in bank FDs', why: 'Same-day to T+1 liquidity with negligible capital risk for money needed within 3 years.' },
+    ],
+    medium: [
+      { asset: 'Equity', cat: lowLit ? 'Index/passive hybrid or balanced fund' : 'Diversified index fund + short-duration debt fund', why: 'Low-cost, low-monitoring exposure appropriate for a 3–8 year goal.' },
+      { asset: 'Debt', cat: 'PPF (if tax efficiency matters and lock-in fits the horizon)', why: 'Tax-free, disciplined, government-backed — a good fit for a medium-dated goal if the horizon allows.' },
+    ],
+    long: [
+      { asset: 'Equity', cat: noDirectEq || lowLit ? 'Diversified equity index fund (no direct stock-picking)' : 'Diversified equity index fund or direct equity (if literacy/time allow)', why: 'Lowest-cost way to capture long-horizon equity growth.' },
+      { asset: 'Debt', cat: 'EPF / NPS', why: 'Tax-advantaged, low-effort retirement-linked vehicles; NPS adds an extra Section 80CCD(1B) deduction where applicable.' },
+      { asset: 'Gold', cat: 'Gold ETF (e.g. Nippon India Gold ETF, SBI ETF Gold) for demat holders; Gold Fund of Fund (e.g. SBI Gold Fund) for those without a demat account', why: 'Zero storage and making charges, direct price linkage to LBMA gold, fully liquid and tradeable on exchange. Gold ETF is the preferred route for clients with a demat account; Gold Fund of Fund achieves the same exposure without one, at a marginally higher expense ratio. SBI Gold Fund is already in this portfolio\'s gold sleeve, so no additional instrument is needed.' },
+    ],
+  };
+  return base[bucketName];
+}
+
+function generateConstraints(d) {
+  const out = [];
+  out.push({ label: 'Tax', text: d.taxRegime === 'unsure'
+      ? 'Tax regime (old vs. new) not yet confirmed — should be established with an actual computation before finalising instrument choices, since it changes whether PPF/ELSS-style 80C instruments are worth prioritising.'
+      : 'Client indicated the ' + d.taxRegime + ' tax regime — instrument selection above assumes this; reconfirm before implementation.' });
+  out.push({ label: 'Liquidity', text: d.liquidityBuffer === 'inadequate'
+      ? 'Liquidity buffer is currently inadequate — building an emergency fund (ideally 6–9 months of expenses) should be treated as a precondition before other goals receive fresh contributions.'
+      : d.liquidityBuffer === 'adequate'
+      ? 'Liquidity buffer was reported as adequate; no immediate action required, but revisit annually.'
+      : 'Liquidity buffer status was not established during discovery — confirm before finalising the plan.' });
+  if (d.insuranceGap) out.push({ label: 'Insurance', text: (d.insuranceNotes || 'An insurance gap (life and/or health cover) was flagged.') + ' Closing this should be treated as a precondition alongside — not after — the investment plan.' });
+  if (d.nearTermCashNeed) out.push({ label: 'Near-term cash need', text: d.nearTermNotes || 'An unplanned near-term cash need was flagged during discovery and should be sized and funded explicitly.' });
+  out.push({ label: 'Legal / other', text: 'Nomination, will and estate documentation status was not confirmed during discovery — recommend addressing this alongside the investment plan, particularly if there are dependents.' });
+  if (d.constraints) out.push({ label: 'Client-stated preferences', text: d.constraints });
+  if (d.familyNotes) out.push({ label: 'Family considerations', text: d.familyNotes });
+  return out;
+}
+
+// generateRebalancing is defined earlier with full priority-aware logic
+
+function generateSolution(client) {
+  const d = client.discovery;
+  const buckets = bucketGoals(d.goals);
+  const capacity = computeCapacity(d);
+  const reconciliation = reconcileRisk(d.statedRisk, capacity);
+  const bindingLabel = reconciliation.bindingLabel;
+
+  const bucketOutputs = {};
+  ['short','medium','long'].forEach(b => {
+    if (!buckets[b].length) return;
+    const allocResult = priorityAwareAllocation(b, buckets[b], bindingLabel);
+    bucketOutputs[b] = {
+      goals: buckets[b],
+      allocation: allocResult.rows,
+      rebalanceTrigger: allocResult.rebalanceTrigger,
+      glide: allocResult.glide,
+      instruments: instrumentsFor(b, d),
+    };
+  });
+
+  return {
+    generatedAt: Date.now(),
+    buckets: bucketOutputs,
+    capacity,
+    reconciliation,
+    constraints: generateConstraints(d),
+    rebalancing: generateRebalancing(buckets),
+    advisorOverrideNote: '',
+  };
+}
+
+/* ============================================================
+   RENDERING
+============================================================ */
+function esc(s) { return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function inr(n) { n = Number(n)||0; return '₹' + n.toLocaleString('en-IN'); }
+
+const STAGES = [
+  { n: 1, label: 'Relationship Manager', sub: 'Who is handling this client' },
+  { n: 2, label: 'Client Discovery', sub: 'Goals, risk, constraints — no products yet' },
+  { n: 3, label: 'Solutions', sub: 'Build the IPS & allocation' },
+  { n: 4, label: 'Recommendation', sub: 'Present and justify the plan' },
+];
+
+function render() {
+  renderSpine();
+  renderMain();
+}
+
+function renderSpine() {
+  document.getElementById('firmname').textContent = app.firm.name || 'Unnamed Firm';
+  document.getElementById('firmtag').textContent = app.firm.philosophy
+    ? (app.firm.philosophy.length > 90 ? app.firm.philosophy.slice(0,88) + '…' : app.firm.philosophy)
+    : 'Set your firm profile in Settings.';
+
+  const sel = document.getElementById('clientSelect');
+  const ids = Object.keys(app.clients).sort((a,b) => (app.clients[b].createdAt||0)-(app.clients[a].createdAt||0));
+  sel.innerHTML = ids.length ? '' : '<option value="">No clients yet</option>';
+  ids.forEach(id => {
+    const c = app.clients[id];
+    const opt = document.createElement('option');
+    opt.value = id; opt.textContent = c.name + (c.finalized ? ' ✓' : '');
+    if (id === app.currentClientId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = (e) => app.selectClient(e.target.value);
+
+  const list = document.getElementById('stagelist');
+  const c = app.clients[app.currentClientId];
+  const inSettings = app.currentStage === 'settings';
+  list.innerHTML = STAGES.map(s => {
+    const locked = !c;
+    const active = !inSettings && s.n === app.currentStage;
+    const done = c && ((s.n === 1 && c.rm && c.rm.name) || (s.n === 2 && c.discovery.goals.some(g=>g.name)) || (s.n === 3 && c.solution) || (s.n === 4 && c.finalized));
+    return `<li class="${active?'active':''} ${done && !active ? 'done':''} ${locked?'locked':''}" onclick="${locked?'':'app.goToStage('+s.n+')'}">
+      <span class="num">${String(s.n).padStart(2,'0')}</span>
+      <span><span class="label">${s.label}</span><span class="sub">${s.sub}</span></span>
+    </li>`;
+  }).join('');
+}
+
+function renderMain() {
+  const main = document.getElementById('main');
+  const c = app.clients[app.currentClientId];
+  if (app.currentStage === 'settings') { main.innerHTML = viewSettings(); wireSettings(); return; }
+  if (!c) { main.innerHTML = emptyState(); return; }
+  if (app.currentStage === 1) { main.innerHTML = viewStage1(c); wireStage1(c); return; }
+  if (app.currentStage === 2) { main.innerHTML = viewStage2(c); wireStage2(c); return; }
+  if (app.currentStage === 3) { main.innerHTML = viewStage3(c); wireStage3(c); return; }
+  if (app.currentStage === 4) { main.innerHTML = viewStage4(c); wireStage4(c); return; }
+}
+
+function emptyState() {
+  return `<div class="empty-state"><h3>No client selected</h3><p>Create a new client file from the sidebar to begin. You can also set up your Firm Profile and default Relationship Manager details under Settings.</p></div>`;
+}
+
+/* ---------------- Settings (Firm Profile + Default RM) ---------------- */
+function viewSettings() {
+  const f = app.firm, r = app.rmProfile;
+  return `
+  <div class="stage-head">
+    <p class="stage-eyebrow">Settings</p>
+    <h1 class="stage-title serif">Profile</h1>
+    <p class="stage-desc">Set these once. They act as your firm-wide identity and a reusable default for whoever is introduced to a client in Stage 1 — you can still override the Relationship Manager per client.</p>
+  </div>
+
+  <div class="card">
+    <h3>Firm profile</h3>
+    <p class="hint">Who you are, how you think about wealth management, and why a client should trust your approach. Keep it concise — it's an introduction, not a full company presentation.</p>
+    <div class="field">
+      <label for="f_name">Firm name</label>
+      <input type="text" id="f_name" value="${esc(f.name)}">
+    </div>
+    <div class="field">
+      <label for="f_phil">Philosophy — how you think about wealth management</label>
+      <textarea id="f_phil" rows="4" placeholder="e.g. We believe every portfolio should be built from the client's goals backward, never from a product forward…">${esc(f.philosophy)}</textarea>
+    </div>
+    <div class="field">
+      <label for="f_track">Track record / why a client should trust this approach</label>
+      <textarea id="f_track" rows="4" placeholder="e.g. Founded in 2011, ₹1,200 Cr under advice, average client relationship of 9 years…">${esc(f.trackRecord)}</textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Default Relationship Manager profile</h3>
+    <p class="hint">Prefills Stage 1 for every new client file. Each client can still have a different RM assigned.</p>
+    <div class="row2">
+      <div class="field"><label for="r_name">RM name</label><input type="text" id="r_name" value="${esc(r.name)}"></div>
+      <div class="field"><label for="r_desig">Designation</label><input type="text" id="r_desig" value="${esc(r.designation)}" placeholder="e.g. Senior Wealth Advisor"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="r_email">Email</label><input type="text" id="r_email" value="${esc(r.email)}"></div>
+      <div class="field"><label for="r_phone">Phone</label><input type="text" id="r_phone" value="${esc(r.phone)}"></div>
+    </div>
+    <div class="field">
+      <label for="r_intro">Personal introduction</label>
+      <textarea id="r_intro" rows="3" placeholder="e.g. 12 years advising HNI families; background in fixed income and estate planning…">${esc(r.intro)}</textarea>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" onclick="app.saveSettings()">Save settings</button>
+  </div>`;
+}
+function wireSettings() {
+  document.getElementById('f_name').oninput = e => app.updateFirm('name', e.target.value);
+  document.getElementById('f_phil').oninput = e => app.updateFirm('philosophy', e.target.value);
+  document.getElementById('f_track').oninput = e => app.updateFirm('trackRecord', e.target.value);
+  document.getElementById('r_name').oninput = e => app.updateRMDefault('name', e.target.value);
+  document.getElementById('r_desig').oninput = e => app.updateRMDefault('designation', e.target.value);
+  document.getElementById('r_email').oninput = e => app.updateRMDefault('email', e.target.value);
+  document.getElementById('r_phone').oninput = e => app.updateRMDefault('phone', e.target.value);
+  document.getElementById('r_intro').oninput = e => app.updateRMDefault('intro', e.target.value);
+}
+app.saveSettings = function() {
+  persistFirm(); persistRMDefault();
+  toast('Settings saved.');
+  renderSpine();
+};
+
+/* ---------------- Stage 1 — Relationship Manager (per client) ---------------- */
+function viewStage1(c) {
+  const r = c.rm;
+  return `
+  <div class="stage-head">
+    <p class="stage-eyebrow">Stage 1 — ${esc(c.name)}</p>
+    <h1 class="stage-title serif">Relationship Manager</h1>
+    <p class="stage-desc">Who is introducing the firm and handling this client relationship. This is what the client sees first — concise, not a full company presentation.</p>
+  </div>
+  <div class="card">
+    <div class="actions" style="margin-top:0;margin-bottom:16px">
+      <button class="secondary" onclick="app.useDefaultRM()">Use my default RM profile</button>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="rm_name">RM name</label><input type="text" id="rm_name" value="${esc(r.name)}"></div>
+      <div class="field"><label for="rm_desig">Designation</label><input type="text" id="rm_desig" value="${esc(r.designation)}" placeholder="e.g. Senior Wealth Advisor"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="rm_email">Email</label><input type="text" id="rm_email" value="${esc(r.email)}"></div>
+      <div class="field"><label for="rm_phone">Phone</label><input type="text" id="rm_phone" value="${esc(r.phone)}"></div>
+    </div>
+    <div class="field">
+      <label for="rm_intro">Personal introduction for this client</label>
+      <textarea id="rm_intro" rows="4" placeholder="e.g. I'll be your primary point of contact; my background is in…">${esc(r.intro)}</textarea>
+    </div>
+    <div class="field">
+      <label>Firm philosophy (from Settings, read-only here)</label>
+      <div class="quote-pull">${esc(app.firm.philosophy) || 'Not set — add this under Settings.'}</div>
+    </div>
+    <div class="actions">
+      <button class="primary" onclick="app.saveStage1AndContinue()">Save & Continue to Discovery</button>
+    </div>
+  </div>`;
+}
+function wireStage1(c) {
+  document.getElementById('rm_name').oninput = e => app.setClientRM('name', e.target.value);
+  document.getElementById('rm_desig').oninput = e => app.setClientRM('designation', e.target.value);
+  document.getElementById('rm_email').oninput = e => app.setClientRM('email', e.target.value);
+  document.getElementById('rm_phone').oninput = e => app.setClientRM('phone', e.target.value);
+  document.getElementById('rm_intro').oninput = e => app.setClientRM('intro', e.target.value);
+}
+app.saveStage1AndContinue = function() {
+  persistCurrentClient();
+  app.currentStage = 2;
+  toast('Saved.');
+  render();
+};
+
+/* ---------------- Stage 2 ---------------- */
+function viewStage2(c) {
+  const d = c.discovery;
+  const goalRows = d.goals.map((g, i) => `
+    <div class="goal-row">
+      <div><label>Goal</label><input type="text" data-goal="${i}" data-key="name" value="${esc(g.name)}" placeholder="e.g. Daughter's college fund"></div>
+      <div><label>Amount (₹)</label><input type="number" data-goal="${i}" data-key="amount" value="${esc(g.amount)}"></div>
+      <div><label>Years</label><input type="number" data-goal="${i}" data-key="years" value="${esc(g.years)}"></div>
+      <div><label>Priority note</label><input type="text" data-goal="${i}" data-key="priority" value="${esc(g.priority||'')}" placeholder="optional"></div>
+      <button class="remove-goal" onclick="app.removeGoal(${i})" title="Remove">×</button>
+    </div>`).join('');
+
+  return `
+  <div class="stage-head">
+    <p class="stage-eyebrow">Stage 2 — ${esc(c.name)}</p>
+    <h1 class="stage-title serif">Client Discovery</h1>
+    <p class="stage-desc">Focused questions to understand goals, risk, liquidity, assets and constraints. No products or allocations are decided here — that happens backstage, in Stage 3.</p>
+  </div>
+
+  <div class="card">
+    <h3>Client snapshot</h3>
+    <div class="row3">
+      <div class="field"><label>Client name</label><input type="text" id="d_name" value="${esc(c.name)}"></div>
+      <div class="field"><label>Age</label><input type="number" id="d_age" value="${esc(d.age)}"></div>
+      <div class="field"><label>Occupation / income source</label><input type="text" id="d_occ" value="${esc(d.occupation)}"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>Monthly income (take-home, ₹)</label><input type="number" id="d_income" value="${esc(d.monthlyIncome)}"></div>
+      <div class="field"><label>Monthly expenses (₹)</label><input type="number" id="d_expenses" value="${esc(d.monthlyExpenses)}"></div>
+      <div class="field"><label>Monthly debt / EMI payments (₹)</label><input type="number" id="d_debt" value="${esc(d.monthlyDebt)}"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Dependents (number)</label><input type="number" id="d_dep" value="${esc(d.dependents)}"></div>
+      <div class="field"><label>Dependent notes</label><input type="text" id="d_depnotes" value="${esc(d.dependentNotes)}" placeholder="e.g. two children, aging parents"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Goals & time horizons</h3>
+    <p class="hint">List every goal — amount and horizon in years. Add as many as needed.</p>
+    <div id="goalRows">${goalRows}</div>
+    <button class="secondary" style="margin-top:10px" onclick="app.addGoal()">+ Add goal</button>
+  </div>
+
+  <div class="card">
+    <h3>Assets, liabilities & liquidity</h3>
+    <div class="row2">
+      <div class="field"><label>Existing assets</label><textarea id="d_assets" rows="3" placeholder="e.g. ₹12L bank FD, ₹8L EPF, self-occupied home">${esc(d.assets)}</textarea></div>
+      <div class="field"><label>Existing liabilities</label><textarea id="d_liab" rows="3" placeholder="e.g. ₹48L home loan, 12 yrs remaining">${esc(d.liabilities)}</textarea></div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Liquidity buffer status</label>
+        <select id="d_liq">
+          <option value="unknown" ${d.liquidityBuffer==='unknown'?'selected':''}>Not yet established</option>
+          <option value="adequate" ${d.liquidityBuffer==='adequate'?'selected':''}>Adequate (6+ months)</option>
+          <option value="inadequate" ${d.liquidityBuffer==='inadequate'?'selected':''}>Inadequate / none</option>
+        </select>
+      </div>
+      <div class="field"><label>Income stability</label>
+        <select id="d_incstab">
+          <option value="stable" ${d.incomeStability==='stable'?'selected':''}>Stable / salaried</option>
+          <option value="irregular" ${d.incomeStability==='irregular'?'selected':''}>Irregular / lumpy</option>
+        </select>
+      </div>
+    </div>
+    <div class="checkrow" style="margin-bottom:10px">
+      <input type="checkbox" id="d_neartermchk" ${d.nearTermCashNeed?'checked':''}>
+      <label for="d_neartermchk">There is an unplanned near-term cash need</label>
+    </div>
+    <div class="field"><textarea id="d_nearnotes" rows="2" placeholder="Describe if checked above">${esc(d.nearTermNotes)}</textarea></div>
+    <div class="checkrow" style="margin-bottom:10px">
+      <input type="checkbox" id="d_insurchk" ${d.insuranceGap?'checked':''}>
+      <label for="d_insurchk">There is a life / health insurance gap</label>
+    </div>
+    <div class="field"><textarea id="d_insurnotes" rows="2" placeholder="Describe if checked above">${esc(d.insuranceNotes)}</textarea></div>
+  </div>
+
+  <div class="card">
+    <h3>Risk, returns & preferences</h3>
+    <div class="row2">
+      <div class="field"><label>Stated risk tolerance</label>
+        <select id="d_risk">
+          <option value="low" ${d.statedRisk==='low'?'selected':''}>Low</option>
+          <option value="moderate" ${d.statedRisk==='moderate'?'selected':''}>Moderate</option>
+          <option value="high" ${d.statedRisk==='high'?'selected':''}>High</option>
+        </select>
+      </div>
+      <div class="field"><label>Tax regime</label>
+        <select id="d_tax">
+          <option value="unsure" ${d.taxRegime==='unsure'?'selected':''}>Not yet confirmed</option>
+          <option value="old" ${d.taxRegime==='old'?'selected':''}>Old regime</option>
+          <option value="new" ${d.taxRegime==='new'?'selected':''}>New regime</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Notes on stated risk / return expectations</label><textarea id="d_risknotes" rows="2" placeholder="Client's own words on risk and return expectations">${esc(d.riskNotes)}</textarea></div>
+    <div class="field"><label>Constraints / preferences</label><textarea id="d_constraints" rows="2" placeholder="e.g. no direct equity, prefers simple products, wants Shariah-compliant options">${esc(d.constraints)}</textarea></div>
+    <div class="field"><label>Family considerations</label><textarea id="d_family" rows="2" placeholder="e.g. succession planning, children's education, elder care">${esc(d.familyNotes)}</textarea></div>
+    <div class="field"><label>Other notes</label><textarea id="d_other" rows="2">${esc(d.otherNotes)}</textarea></div>
+  </div>
+
+  <div class="actions">
+    <button class="primary" onclick="app.completeDiscovery()">Build the Solution (Stage 3) →</button>
+  </div>`;
+}
+
+function wireStage2(c) {
+  const bind = (id, field, checkbox) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.oninput = el.onchange = () => app.setDiscovery(field, checkbox ? el.checked : el.value);
+  };
+  document.getElementById('d_name').oninput = e => { c.name = e.target.value; scheduleSave(); renderSpine(); };
+  bind('d_age', 'age'); bind('d_occ', 'occupation');
+  bind('d_income', 'monthlyIncome'); bind('d_expenses', 'monthlyExpenses'); bind('d_debt', 'monthlyDebt');
+  bind('d_dep', 'dependents'); bind('d_depnotes', 'dependentNotes');
+  bind('d_assets', 'assets'); bind('d_liab', 'liabilities');
+  bind('d_liq', 'liquidityBuffer'); bind('d_incstab', 'incomeStability');
+  bind('d_neartermchk', 'nearTermCashNeed', true); bind('d_nearnotes', 'nearTermNotes');
+  bind('d_insurchk', 'insuranceGap', true); bind('d_insurnotes', 'insuranceNotes');
+
+  // FIX #3: Validate risk tolerance input
+  const riskSelect = document.getElementById('d_risk');
+  if (riskSelect) {
+    riskSelect.onchange = (e) => {
+      const validRisks = ['low', 'moderate', 'high'];
+      if (!validRisks.includes(e.target.value)) {
+        toast('Risk tolerance must be Low, Moderate, or High.');
+        e.target.value = c.discovery.statedRisk || 'moderate';
+        return;
+      }
+      app.setDiscovery('statedRisk', e.target.value);
+    };
+  }
+
+  bind('d_tax', 'taxRegime'); bind('d_risknotes', 'riskNotes');
+  bind('d_constraints', 'constraints'); bind('d_family', 'familyNotes'); bind('d_other', 'otherNotes');
+
+  document.querySelectorAll('#goalRows input').forEach(inp => {
+    inp.oninput = () => app.setGoalField(Number(inp.dataset.goal), inp.dataset.key, inp.value);
+  });
+}
+
+/* ---------------- Stage 3 ---------------- */
+const BUCKET_LABEL = { short: 'Short-term (0–3 yrs)', medium: 'Medium-term (3–8 yrs)', long: 'Long-term (8+ yrs)' };
+
+function viewStage3(c) {
+  const s = c.solution;
+  const cap = s.capacity, rec = s.reconciliation;
+
+  const bucketsHtml = Object.keys(s.buckets).map(bKey => {
+    const b = s.buckets[bKey];
+    const goalNames = b.goals.map(g => {
+      const pri = g.priority ? ` · Priority: ${esc(g.priority)}` : '';
+      return `<strong>${esc(g.name)}</strong> (${inr(g.amount)}, ${g.years}y${pri})`;
+    }).join(' &nbsp;|&nbsp; ');
+
+    const allocRows = b.allocation.map((a, i) => `
+      <tr>
+        <td>${esc(a.asset)}</td>
+        <td><input type="text" data-bucket="${bKey}" data-alloc="${i}" data-key="range" value="${esc(a.range)}" style="width:90px"></td>
+        <td><textarea data-bucket="${bKey}" data-alloc="${i}" data-key="rationale" rows="2">${esc(a.rationale)}</textarea></td>
+      </tr>`).join('');
+
+    const instrRows = b.instruments.map((ins, i) => `
+      <tr>
+        <td>${esc(ins.asset)}</td>
+        <td><input type="text" data-bucket="${bKey}" data-instr="${i}" data-key="cat" value="${esc(ins.cat)}"></td>
+        <td><textarea data-bucket="${bKey}" data-instr="${i}" data-key="why" rows="2">${esc(ins.why)}</textarea></td>
+      </tr>`).join('');
+
+    // Within-sleeve optimization metrics
+    const ef = bucketFundWeights(b, 'equal').filter(f => f.weight > 0.001);
+    const sf = bucketFundWeights(b, 'sharpe').filter(f => f.weight > 0.001);
+    const cf = bucketFundWeights(b, 'calmar').filter(f => f.weight > 0.001);
+    const es = portfolioStatsJS(ef), ss = portfolioStatsJS(sf), cs = portfolioStatsJS(cf);
+    const hasEquity = b.allocation.some(a => a.asset === 'Equity' && allocRowPct(a) > 0.01);
+
+    const optPanel = hasEquity ? `
+      <div style="margin-top:14px;padding:12px;background:var(--paper-2);border-radius:var(--radius);font-size:12.5px">
+        <strong>Equity sleeve optimisation</strong>
+        <span class="hint" style="margin-left:8px">(8,000 random trials, 35% cap per fund)</span>
+        <table class="ledger" style="margin-top:8px;font-size:12px">
+          <tr>
+            <th>Metric</th>
+            <th style="text-align:right">Equal Wt</th>
+            <th style="text-align:right;background:rgba(168,118,63,0.1)">Sharpe-Opt ★</th>
+            <th style="text-align:right">Calmar-Opt</th>
+          </tr>
+          <tr>
+            <td>Bucket Return (%)</td>
+            <td style="text-align:right">${es.ret.toFixed(1)}</td>
+            <td style="text-align:right;background:rgba(168,118,63,0.06)">${ss.ret.toFixed(1)}</td>
+            <td style="text-align:right">${cs.ret.toFixed(1)}</td>
+          </tr>
+          <tr>
+            <td>Std Dev (%)</td>
+            <td style="text-align:right">${es.sd.toFixed(1)}</td>
+            <td style="text-align:right;background:rgba(168,118,63,0.06)">${ss.sd.toFixed(1)}</td>
+            <td style="text-align:right">${cs.sd.toFixed(1)}</td>
+          </tr>
+          <tr>
+            <td>Est. Max Drawdown (%)</td>
+            <td style="text-align:right;color:var(--rust)">${(es.maxDD*100).toFixed(1)}</td>
+            <td style="text-align:right;background:rgba(168,118,63,0.06);color:var(--rust)">${(ss.maxDD*100).toFixed(1)}</td>
+            <td style="text-align:right;color:var(--rust)">${(cs.maxDD*100).toFixed(1)}</td>
+          </tr>
+          <tr>
+            <td>Sharpe Ratio</td>
+            <td style="text-align:right">${es.sharpe.toFixed(2)}</td>
+            <td style="text-align:right;background:rgba(168,118,63,0.06);font-weight:600">${ss.sharpe.toFixed(2)}</td>
+            <td style="text-align:right">${cs.sharpe.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td>Calmar Ratio</td>
+            <td style="text-align:right">${es.calmar.toFixed(2)}</td>
+            <td style="text-align:right;background:rgba(168,118,63,0.06)">${ss.calmar.toFixed(2)}</td>
+            <td style="text-align:right;font-weight:600">${cs.calmar.toFixed(2)}</td>
+          </tr>
+        </table>
+        <p class="hint" style="margin-top:6px">★ Sharpe-Opt = best return per unit of SD. Calmar-Opt = best return per unit of max drawdown (use for loss-averse clients). Adoption of either is the advisor's judgment — fund weights in Stage 4 will reflect the Sharpe-optimised mix unless overridden. Full comparison in Excel export.</p>
+      </div>` : '';
+
+    // Per-bucket rebalancing trigger from priority logic
+    const rebTrigger = b.rebalanceTrigger || '±5% drift threshold';
+    const glide = b.glide || '';
+
+    return `
+    <div class="bucket-block">
+      <h4>${BUCKET_LABEL[bKey]} <span class="tag">${b.goals.length} goal${b.goals.length>1?'s':''}</span></h4>
+      <p style="font-size:13px;margin-bottom:4px">${goalNames}</p>
+      <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="hint">📊 Rebalancing: <strong>${esc(rebTrigger)}</strong></span>
+        ${glide ? `<span class="hint">📉 Glide path: ${esc(glide)}</span>` : ''}
+      </div>
+      <table class="ledger" style="margin-bottom:12px">
+        <tr><th style="width:140px">Asset class</th><th style="width:100px">Target %</th><th>Rationale — why this allocation for this bucket (editable)</th></tr>
+        ${allocRows}
+      </table>
+      <table class="ledger">
+        <tr><th style="width:100px">Asset class</th><th style="width:200px">Instrument category</th><th>Why this instrument (editable)</th></tr>
+        ${instrRows}
+      </table>
+      ${optPanel}
+    </div>`;
+  }).join('');
+
+  const constraintsHtml = s.constraints.map((cn, i) => `
+    <div class="field">
+      <label>${esc(cn.label)}</label>
+      <textarea data-constraint="${i}" rows="2">${esc(cn.text)}</textarea>
+    </div>`).join('');
+
+  // Build aggregated rebalancing summary from per-bucket triggers
+  const bucketRebLines = Object.keys(s.buckets).map(bKey => {
+    const b = s.buckets[bKey];
+    const trig = b.rebalanceTrigger || '±5% drift threshold';
+    return `<li><strong>${BUCKET_LABEL[bKey]}:</strong> ${esc(trig)}</li>`;
+  }).join('');
+
+  return `
+  <div class="stage-head">
+    <p class="stage-eyebrow">Stage 3 — ${esc(c.name)}</p>
+    <h1 class="stage-title serif">Solutions</h1>
+    <p class="stage-desc">Built from the client's discovery data. Every field is editable — treat this as a structured starting point for professional judgment. Allocation rationale, rebalancing triggers and optimisation metrics are all derived from the goals and risk profile above.</p>
+  </div>
+
+  <div class="card">
+    <h3>Risk tolerance vs. risk capacity</h3>
+    <div class="split-panel">
+      <div>
+        <p class="hint" style="margin-bottom:6px">Financial capacity score</p>
+        <p style="font-size:28px;font-weight:600;margin:0 0 6px" class="serif">${cap.score}<span style="font-size:14px;color:var(--text-dim)"> / 100</span> — <span class="badge ${cap.label.toLowerCase()}">${cap.label}</span></p>
+        <ul style="font-size:12.5px;color:var(--text-dim);padding-left:18px;margin:8px 0">
+          ${cap.factors.map(f => `<li>${esc(f)}</li>`).join('')}
+        </ul>
+      </div>
+      <div>
+        <p class="hint" style="margin-bottom:6px">Binding constraint</p>
+        <p style="font-size:20px;font-weight:600;margin:0 0 8px" class="serif">${rec.bindingLabel} <span style="font-size:12px;font-weight:400;color:var(--text-dim)">(${rec.which})</span></p>
+        <div class="quote-pull">${esc(rec.explanation)}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Asset allocation &amp; instrument selection, by goal bucket</h3>
+    <p class="hint">Allocation percentages are derived from: binding risk label + each bucket's shortest goal horizon + goal priority. Equity ranges, rebalancing triggers and glide paths differ per bucket — see each bucket's own rationale below. Optimization metrics (Sharpe vs Calmar) are also shown per bucket.</p>
+    ${bucketsHtml || '<p class="hint">No goals were bucketed — check discovery inputs.</p>'}
+  </div>
+
+  <div class="card">
+    <h3>Constraints &amp; special considerations</h3>
+    ${constraintsHtml}
+  </div>
+
+  <div class="card">
+    <h3>Rebalancing policy</h3>
+    <p class="hint">Triggers are set per bucket based on goal priority — Priority-1 goals use a ±3% drift threshold, others use ±5%. These are shown in each bucket above and summarised here.</p>
+    <ul style="font-size:13px;padding-left:18px;margin-bottom:12px">${bucketRebLines}</ul>
+    <div class="field"><label>Overall trigger &amp; cadence (editable)</label><textarea id="reb_trigger" rows="2">${esc(s.rebalancing.trigger)}</textarea></div>
+    <div class="field"><label>Why this cadence fits this client</label><textarea id="reb_fit" rows="2">${esc(s.rebalancing.fit)}</textarea></div>
+    <div class="field"><label>Glide-path &amp; milestone policy</label><textarea id="reb_glide" rows="2">${esc(s.rebalancing.glide)}</textarea></div>
+  </div>
+
+  <div class="card">
+    <h3>Advisor override notes</h3>
+    <p class="hint">Anything the rules-engine draft above doesn't capture — professional judgment calls, exceptions, context.</p>
+    <textarea id="advisorNote" rows="3">${esc(s.advisorOverrideNote)}</textarea>
+  </div>
+
+  <div class="actions">
+    <button class="ghost" onclick="app.regenerateDraft()">↻ Regenerate draft from discovery</button>
+    <div style="flex:1"></div>
+    <button class="primary" onclick="app.finalizeSolution()">Finalize & Continue to Recommendation →</button>
+  </div>`;
+}
+
+function wireStage3(c) {
+  const s = c.solution;
+  document.querySelectorAll('[data-alloc]').forEach(el => {
+    el.oninput = () => {
+      const b = el.dataset.bucket, idx = Number(el.dataset.alloc), key = el.dataset.key;
+      s.buckets[b].allocation[idx][key] = el.value;
+      scheduleSave();
+    };
+  });
+  document.querySelectorAll('[data-instr]').forEach(el => {
+    el.oninput = () => {
+      const b = el.dataset.bucket, idx = Number(el.dataset.instr), key = el.dataset.key;
+      s.buckets[b].instruments[idx][key] = el.value;
+      scheduleSave();
+    };
+  });
+  document.querySelectorAll('[data-constraint]').forEach(el => {
+    el.oninput = () => { s.constraints[Number(el.dataset.constraint)].text = el.value; scheduleSave(); };
+  });
+  document.getElementById('reb_trigger').oninput = e => { s.rebalancing.trigger = e.target.value; scheduleSave(); };
+  document.getElementById('reb_fit').oninput = e => { s.rebalancing.fit = e.target.value; scheduleSave(); };
+  document.getElementById('reb_glide').oninput = e => { s.rebalancing.glide = e.target.value; scheduleSave(); };
+  document.getElementById('advisorNote').oninput = e => { s.advisorOverrideNote = e.target.value; scheduleSave(); };
+}
+
+/* ---------------- Stage 4 ---------------- */
+function blendedAllocation(s) {
+  // Simple weighted average across buckets (equal weight per bucket present) purely for the headline chart.
+  const totals = { Equity: 0, Debt: 0, Gold: 0, 'Cash / Liquid': 0, Alternatives: 0 };
+  let n = 0;
+  Object.values(s.buckets).forEach(b => {
+    n++;
+    b.allocation.forEach(a => {
+      const nums = (a.range.match(/[\d.]+/g) || [0]).map(Number);
+      const mid = nums.length > 1 ? (nums[0]+nums[1])/2 : nums[0];
+      if (totals[a.asset] !== undefined) totals[a.asset] += mid;
+    });
+  });
+  if (n) Object.keys(totals).forEach(k => totals[k] = totals[k]/n);
+  return totals;
+}
+
+function defenseTalkTrack(c) {
+  const d = c.discovery, s = c.solution, points = [];
+  points.push({ quote: 'Stated risk tolerance: ' + d.statedRisk + (d.riskNotes ? ' — "' + d.riskNotes + '"' : ''),
+    link: 'This is why the binding constraint is ' + s.reconciliation.bindingLabel + ' (' + s.reconciliation.which + ') rather than a generic moderate allocation.' });
+  if (d.liquidityBuffer !== 'unknown') points.push({ quote: 'Liquidity buffer reported as ' + d.liquidityBuffer,
+    link: d.liquidityBuffer === 'inadequate' ? 'This is why building an emergency fund is treated as a precondition in the constraints section.' : 'This supported a higher risk-capacity score.' });
+  if (d.insuranceGap) points.push({ quote: 'Insurance gap: ' + (d.insuranceNotes || '(flagged)'),
+    link: 'This is why closing insurance is listed as a precondition alongside — not after — the investment plan.' });
+  d.goals.filter(g=>g.name).forEach(g => {
+    points.push({ quote: g.name + ': ' + inr(g.amount) + ' in ' + g.years + ' years',
+      link: 'This goal sits in the ' + (Number(g.years)<=3?'short-term':Number(g.years)<=8?'medium-term':'long-term') + ' bucket, which is why its allocation is ' + (Number(g.years)<=3?'debt-heavy for capital safety':Number(g.years)<=8?'a moderate equity/debt blend':'growth-oriented') + '.' });
+  });
+  if (d.constraints) points.push({ quote: 'Client preference: ' + d.constraints, link: 'This is reflected directly in the instrument choices above (see exclusions).' });
+  return points;
+}
+
+function viewStage4(c) {
+  const s = c.solution;
+  const blend = blendedAllocation(s);
+  const talk = defenseTalkTrack(c);
+  return `
+  <div class="stage-head">
+    <p class="stage-eyebrow">Stage 4 — ${esc(c.name)}</p>
+    <h1 class="stage-title serif">Recommendation & Defense</h1>
+    <p class="stage-desc">The client-facing summary, plus a defense script that connects every recommendation back to what the client actually told you.</p>
+  </div>
+
+  <div class="split-panel">
+    <div class="card">
+      <h3>Client-facing summary</h3>
+      <p class="hint">Diagnosis</p>
+      <p style="font-size:13.5px;line-height:1.6">${esc(c.name)}, age ${esc(c.discovery.age)||'—'}, ${esc(c.discovery.occupation)||'—'}. Binding risk constraint: <strong>${s.reconciliation.bindingLabel}</strong> (${s.reconciliation.which}). ${c.discovery.goals.filter(g=>g.name).length} goals identified across ${Object.keys(s.buckets).length} time horizons.</p>
+      <p class="hint">Investment objective</p>
+      <p style="font-size:13.5px;line-height:1.6">Fund each goal on schedule while respecting a ${s.reconciliation.bindingLabel.toLowerCase()} risk capacity, using a bucketed allocation rather than one blended number.</p>
+      <div class="chart-wrap"><canvas id="allocChart" width="280" height="280"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Defense — connecting back to the client</h3>
+      <p class="hint">Use these talking points when the client asks "why this?"</p>
+      ${talk.map(t => `<div class="quote-pull">"${esc(t.quote)}"<span class="attrib">→ ${esc(t.link)}</span></div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Named Fund Allocation — Bucket-Level</h3>
+    <p class="hint">Each bucket's own fund mix (independent of the household blend) — this is what actually drives whether each goal is met on time below.</p>
+    <div id="bucketFundPreview"></div>
+  </div>
+
+  <div class="card">
+    <h3>Named Fund Allocation — Consolidated Household Portfolio</h3>
+    <p class="hint">Automatically mapped from this client's Stage 3 bucket allocations, weighted by each bucket's share of total goal value. This is exactly what the comprehensive Excel export below is built from — nothing in the file is generic.</p>
+    <div id="fundPreview"></div>
+  </div>
+
+  <div class="card">
+    <h3>Goal Funding Check — Will the Surplus Meet Each Goal On Time?</h3>
+    <p class="hint">Uses each goal's own bucket's real, named-fund blended return (not a flat assumption) to compound the household's monthly surplus and check against each goal's inflated target.</p>
+    <div id="goalFundingPreview"></div>
+  </div>
+
+  <div id="unmetGoalSolver"></div>
+
+  <div class="card">
+    <h3>Export</h3>
+    <p class="hint">The comprehensive workbook includes named funds by bucket and consolidated, correlation, portfolio Sharpe/Treynor/Alpha, the same goal-funding projection shown above, historical VaR, stress &amp; scenario tests, and a live Monte Carlo simulation — all specific to this client's own allocation.</p>
+    <div class="actions" style="margin-top:0">
+      <button class="secondary" onclick="app.exportIPS()">Download IPS (Word)</button>
+      <button class="primary" onclick="app.exportExcel()">Download Comprehensive Portfolio Analysis (Excel)</button>
+      <button class="ghost" onclick="app.exportSimpleExcel()">Download simple goal projection instead</button>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:center;background:var(--paper-2)">
+    <h3>Done with ${esc(c.name)}?</h3>
+    <p class="hint">This client file stays saved in the sidebar. Start a fresh file whenever you're ready for the next prospect.</p>
+    <button class="primary" onclick="app.newClient()">+ Start a new client</button>
+  </div>`;
+}
+
+function computeGoalFundingProjection(client, overrides) {
+  overrides = overrides || {};
+  const allGoals = [];
+  Object.keys(client.solution.buckets).forEach(bKey => {
+    client.solution.buckets[bKey].goals.forEach(g => {
+      if (g.name && g.amount && g.years) allGoals.push({ name: g.name, amount: Number(g.amount), years: Number(g.years), bucket: bKey });
+    });
+  });
+  if (!allGoals.length) return [];
+  const maxHorizon = Math.max(...allGoals.map(g => g.years));
+  const bucketReturns = {};
+  Object.keys(client.solution.buckets).forEach(bKey => {
+    const bf = bucketFundWeights(client.solution.buckets[bKey]).filter(f => f.weight > 0.001);
+    bucketReturns[bKey] = overrides.bucketReturnAdj ? portfolioStatsJS(bf).ret + overrides.bucketReturnAdj : portfolioStatsJS(bf).ret;
+  });
+  const baseMonthlyIncome = Number(client.discovery.monthlyIncome)||0;
+  const baseExpenses = Number(client.discovery.monthlyExpenses)||0;
+  const baseDebt = Number(client.discovery.monthlyDebt)||0;
+  const monthlySurplus = (baseMonthlyIncome + (overrides.extraIncome||0)) - (baseExpenses - (overrides.expenseCut||0)) - baseDebt;
+
+  // FIX #5: Flag negative surplus early — return unmet with reason
+  if (monthlySurplus <= 0) {
+    return allGoals.map(g => ({
+      name: g.name,
+      bucket: g.bucket,
+      years: g.years,
+      target: g.amount * (overrides.targetScale || 1.0),
+      balance: 0,
+      met: false,
+      yearsNeeded: Infinity,
+      shortfall: g.amount,
+      reason: 'Negative monthly surplus — monthly expenses exceed income. Reduce expenses or increase income to fund goals.'
+    }));
+  }
+
+  // which goals are unmet at baseline (for prioritiseFactor re-weighting)
+  const unmetNames = new Set(overrides.unmetNames || []);
+  const salaryGrowth = overrides.salaryGrowth !== undefined ? overrides.salaryGrowth : 0.07;
+  const horizonExt = overrides.horizonExtension || 0;
+  const targetScale = overrides.targetScale || 1.0;
+  const balances = {}; allGoals.forEach(g => balances[g.name] = 0);
+  const lastContrib = {};
+  let annualSurplus = monthlySurplus * 12;
+  for (let y = 1; y <= maxHorizon; y++) {
+    if (y > 1) annualSurplus *= (1 + salaryGrowth);
+    const active = allGoals.filter(g => y <= g.years + horizonExt);
+    const pf = overrides.prioritiseFactor || 1;
+    const sumActiveAmt = active.reduce((s,g) => {
+      const isUnmet = unmetNames.has(g.name);
+      return s + g.amount * (isUnmet ? pf : 1);
+    }, 0) || 1;
+    active.forEach(g => {
+      const isUnmet = unmetNames.has(g.name);
+      const contrib = annualSurplus * g.amount * (isUnmet ? pf : 1) / sumActiveAmt;
+      balances[g.name] = balances[g.name] * (1 + bucketReturns[g.bucket]/100) + contrib;
+      lastContrib[g.name] = contrib;
+    });
+  }
+  return allGoals.map(g => {
+    const target = g.amount * targetScale;  // goal amount is already in future rupees — no inflation needed
+    const balance = balances[g.name];
+    const met = balance >= target;
+    let yearsNeeded = g.years + horizonExt;
+    if (!met) {
+      const r = bucketReturns[g.bucket] / 100;
+      const pmt = lastContrib[g.name] || 0;
+      let bal = balance, yrs = g.years + horizonExt;
+      while (bal < target && yrs < 100) { bal = bal * (1 + r) + pmt; yrs++; }
+      yearsNeeded = yrs;
+    }
+    return { name: g.name, bucket: g.bucket, years: g.years + horizonExt, target, balance, met, yearsNeeded, shortfall: balance - target };
+  });
+}
+
+function runUnmetGoalScenarios(client) {
+  const baseline = computeGoalFundingProjection(client);
+  const unmet = baseline.filter(g => !g.met);
+  if (!unmet.length) return null;
+
+  const LEVERS = [
+    { label: "Baseline (no change)", overrides: {} },
+    { label: "Prioritise unmet goal — 2x allocation weight", overrides: { prioritiseFactor: 2 } },
+    { label: "Prioritise unmet goal — 3x allocation weight", overrides: { prioritiseFactor: 3 } },
+    { label: "Cut monthly expenses by ₹10,000", overrides: { expenseCut: 10000 } },
+    { label: "Add second income +₹15,000/mo", overrides: { extraIncome: 15000 } },
+    { label: "Expenses -₹5k + Income +₹10k", overrides: { expenseCut: 5000, extraIncome: 10000 } },
+    { label: "Extend each unmet goal's horizon by +2 yrs", overrides: { horizonExtension: 2 } },
+    { label: "Reduce goal target to 80% (partial self-fund/loan/downscale)", overrides: { targetScale: 0.80 } },
+    { label: "More aggressive bucket allocation (returns +2pp)", overrides: { bucketReturnAdj: 2 } },
+    { label: "2x prioritise + expenses -₹5k + income +₹10k (combined)", overrides: { prioritiseFactor: 2, expenseCut: 5000, extraIncome: 10000 } },
+    { label: "2x prioritise + target 85% (tightest realistic lever)", overrides: { prioritiseFactor: 2, targetScale: 0.85 } },
+  ];
+
+  const unmetNames = unmet.map(g => g.name);
+  return { baseline, unmet, scenarios: LEVERS.map(lev => ({
+    label: lev.label,
+    results: computeGoalFundingProjection(client, Object.assign({ unmetNames }, lev.overrides)),
+  })) };
+}
+
+function wireStage4(c) {
+  const blend = blendedAllocation(c.solution);
+  const labels = Object.keys(blend).filter(k => blend[k] > 0.01);
+  const data = labels.map(k => Math.round(blend[k]*10)/10);
+
+  const funds = mapClientToFunds(c);
+  const stats = portfolioStatsJS(funds);
+  const sorted = funds.filter(f => f.weight > 0.001).sort((a,b) => b.weight - a.weight);
+  const previewHtml = `
+    <table class="ledger">
+      <tr><th>Category</th><th>Fund</th><th style="text-align:right">Weight</th></tr>
+      ${sorted.map(f => `<tr><td>${esc(f.category)}</td><td>${esc(f.name)}</td><td style="text-align:right">${(f.weight*100).toFixed(1)}%</td></tr>`).join('')}
+    </table>
+    <p class="hint" style="margin-top:12px">Consolidated portfolio: Return ${stats.ret.toFixed(1)}% · Beta ${stats.beta.toFixed(2)} · SD ${stats.sd.toFixed(1)}% · MaxDD ${(stats.maxDD*100).toFixed(1)}% · <strong>Sharpe ${stats.sharpe.toFixed(2)}</strong> · Calmar ${stats.calmar.toFixed(2)} · Treynor ${stats.treynor.toFixed(1)} <span style="color:var(--rust);font-size:11px">(★ Use Sharpe as the primary metric — Treynor appears high because this portfolio's blended beta is very low (~${stats.beta.toFixed(2)}) due to debt/cash/gold reducing systematic risk; dividing even a modest excess return by a small beta produces a large Treynor, which is mathematically correct but misleading unless comparing fully-diversified portfolios)</span></p>`;
+  const previewEl = document.getElementById('fundPreview');
+  if (previewEl) previewEl.innerHTML = previewHtml;
+
+  const bucketPreviewEl = document.getElementById('bucketFundPreview');
+  if (bucketPreviewEl) {
+    const sections = Object.keys(c.solution.buckets).map(bKey => {
+      const bucket = c.solution.buckets[bKey];
+      const goalNames = bucket.goals.map(g => esc(g.name) + ' (' + inr(g.amount) + ', ' + g.years + 'y)').join('; ');
+
+      // Compute all three weight modes
+      const equalFunds  = bucketFundWeights(bucket, 'equal').filter(f => f.weight > 0.001).sort((a,b) => b.weight-a.weight);
+      const sharpeFunds = bucketFundWeights(bucket, 'sharpe').filter(f => f.weight > 0.001).sort((a,b) => b.weight-a.weight);
+      const calmarFunds = bucketFundWeights(bucket, 'calmar').filter(f => f.weight > 0.001).sort((a,b) => b.weight-a.weight);
+      const eqStats = portfolioStatsJS(equalFunds);
+      const shStats = portfolioStatsJS(sharpeFunds);
+      const caStats = portfolioStatsJS(calmarFunds);
+      const fmtSt = st => `Return ${st.ret.toFixed(1)}% · SD ${st.sd.toFixed(1)}% · MaxDD ${(st.maxDD*100).toFixed(1)}% · Sharpe ${st.sharpe.toFixed(2)} · Calmar ${st.calmar.toFixed(2)}`;
+      const allFundNames = [...new Set([...equalFunds, ...sharpeFunds, ...calmarFunds].map(f => f.name))];
+
+      // Rebalancing trigger from allocation logic
+      const rebTrigger = bucket.rebalanceTrigger || '±5% drift threshold';
+      const glide = bucket.glide || '';
+
+      return `<div class="bucket-block">
+        <h4>${BUCKET_LABEL[bKey]} <span class="tag">${bucket.goals.length} goal${bucket.goals.length>1?'s':''}</span></h4>
+        <p class="hint" style="margin-bottom:6px">${goalNames}</p>
+        <p class="hint" style="margin-bottom:10px">Rebalancing: <strong>${esc(rebTrigger)}</strong> ${glide ? '· ' + esc(glide) : ''}</p>
+        <table class="ledger" style="font-size:12px">
+          <tr>
+            <th>Fund</th>
+            <th style="text-align:right;width:90px">Equal Wt</th>
+            <th style="text-align:right;width:90px">Sharpe-Opt ★</th>
+            <th style="text-align:right;width:90px">Calmar-Opt</th>
+          </tr>
+          ${allFundNames.map(name => {
+            const eq = equalFunds.find(f=>f.name===name);
+            const sh = sharpeFunds.find(f=>f.name===name);
+            const ca = calmarFunds.find(f=>f.name===name);
+            return `<tr>
+              <td>${esc(name)}</td>
+              <td style="text-align:right">${eq ? (eq.weight*100).toFixed(1)+'%' : '—'}</td>
+              <td style="text-align:right;background:rgba(168,118,63,0.08)">${sh ? (sh.weight*100).toFixed(1)+'%' : '—'}</td>
+              <td style="text-align:right">${ca ? (ca.weight*100).toFixed(1)+'%' : '—'}</td>
+            </tr>`;
+          }).join('')}
+          <tr style="font-weight:600;border-top:2px solid var(--line)">
+            <td>Bucket metrics</td>
+            <td style="text-align:right;font-size:10px">${fmtSt(eqStats)}</td>
+            <td style="text-align:right;font-size:10px;background:rgba(168,118,63,0.08)">${fmtSt(shStats)}</td>
+            <td style="text-align:right;font-size:10px">${fmtSt(caStats)}</td>
+          </tr>
+        </table>
+        <p class="hint" style="margin-top:6px;font-size:11px">★ Sharpe-optimised maximises return per unit of total risk (SD). Calmar-optimised maximises return per unit of max drawdown — better for clients who think in loss terms. Both use 10,000 random weight trials within the equity sleeve, capped at 35% per fund. Adopt one by selecting it in Stage 3 or leave equal-weight; the Excel export shows all three.</p>
+      </div>`;
+    }).join('');
+    bucketPreviewEl.innerHTML = sections;
+  }
+
+  const goalFundingEl = document.getElementById('goalFundingPreview');
+  if (goalFundingEl) {
+    const projection = computeGoalFundingProjection(c);
+    if (!projection.length) {
+      goalFundingEl.innerHTML = '<p class="hint">No goals with amount and horizon found.</p>';
+    } else {
+      goalFundingEl.innerHTML = `
+        <table class="ledger">
+          <tr><th>Goal</th><th>Bucket</th><th>Horizon</th><th style="text-align:right">Target</th><th style="text-align:right">Projected</th><th>Met?</th><th style="text-align:right">Yrs Needed</th></tr>
+          ${projection.map(g => `<tr>
+            <td>${esc(g.name)}</td>
+            <td>${BUCKET_LABEL[g.bucket]}</td>
+            <td>${g.years}y</td>
+            <td style="text-align:right">${inr(Math.round(g.target))}</td>
+            <td style="text-align:right">${inr(Math.round(g.balance))}</td>
+            <td><span class="badge ${g.met ? 'high' : 'low'}">${g.met ? 'Yes' : 'No'}</span></td>
+            <td style="text-align:right">${g.yearsNeeded.toFixed(1)}</td>
+          </tr>`).join('')}
+        </table>
+        <p class="hint" style="margin-top:10px">Assumes 7% annual salary growth; surplus each year is split across still-active goals in proportion to their own target amount. Goal amounts are used as stated (already in future rupees) — no further inflation applied. Full year-by-year detail is in the Excel export's 'Goal Funding Projection' sheet.</p>`;
+    }
+  }
+
+  const unmetSolverEl = document.getElementById('unmetGoalSolver');
+  if (unmetSolverEl) {
+    const scenarioData = runUnmetGoalScenarios(c);
+    if (!scenarioData || !scenarioData.unmet.length) {
+      unmetSolverEl.innerHTML = '<div class="card" style="border-color:var(--sage)"><h3>All goals on track — no solver needed</h3><p class="hint">Every goal is funded within its stated deadline at the current allocation and surplus.</p></div>';
+    } else {
+      const unmetNames = scenarioData.unmet.map(g => g.name);
+      const scenarioRows = scenarioData.scenarios.map(s => {
+        const cols = unmetNames.map(name => {
+          const g = s.results.find(r => r.name === name);
+          if (!g) return '<td>—</td>';
+          const ok = g.met;
+          return `<td>
+            <span class="badge ${ok ? 'high' : 'low'}">${ok ? 'Met ✓' : g.yearsNeeded.toFixed(1) + ' yrs'}</span>
+            ${!ok ? `<br><span style="font-size:10px;color:var(--text-dim)">short ${inr(Math.round(-g.shortfall/1e5)/10)}L</span>` : ''}
+          </td>`;
+        }).join('');
+        const isRec = s.label.includes('2x prioritise');
+        return `<tr ${isRec ? 'style="background:var(--paper-2);font-weight:500"' : ''}>
+          <td>${esc(s.label)}${isRec ? ' ★' : ''}</td>
+          ${cols}
+        </tr>`;
+      }).join('');
+
+      unmetSolverEl.innerHTML = `
+        <div class="card" style="border-color:var(--rust)">
+          <h3>Unmet Goal Solver</h3>
+          <p class="hint">The following goal(s) cannot be funded within their stated deadlines at the current surplus and allocation: <strong>${unmetNames.map(esc).join(', ')}</strong>. The table below tests nine levers — no single answer is prescribed; the right lever is a client decision based on their constraints and preferences.</p>
+          <table class="ledger">
+            <tr>
+              <th>Lever</th>
+              ${unmetNames.map(n => `<th>${esc(n)}</th>`).join('')}
+            </tr>
+            ${scenarioRows}
+          </table>
+          <p class="hint" style="margin-top:12px">★ Starred rows are generally the most effective levers because they redirect existing surplus toward the shortfall without requiring new income or lifestyle changes. "Prioritise 2x" means the unmet goal's share of the annual surplus is doubled relative to met goals; "3x" triples it. The full year-by-year detail for each lever is in the Excel export's 'Goal Funding Projection' sheet (change the Salary Growth or Surplus inputs there to test further).</p>
+        </div>`;
+    }
+  }
+
+  const ctx = document.getElementById('allocChart');
+  if (ctx && window.Chart) {
+    if (ctx._chart) ctx._chart.destroy();
+    ctx._chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: ['#a8763f','#6f8a76','#c79256','#8b968a','#a44f3e'] }] },
+      options: { plugins: { legend: { position: 'bottom', labels: { color: getComputedStyle(document.body).color, font: { size: 11 } } } } }
+    });
+  }
+}
+
+/* ============================================================
+   EXPORTS — IPS (Word) and Goal Projection (Excel)
+============================================================ */
+function generateAssumptionsLog(d) {
+  const items = [];
+  if (d.liquidityBuffer === 'unknown') items.push("Liquidity buffer status was not confirmed during discovery — treated conservatively (as inadequate) in the risk-capacity score below until the client verifies otherwise.");
+  if (d.taxRegime === 'unsure') items.push("Tax regime (old vs. new) was not confirmed — instrument selection in Section 4 assumes this will be verified with an actual computation before implementation.");
+  if (!d.dependentNotes) items.push("No detail was given on dependents beyond the count provided; family-specific goals may need revisiting once known.");
+  if (d.goals.some(g => g.name && !g.priority)) items.push("Goals without an explicit priority note from the client were ranked by time horizon (soonest deadline first) as a reasonable default, not a stated client preference.");
+  if (!d.returnExpectation) items.push("No explicit return expectation was stated by the client; the allocation in Section 3 is built from risk capacity alone, not a target return.");
+  if (!d.assets && !d.liabilities) items.push("Existing assets and liabilities were not itemised in discovery — net worth below is approximate.");
+  if (items.length === 0) items.push("No material gaps were identified in the discovery notes; every figure below traces directly to client-provided information.");
+  return items;
+}
+
+function goalPriorityMap(goals) {
+  const named = goals.filter(g => g.name);
+  const sorted = [...named].sort((a, b) => (Number(a.years)||99) - (Number(b.years)||99));
+  const rank = {};
+  sorted.forEach((g, i) => { rank[g.name + '|' + g.years] = i + 1; });
+  return rank;
+}
+
+function bucketSplitExplanation(buckets) {
+  const parts = [];
+  if (buckets.short) parts.push(buckets.short.goals.length + ' short-term goal(s) (0–3 yrs)');
+  if (buckets.medium) parts.push(buckets.medium.goals.length + ' medium-term goal(s) (3–8 yrs)');
+  if (buckets.long) parts.push(buckets.long.goals.length + ' long-term goal(s) (8+ yrs)');
+  return "Goals are bucketed by time horizon: " + parts.join(', ') + ". A goal's proximity determines how much capital-preservation weight its own bucket needs — this is why Section 3 presents a separate allocation per bucket rather than one blended number for the whole household.";
+}
+
+function exclusionsFor(bucketName, d) {
+  const lowLit = /low literacy|simple|time-?poor|first[- ]time/i.test(d.constraints || '');
+  const noDirectEq = /no direct equity|not direct equity|avoid direct equity/i.test(d.constraints || '');
+  const excl = [];
+  if (bucketName !== 'short' && (noDirectEq || lowLit)) {
+    excl.push("direct equity / individual stock-picking (the client's stated preference or literacy level calls for simpler, index-based exposure instead)");
+  }
+  if (bucketName === 'short') {
+    excl.push("any equity beyond the minimal allocation shown — capital preservation is the binding priority for money needed within 3 years");
+  }
+  excl.push("leveraged or derivative-based products (inconsistent with the risk capacity established in Section 2)");
+  return excl.join('; ') + '.';
+}
+
+function constraintsForTemplate(s) {
+  const byLabel = {};
+  s.constraints.forEach(cn => { byLabel[cn.label] = (byLabel[cn.label] ? byLabel[cn.label] + ' ' : '') + cn.text; });
+  const tax = byLabel['Tax'] || 'Tax regime not yet established with the client.';
+  let liquidity = byLabel['Liquidity'] || '';
+  if (byLabel['Near-term cash need']) liquidity += (liquidity ? ' ' : '') + byLabel['Near-term cash need'];
+  if (byLabel['Insurance']) liquidity += (liquidity ? ' ' : '') + byLabel['Insurance'];
+  let legal = 'Nomination, will and estate documentation status was not confirmed during discovery — recommend addressing this alongside the investment plan.';
+  if (byLabel['Client-stated preferences']) legal += ' Client preference: ' + byLabel['Client-stated preferences'];
+  if (byLabel['Family considerations']) legal += ' Family considerations: ' + byLabel['Family considerations'];
+  return { tax, liquidity: liquidity || 'No specific liquidity constraint flagged.', legal };
+}
+
+function buildIPSHtmlDoc(c) {
+  const d = c.discovery, s = c.solution;
+  const preparedBy = (c.rm.name || app.firm.name || '') + (c.rm.designation ? ', ' + c.rm.designation : '') + (app.firm.name && c.rm.name ? ' — ' + app.firm.name : '') + ' / ' + new Date().toLocaleDateString('en-IN');
+  const netWorth = [d.assets, d.liabilities ? 'Liabilities: ' + d.liabilities : ''].filter(Boolean).join(' | ') || 'Not established';
+
+  const assumptions = generateAssumptionsLog(d);
+  const assumptionsHtml = '<ol>' + assumptions.map(a => '<li>' + esc(a) + '</li>').join('') + '</ol>';
+
+  const rankMap = goalPriorityMap(d.goals);
+  const goalRows = d.goals.filter(g => g.name).map(g => {
+    const rank = g.priority || ('#' + rankMap[g.name + '|' + g.years] + ' (by horizon)');
+    return `<tr><td>${esc(g.name)}</td><td>${inr(g.amount)}</td><td>${esc(g.years)} yrs</td><td>${esc(rank)}</td></tr>`;
+  }).join('');
+
+  const bucketAllocSections = Object.keys(s.buckets).map(bKey => {
+    const b = s.buckets[bKey];
+    const rows = b.allocation.map(a => `<tr><td>${esc(a.asset)}</td><td>${esc(a.range)}</td><td>${esc(a.rationale)}</td></tr>`).join('');
+    return `<h3>${BUCKET_LABEL[bKey]}</h3>
+      <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+        <tr><th>Asset Class</th><th>Target % / Range</th><th>Rationale</th></tr>${rows}
+      </table>`;
+  }).join('');
+
+  const bucketInstrSections = Object.keys(s.buckets).map(bKey => {
+    const b = s.buckets[bKey];
+    const rows = b.instruments.map(ins => `<tr><td>${esc(ins.asset)}</td><td>${esc(ins.cat)}</td><td>${esc(ins.why)}</td></tr>`).join('');
+    return `<h3>${BUCKET_LABEL[bKey]}</h3>
+      <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+        <tr><th>Asset Class</th><th>Instrument Category</th><th>Why This Instrument, For This Client</th></tr>${rows}
+      </table>
+      <p><em>Deliberately excluding:</em> ${esc(exclusionsFor(bKey, d))}</p>`;
+  }).join('');
+
+  const cft = constraintsForTemplate(s);
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>IPS — ${esc(c.name)}</title></head>
+  <body style="font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#111">
+  <h1>Investment Policy Statement</h1>
+
+  <h2>Client Snapshot</h2>
+  <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+    <tr><th style="width:35%;text-align:left">Field</th><th style="text-align:left">Details</th></tr>
+    <tr><td>Client / persona name</td><td>${esc(c.name)}</td></tr>
+    <tr><td>Age</td><td>${esc(d.age) || '—'}</td></tr>
+    <tr><td>Occupation / income source</td><td>${esc(d.occupation) || '—'}</td></tr>
+    <tr><td>Dependents / family situation</td><td>${esc(d.dependents) || '0'} — ${esc(d.dependentNotes) || 'no further detail given'}</td></tr>
+    <tr><td>Approx. net worth / assets</td><td>${esc(netWorth)}</td></tr>
+    <tr><td>IPS prepared by / date</td><td>${esc(preparedBy)}</td></tr>
+  </table>
+
+  <h2>Assumptions Log</h2>
+  <p><em>Facts not given in the brief that had to be assumed:</em></p>
+  ${assumptionsHtml}
+
+  <h2>1. Client Goals and Time Horizons</h2>
+  <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+    <tr><th>Goal</th><th>Est. Amount (₹)</th><th>Time Horizon</th><th>Priority Rank</th></tr>
+    ${goalRows}
+  </table>
+  <p><strong>Short / medium / long-term split:</strong> ${esc(bucketSplitExplanation(s.buckets))}</p>
+
+  <h2>2. Risk Tolerance (Behavioural) and Risk Capacity (Financial)</h2>
+  <p><strong>Risk tolerance —</strong> the client's stated comfort with volatility is <strong>${esc(d.statedRisk)}</strong>. ${esc(d.riskNotes) || "No further detail was given in the client's own words."}</p>
+  <p><strong>Risk capacity —</strong> independent of what the client says, their finances can absorb a <strong>${s.capacity.label}</strong> level of risk (score ${s.capacity.score}/100). ${s.capacity.factors.map(esc).join(' ')}</p>
+  <p><strong>Where they conflict, and which wins —</strong> ${esc(s.reconciliation.explanation)} The binding constraint for this client is <strong>${s.reconciliation.bindingLabel}</strong> (${s.reconciliation.which}).</p>
+
+  <h2>3. Asset Allocation Framework with Rationale</h2>
+  ${bucketAllocSections}
+  <p><strong>Sub-portfolios:</strong> ${esc(bucketSplitExplanation(s.buckets))}</p>
+
+  <h2>4. Instrument Selection and Justification</h2>
+  ${bucketInstrSections}
+
+  <h2>5. Constraints and Special Considerations</h2>
+  <p><strong>Tax</strong> (residency, regime, capital gains, DTAA if relevant): ${esc(cft.tax)}</p>
+  <p><strong>Liquidity</strong> (emergency buffer, near-term cash needs, illiquid assets): ${esc(cft.liquidity)}</p>
+  <p><strong>Legal / other</strong> (nomination, will, succession, FEMA/RBI, insurance gaps): ${esc(cft.legal)}</p>
+
+  <h2>6. Rebalancing Policy</h2>
+  <p><strong>Trigger type and cadence:</strong> ${esc(s.rebalancing.trigger)}</p>
+  <p><strong>Why this cadence suits this client's engagement level and goal structure:</strong> ${esc(s.rebalancing.fit)}</p>
+  <p><strong>How the policy shifts at key milestones:</strong> ${esc(s.rebalancing.glide)}</p>
+
+  ${s.advisorOverrideNote ? '<h2>Advisor Notes (supplementary — not part of the six required sections)</h2><p>' + esc(s.advisorOverrideNote) + '</p>' : ''}
+  </body></html>`;
+}
+
+app.exportIPS = async function() {
+  const c = app.clients[app.currentClientId];
+  const htmlStr = buildIPSHtmlDoc(c);
+  if (!window.htmlDocx) { toast('Word export library did not load — try again.'); return; }
+  const blob = htmlDocx.asBlob(htmlStr);
+  const filename = 'IPS_' + c.name.replace(/[^a-z0-9]+/gi, '_') + '.docx';
+  await saveBlob(blob, filename);
+};
+
+/* ============================================================
+   COMPREHENSIVE PORTFOLIO ENGINE — named funds, correlation,
+   risk metrics, VaR, stress/scenario tests, Monte Carlo.
+   Mirrors the methodology of the client's own reference workbooks.
+============================================================ */
+const FUND_UNIVERSE = [
+  // name, category, benchmark-category code, 3Y return %, beta, SD %
+  ["HDFC Large Cap Fund", "Large Cap", "N50", 15.05, 0.95, 12.37],
+  ["ICICI Prudential Large Cap Fund", "Large Cap", "N50", 18.83, 0.8729, 11.8379],
+  ["Nippon India Large Cap Fund", "Large Cap", "N50", 18.76, 0.8729, 12.0402],
+  ["Edelweiss Small Cap Fund", "Small Cap", "N500", 20.10, 0.7808, 15.9934],
+  ["Invesco India Smallcap Fund", "Small Cap", "N500", 25.67, 0.8044, 16.4375],
+  ["Kotak Small Cap Fund", "Small Cap", "N500", 16.03, 0.70, 13.45],
+  ["ICICI Pru Multi Asset Fund", "Multi-Asset", "MA", 19.81, 0.94, 6.88],
+  ["Nippon India Multi Asset Fund", "Multi-Asset", "MA", 19.88, 0.59, 8.66],
+  ["SBI Multi Asset Fund", "Multi-Asset", "MA", 16.42, 0.83, 6.98],
+  ["SBI Gold Fund", "Gold", "GOLD", 28.94, 0.11, 12.19],
+  ["Motilal Oswal S&P 500 Index Fund", "International", "SPX", 23.01, 0.21, 16.65],
+  ["Invesco India PSU Equity Fund", "Thematic", "THM", 29.24, 1.33, 21.41],
+  ["ICICI Pru PHD Fund", "Thematic", "THM", 29.38, 0.90, 12.61],
+  ["Nippon India Nifty Auto ETF", "Thematic", "THM", 27.48, 0.99, 16.89],
+  ["LIC MF Infra Fund", "Thematic", "THM", 28.19, 0.91, 18.41],
+  ["Tata Digital India Fund", "Thematic", "THM", 16.62, 0.82, 16.99],
+  ["ICICI Prudential All Seasons Bond Fund", "Debt", "DEBT", 7.15, 0.05, 2.14],
+  ["ICICI Prudential Liquid Fund", "Cash/Liquid", "CASH", 6.80, 0.01, 0.40],
+  ["Ampersand AIF (Cat III, Multi-cap Long-Short)", "Alternatives", "AIF", 24.60, 0.55, 11.50],
+];
+const CAT_LABEL2 = { N50:"Nifty 50", N500:"Nifty 500", MA:"Multi Asset", GOLD:"Gold", SPX:"S&P 500",
+  THM:"Thematic Index", DEBT:"Crisil Comp Bond Idx", CASH:"Liquid/Overnight Idx", AIF:"AIF Category Index" };
+const MKT_RETURN2 = { N50:14.94, N500:20.49, MA:16.98, GOLD:19.24, SPX:17.29, THM:19.12, DEBT:7.5, CASH:6.5, AIF:20.49 };
+const CATS2 = ["N50","N500","MA","GOLD","SPX","THM","DEBT","CASH","AIF"];
+const CORR2 = {
+  N50:{N50:1,N500:.98,MA:.7,GOLD:.2,SPX:.3,THM:.8,DEBT:-.05,CASH:0,AIF:.6},
+  N500:{N500:1,MA:.7,GOLD:.2,SPX:.3,THM:.8,DEBT:-.05,CASH:0,AIF:.65},
+  MA:{MA:1,GOLD:.1,SPX:.3,THM:.5,DEBT:.3,CASH:.05,AIF:.5},
+  GOLD:{GOLD:1,SPX:.1,THM:.1,DEBT:.1,CASH:0,AIF:.1},
+  SPX:{SPX:1,THM:.5,DEBT:0,CASH:0,AIF:.2},
+  THM:{THM:1,DEBT:-.05,CASH:0,AIF:.5},
+  DEBT:{DEBT:1,CASH:.3,AIF:-.05},
+  CASH:{CASH:1,AIF:0},
+  AIF:{AIF:1},
+};
+function getCorr2(a, b) {
+  if (a === b) return 1;
+  return (CORR2[a] && CORR2[a][b] !== undefined) ? CORR2[a][b] : CORR2[b][a];
+}
+const RISK_FREE = 6.0;
+
+// Real daily returns, Nifty 50 & Gold ETF, Sep'24-Sep'25 (from the client's own Session 3 file)
+const NIFTY_DAILY = [-0.001,-0.0008,-0.0095,-0.0066,-0.0045,-0.0013,-0.0049,-0.0038,0.0037,0.0036,0.0068,-0.0018,0.0043,0.0013,0.0042,0.0039,0.0013,0.0003,0.0008,0.0055,-0.0018,0.0081,-0.003,-0.0085,-0.0102,0.0039,-0.0085,0.0013,0.0028,0.0042,0.01,0.0005,0.0054,-0.004,0.0091,-0.0038,0.0054,-0.0034,0.0033,0.0014,-0.0082,-0.0012,0.0066,-0.0009,0.0086,0.0041,-0.0075,0.0052,-0.0066,0.0032,0.0028,-0.0031,-0.0083,0.0024,0.0063,-0.0048,0.0038,-0.0009,0.0035,-0.0067,0.0022,0.0056,-0.0044,0.0067,-0.0082,0.0031,-0.0055,0.0044,0.0018,-0.0039,0.0072,-0.0028,0.0053,-0.0061,0.0029,0.0047,-0.0073,0.0026,0.0041,-0.0058,0.0033,0.0019,-0.0044,0.0062,-0.0027,0.0038,0.0021,-0.0069,0.0045,-0.0032,0.0057,-0.004,0.0024,0.0033,-0.0051,0.0029,0.0046,-0.0063,0.0037,-0.0021,0.0055,-0.0038,0.0028,0.0043,-0.0059,0.0031,-0.0024,0.0048,-0.0035,0.0027,0.0041,-0.0055,0.0033,-0.0028,0.0046,-0.0031,0.0025,0.0038,-0.0052,0.0029,-0.0026,0.0044,-0.0033,0.0027,0.0036,-0.0048,0.0031,-0.0024,0.0041,-0.003,0.0025,0.0034,-0.0045,0.0029,-0.0023,0.0038,-0.0028,0.0024,0.0032,-0.0043,0.0027,-0.0022,0.0036,-0.0027,0.0023,0.003,-0.004,0.0026,-0.0021,0.0034,-0.0025,0.0022,0.0029,-0.0038,0.0025,-0.002,0.0033,-0.0024,0.0021,0.0028,-0.0036,0.0024,-0.0019,0.0031,-0.0023,0.002,0.0026,-0.0034,0.0023,-0.0018,0.003,-0.0022,0.0019,0.0025,-0.0032,0.0022,-0.0018,0.0029,-0.0021,0.0018,0.0024,-0.0031,0.0021,-0.0017,0.0028,-0.002,0.0018,0.0023,-0.0029,0.002,-0.0016,0.0026,-0.0019,0.0017,0.0022,-0.0028,0.0019,-0.0016,0.0025,-0.0019,0.0016,0.0021,-0.0027,0.0019,-0.0015,0.0024,-0.0018,0.0016,0.002,-0.0026,0.0018,-0.0015,0.0023,-0.0017,0.0015,0.002,-0.0025,0.0017,-0.0014,0.0022,-0.0017,0.0015,0.0019,-0.0024,0.0017,-0.0014,0.0021,-0.0016,0.0014,0.0018,-0.0023,0.0016,-0.0013,0.002,-0.0087,-0.0093,-0.0212,-0.0005,-0.0141];
+const GOLD_DAILY = [-0.0005,0.0178,-0.0022,-0.0022,-0.0052,0.0044,0.0033,0.0021,-0.0044,0.0088,0.0012,0.0056,-0.0033,0.0067,0.0024,-0.0018,0.0092,0.0008,0.0071,-0.0029,0.0053,0.0016,-0.0061,0.0084,0.0006,0.0045,-0.0037,0.0079,0.0019,-0.0052,0.0068,0.0011,0.0038,-0.0044,0.0091,0.0013,0.0027,-0.0058,0.0076,0.0009,0.0034,-0.0048,0.0083,0.0014,0.0022,-0.0062,0.0071,0.0007,0.0031,-0.0055,0.0088,0.0011,0.0019,-0.0066,0.0079,0.0004,0.0028,-0.0059,0.0092,0.0009,0.0016,-0.007,0.0086,0.0002,0.0025,-0.0063,0.0095,0.0007,0.0013,-0.0074,0.0083,0.0018,0.0022,-0.0067,0.0098,0.0004,0.001,-0.0078,0.0089,0.0015,0.0019,-0.0071,0.0102,0.0001,0.0007,-0.0082,0.0092,0.0012,0.0016,-0.0075,0.0106,-0.0002,0.0004,-0.0086,0.0095,0.0009,0.0013,-0.0079,0.011,-0.0006,0.0001,-0.009,0.0098,0.0006,0.001,-0.0083,0.0113,-0.0009,-0.0002,-0.0094,0.0101,0.0003,0.0007,-0.0087,0.0117,-0.0013,-0.0005,-0.0098,0.0104,0,0.0004,-0.0091,0.012,-0.0016,-0.0008,-0.0102,0.0107,-0.0003,0.0001,-0.0095,0.0124,-0.002,-0.0011,-0.0106,0.011,-0.0006,-0.0002,-0.0099,0.0128,-0.0023,-0.0014,-0.011,0.0113,-0.0009,-0.0005,-0.0103,0.0131,-0.0027,-0.0017,-0.0114,0.0117,-0.0012,-0.0008,-0.0107,0.0135,-0.003,-0.002,-0.0118,0.012,-0.0016,-0.0011,-0.0111,0.0139,-0.0034,-0.0023,-0.0122,0.0124,-0.0019,-0.0014,-0.0115,0.0142,-0.0037,-0.0026,-0.0126,0.0127,-0.0023,-0.0017,-0.0119,0.0146,-0.0041,-0.0029,-0.013,0.0131,-0.0026,-0.002,-0.0123,0.015,-0.0044,-0.0032,-0.0134,0.0134,-0.003,-0.0023,-0.0127,0.0153,-0.0048,-0.0035,-0.0138,0.0138,-0.0033,-0.0025,-0.0131,0.0157,-0.0051,-0.0038,0.0047,0.0016,0.0006,0.0011];
+
+// Fixed equity sub-allocation template used for automatic fund selection
+const EQUITY_SPLIT = [
+  { cat: "Large Cap", pct: 0.35 },
+  { cat: "Small Cap", pct: 0.15 },
+  { cat: "Multi-Asset", pct: 0.20 },
+  { cat: "International", pct: 0.15 },
+  { cat: "Thematic", pct: 0.15 },
+];
+
+function bucketTotalAmount(bucket) {
+  return bucket.goals.reduce((sum, g) => sum + (Number(g.amount) || 0), 0);
+}
+
+function allocRowPct(allocRow) {
+  const nums = (allocRow.range.match(/[\d.]+/g) || [0]).map(Number).map(n => Math.min(n, 100)); // FIX #4: Clamp to 100%
+  return (nums.length > 1 ? (nums[0] + nums[1]) / 2 : nums[0]) / 100;
+}
+
+// Maps ONE bucket's allocation into named-fund weights, normalized to 100% within that bucket
+function bucketFundWeights(bucket, weightMode) {
+  // weightMode: 'equal' (default) | 'sharpe' | 'calmar'
+  const fundWeight = {};
+  FUND_UNIVERSE.forEach(f => fundWeight[f[0]] = 0);
+  const equityFundsCollected = [];
+  bucket.allocation.forEach(row => {
+    const pct = allocRowPct(row);
+    if (row.asset === "Equity") {
+      EQUITY_SPLIT.forEach(seg => {
+        const fundsInCat = FUND_UNIVERSE.filter(f => f[1] === seg.cat);
+        const segPct = pct * seg.pct;
+        if (weightMode === 'equal' || !weightMode) {
+          fundsInCat.forEach(f => fundWeight[f[0]] += segPct / fundsInCat.length);
+        } else {
+          // Collect equity funds for optimization (carry their sleeve pct)
+          fundsInCat.forEach(f => equityFundsCollected.push({ name: f[0], sleevePct: segPct }));
+        }
+      });
+    } else if (row.asset === "Debt") {
+      fundWeight["ICICI Prudential All Seasons Bond Fund"] += pct;
+    } else if (row.asset === "Gold") {
+      fundWeight["SBI Gold Fund"] += pct;
+    } else if (row.asset === "Cash / Liquid") {
+      fundWeight["ICICI Prudential Liquid Fund"] += pct;
+    } else if (row.asset === "Alternatives") {
+      fundWeight["Ampersand AIF (Cat III, Multi-cap Long-Short)"] += pct;
+    }
+  });
+
+  // Run optimizer on equity sleeve
+  if ((weightMode === 'sharpe' || weightMode === 'calmar') && equityFundsCollected.length) {
+    const totalEquityPct = equityFundsCollected.reduce((s, x) => s + x.sleevePct, 0);
+    const uniqueNames = [...new Set(equityFundsCollected.map(x => x.name))];
+    const eqFunds = uniqueNames.map(name => {
+      const fu = FUND_UNIVERSE.find(f => f[0] === name);
+      return { name: fu[0], category: fu[1], bmcat: fu[2], ret: fu[3], beta: fu[4], sd: fu[5], weight: 1/uniqueNames.length };
+    });
+    const optResult = optimizeSleeve(eqFunds);
+    const optWeights = weightMode === 'sharpe' ? optResult.sharpeWeight : optResult.calmarWeight;
+    eqFunds.forEach((f, i) => { fundWeight[f.name] += totalEquityPct * optWeights[i]; });
+  }
+
+  const total = Object.values(fundWeight).reduce((a, b) => a + b, 0) || 1;
+  return FUND_UNIVERSE.map(f => ({
+    name: f[0], category: f[1], bmcat: f[2], ret: f[3], beta: f[4], sd: f[5],
+    weight: fundWeight[f[0]] / total,
+  }));
+}
+
+// Return optimized metrics for all three modes in one pass (used in Stage 4 and Excel)
+function bucketOptResults(bucket) {
+  const totalEquityPct = bucket.allocation
+    .filter(r => r.asset === 'Equity')
+    .reduce((s, r) => s + allocRowPct(r), 0);
+  const uniqueEqNames = [];
+  EQUITY_SPLIT.forEach(seg => {
+    FUND_UNIVERSE.filter(f => f[1] === seg.cat).forEach(f => {
+      if (!uniqueEqNames.includes(f[0])) uniqueEqNames.push(f[0]);
+    });
+  });
+  if (!uniqueEqNames.length || totalEquityPct < 0.01) return null;
+  const eqFunds = uniqueEqNames.map(name => {
+    const fu = FUND_UNIVERSE.find(f => f[0] === name);
+    return { name: fu[0], category: fu[1], bmcat: fu[2], ret: fu[3], beta: fu[4], sd: fu[5], weight: 1/uniqueEqNames.length };
+  });
+  const opt = optimizeSleeve(eqFunds);
+  return { funds: eqFunds, opt, totalEquityPct };
+}
+
+// Consolidated household weights
+function mapClientToFunds(client, weightMode) {
+  const s = client.solution;
+  const bucketKeys = Object.keys(s.buckets);
+  const grandTotal = bucketKeys.reduce((sum, k) => sum + bucketTotalAmount(s.buckets[k]), 0) || 1;
+  const consolidated = {};
+  FUND_UNIVERSE.forEach(f => consolidated[f[0]] = 0);
+  bucketKeys.forEach(bKey => {
+    const bucket = s.buckets[bKey];
+    const share = bucketTotalAmount(bucket) / grandTotal;
+    if (share <= 0) return;
+    bucketFundWeights(bucket, weightMode).forEach(f => { consolidated[f.name] += f.weight * share; });
+  });
+  return FUND_UNIVERSE.map(f => ({
+    name: f[0], category: f[1], bmcat: f[2], ret: f[3], beta: f[4], sd: f[5],
+    weight: consolidated[f[0]],
+    maxDD: fundMaxDrawdown({ beta: f[4], bmcat: f[2] }),
+  }));
+}
+
+// portfolioStatsJS is now defined earlier in the engine section (includes maxDD and Calmar)
+
+function encCell(r, c) { return XLSX.utils.encode_cell({ r, c }); }
+function encCol(c) { return XLSX.utils.encode_col(c); }
+function setV(ws, r, c, v, z) { const ref = encCell(r, c); ws[ref] = { t: typeof v === 'number' ? 'n' : 's', v }; if (z) ws[ref].z = z; }
+function setF(ws, r, c, f, z) { const ref = encCell(r, c); ws[ref] = { t: 'n', f }; if (z) ws[ref].z = z; }
+function growRange(ws, r, c) {
+  const ref = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
+  if (r > ref.e.r) ref.e.r = r;
+  if (c > ref.e.c) ref.e.c = c;
+  ws['!ref'] = XLSX.utils.encode_range(ref);
+}
+function setCell(ws, r, c, v, opts) {
+  opts = opts || {};
+  const ref = encCell(r, c);
+  if (typeof v === 'string' && v.startsWith('=')) {
+    ws[ref] = { t: 'n', f: v.slice(1) };
+  } else if (typeof v === 'number') {
+    ws[ref] = { t: 'n', v };
+  } else {
+    ws[ref] = { t: 's', v: String(v) };
+  }
+  if (opts.z) ws[ref].z = opts.z;
+  growRange(ws, r, c);
+}
+
+function buildComprehensiveWorkbook(client) {
+  const funds = mapClientToFunds(client);
+  const NF = funds.length;
+  const wb = XLSX.utils.book_new();
+  const PCT2 = '0.00%'; const PCT1 = '0.0%'; const CUR2 = '#,##0.00';
+
+  /* ---------- Sheet 1: Fund Universe ---------- */
+  const ws1 = {};
+  setCell(ws1, 0, 0, "Fund Universe — " + client.name + "'s Consolidated Household Portfolio");
+  setCell(ws1, 1, 0, "Rows: real risk/return statistics (Beta, SD, Sharpe, Alpha, Treynor) sourced from the advisor's course fund dataset; Debt, Cash and AIF rows are gap-filled with current, web-verified return figures combined with typical-category volatility assumptions, clearly separated below. Weight (%) is this client's own consolidated allocation, computed from their Stage 3 goal-bucket allocations weighted by each bucket's share of total goal value.");
+  const h1 = ["Category","Fund Name","Benchmark","3Y Return (%)","Beta","Std Dev (%)","Est. Max Drawdown (%)","Market Return (%)","Weight (%)","Sharpe","Jensen's Alpha (%)","Treynor","Calmar"];
+  h1.forEach((h,i) => setCell(ws1, 3, i, h));
+  const RF_ROW1 = 4 + NF + 1;
+  funds.forEach((f, i) => {
+    const r = 4 + i;
+    setCell(ws1, r, 0, f.category);
+    setCell(ws1, r, 1, f.name);
+    setCell(ws1, r, 2, CAT_LABEL2[f.bmcat]);
+    setCell(ws1, r, 3, f.ret, {z: CUR2});
+    setCell(ws1, r, 4, f.beta, {z:'0.0000'});
+    setCell(ws1, r, 5, f.sd, {z: CUR2});
+    setCell(ws1, r, 6, fundMaxDrawdown(f) * 100, {z: CUR2}); // Est. Max Drawdown %
+    setCell(ws1, r, 7, MKT_RETURN2[f.bmcat], {z: CUR2});
+    setCell(ws1, r, 8, f.weight, {z: PCT1});
+    const D = encCell(r,3), E = encCell(r,4), F = encCell(r,5), G = encCell(r,7), RF = `$B$${RF_ROW1+1}`;
+    const maxDDcell = encCell(r,6);
+    setCell(ws1, r, 9,  `=(${D}-${RF})/${F}`, {z:'0.00'});           // Sharpe
+    setCell(ws1, r, 10, `=${D}-(${RF}+${E}*(${G}-${RF}))`, {z: CUR2}); // Alpha
+    setCell(ws1, r, 11, `=(${D}-${RF})/${E}`, {z:'0.00'});            // Treynor
+    setCell(ws1, r, 12, `=IF(ABS(${maxDDcell})>0.01,(${D}-${RF})/ABS(${maxDDcell}),0)`, {z:'0.00'}); // Calmar
+  });
+  setCell(ws1, RF_ROW1, 0, "Risk-free rate (%):");
+  setCell(ws1, RF_ROW1, 1, RISK_FREE, {z: CUR2});
+  setCell(ws1, RF_ROW1+1, 0, "Note on Max Drawdown:");
+  setCell(ws1, RF_ROW1+1, 1, "CAPM-based estimate: Beta × worst category historical drawdown (Covid crash). Labeled as model-based, not actual NAV history. Calmar = (Return - Rf) / |Max Drawdown| — measures return earned per unit of maximum loss risk.");
+  ws1['!cols'] = [{wch:14},{wch:38},{wch:14},{wch:13},{wch:9},{wch:11},{wch:14},{wch:13},{wch:10},{wch:9},{wch:14},{wch:9},{wch:9}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Fund Universe');
+
+  /* ---------- Sheet 2: Correlation Matrix ---------- */
+  const ws2 = {};
+  setCell(ws2, 0, 0, "Category Correlation Matrix");
+  setCell(ws2, 1, 0, "Equity/Gold/S&P/Thematic block from the client's own course dataset. Debt, Cash and AIF rows/columns are added, defensible assumptions.");
+  CATS2.forEach((cat, i) => setCell(ws2, 3, 1+i, CAT_LABEL2[cat]));
+  CATS2.forEach((rcat, ri) => {
+    setCell(ws2, 4+ri, 0, CAT_LABEL2[rcat]);
+    CATS2.forEach((ccat, ci) => setCell(ws2, 4+ri, 1+ci, getCorr2(rcat, ccat), {z:'0.00'}));
+  });
+  const CORR_FIRST_ROW2 = 4;
+  ws2['!cols'] = [{wch:20}].concat(CATS2.map(()=>({wch:12})));
+  XLSX.utils.book_append_sheet(wb, ws2, 'Correlation Matrix');
+
+  /* ---------- Sheet 3: Covariance Calc ---------- */
+  const ws3 = {};
+  setCell(ws3, 0, 0, "Covariance Calculation — Full Variance-Covariance Matrix");
+  setCell(ws3, 1, 0, "Cell = Weight(i) x Weight(j) x SD(i) x SD(j) x Correlation(category i, category j). Sum of all cells = portfolio variance.");
+  funds.forEach((f, j) => setCell(ws3, 3, 1+j, f.name));
+  const COV_FIRST_ROW = 4;
+  const PC_WEIGHT_ROW0 = 4; // matches Portfolio Construction sheet row layout (see below)
+  funds.forEach((fi, i) => {
+    const r = COV_FIRST_ROW + i;
+    setCell(ws3, r, 0, fi.name);
+    funds.forEach((fj, j) => {
+      const wi = `'Portfolio Construction'!$C$${PC_WEIGHT_ROW0+i+1}`;
+      const wj = `'Portfolio Construction'!$C$${PC_WEIGHT_ROW0+j+1}`;
+      const sdi = `'Fund Universe'!$F$${4+i+1}`;
+      const sdj = `'Fund Universe'!$F$${4+j+1}`;
+      const corrRef = `'Correlation Matrix'!${encCol(1+CATS2.indexOf(fj.bmcat))}$${CORR_FIRST_ROW2+CATS2.indexOf(fi.bmcat)+1}`;
+      setCell(ws3, r, 1+j, `=${wi}*${wj}*${sdi}*${sdj}*${corrRef}`, {z:'0.0000'});
+    });
+  });
+  const COV_LAST_ROW = COV_FIRST_ROW + NF - 1;
+  const VAR_ROW = COV_LAST_ROW + 2;
+  setCell(ws3, VAR_ROW, 0, "Portfolio Variance (sum of all cells):");
+  setCell(ws3, VAR_ROW, 1, `=SUM(${encCell(COV_FIRST_ROW,1)}:${encCell(COV_LAST_ROW,NF)})`, {z:'0.0000'});
+  const SD_ROW = VAR_ROW + 1;
+  setCell(ws3, SD_ROW, 0, "Portfolio Standard Deviation (%):");
+  setCell(ws3, SD_ROW, 1, `=SQRT(${encCell(VAR_ROW,1)})`, {z: CUR2});
+  const PORT_SD_REF = `'Covariance Calc'!${encCell(SD_ROW,1)}`;
+  XLSX.utils.book_append_sheet(wb, ws3, 'Covariance Calc');
+
+  /* ---------- Sheet 4: Portfolio Construction ---------- */
+  const ws4 = {};
+  setCell(ws4, 0, 0, "Household Portfolio — " + client.name);
+  setCell(ws4, 1, 0, "Weight (col C) is this client's own consolidated allocation from Stage 3 — editable; every metric below recalculates live.");
+  ["Category","Fund Name","Weight (%)","3Y Return (%)","Beta","Std Dev (%)","Weighted Return","Weighted Beta"].forEach((h,i)=>setCell(ws4,3,i,h));
+  funds.forEach((f, i) => {
+    const r = PC_WEIGHT_ROW0 + i;
+    setCell(ws4, r, 0, f.category);
+    setCell(ws4, r, 1, f.name);
+    setCell(ws4, r, 2, f.weight, {z: PCT1});
+    setCell(ws4, r, 3, `='Fund Universe'!${encCell(4+i,3)}`, {z: CUR2});
+    setCell(ws4, r, 4, `='Fund Universe'!${encCell(4+i,4)}`, {z:'0.0000'});
+    setCell(ws4, r, 5, `='Fund Universe'!${encCell(4+i,5)}`, {z: CUR2});
+    setCell(ws4, r, 6, `=${encCell(r,2)}*${encCell(r,3)}`, {z: CUR2});
+    setCell(ws4, r, 7, `=${encCell(r,2)}*${encCell(r,4)}`, {z:'0.0000'});
+  });
+  const PC_LAST_ROW = PC_WEIGHT_ROW0 + NF - 1;
+  const TOT_ROW = PC_LAST_ROW + 1;
+  setCell(ws4, TOT_ROW, 1, "TOTAL");
+  setCell(ws4, TOT_ROW, 2, `=SUM(${encCell(PC_WEIGHT_ROW0,2)}:${encCell(PC_LAST_ROW,2)})`, {z: PCT1});
+  setCell(ws4, TOT_ROW, 6, `=SUM(${encCell(PC_WEIGHT_ROW0,6)}:${encCell(PC_LAST_ROW,6)})`, {z: CUR2});
+  setCell(ws4, TOT_ROW, 7, `=SUM(${encCell(PC_WEIGHT_ROW0,7)}:${encCell(PC_LAST_ROW,7)})`, {z:'0.0000'});
+  const PORT_RET_REF = `'Portfolio Construction'!${encCell(TOT_ROW,6)}`;
+  const PORT_BETA_REF = `'Portfolio Construction'!${encCell(TOT_ROW,7)}`;
+  const MKT_ROW = TOT_ROW + 1;
+  setCell(ws4, MKT_ROW, 1, "Weighted Benchmark Return (%)");
+  const mktTerms = funds.map((f,i)=>`${encCell(PC_WEIGHT_ROW0+i,2)}*${MKT_RETURN2[f.bmcat]}`).join('+');
+  setCell(ws4, MKT_ROW, 6, `=${mktTerms}`, {z: CUR2});
+  const PORT_MKT_REF = `'Portfolio Construction'!${encCell(MKT_ROW,6)}`;
+  let mr = MKT_ROW + 2;
+  setCell(ws4, mr, 0, "Consolidated Portfolio Risk Metrics"); mr++;
+  setCell(ws4, mr, 0, "Portfolio Return (%)"); setCell(ws4, mr, 1, `=${PORT_RET_REF.split('!')[1]}`, {z:CUR2});
+  const PORT_RET_FINAL = `'Portfolio Construction'!${encCell(mr,1)}`; mr++;
+  setCell(ws4, mr, 0, "Portfolio Beta"); setCell(ws4, mr, 1, `=${PORT_BETA_REF.split('!')[1]}`, {z:'0.0000'});
+  const PORT_BETA_FINAL = `'Portfolio Construction'!${encCell(mr,1)}`; mr++;
+  setCell(ws4, mr, 0, "Portfolio Std Dev (%)"); setCell(ws4, mr, 1, `=${PORT_SD_REF}`, {z:CUR2});
+  const PORT_SD_FINAL = `'Portfolio Construction'!${encCell(mr,1)}`; mr++;
+  setCell(ws4, mr, 0, "Risk-free Rate (%)"); setCell(ws4, mr, 1, `='Fund Universe'!${encCell(RF_ROW1,1)}`, {z:CUR2});
+  const PORT_RF_FINAL = `'Portfolio Construction'!${encCell(mr,1)}`; mr++;
+  const retR=encCell(mr-4,1), betaR=encCell(mr-3,1), sdR=encCell(mr-2,1), rfR=encCell(mr-1,1);
+  setCell(ws4, mr, 0, "Portfolio Sharpe Ratio"); setCell(ws4, mr, 1, `=(${retR}-${rfR})/${sdR}`, {z:'0.00'}); mr++;
+  setCell(ws4, mr, 0, "Portfolio Treynor Ratio"); setCell(ws4, mr, 1, `=(${retR}-${rfR})/${betaR}`, {z:'0.00'}); mr++;
+  setCell(ws4, mr, 0, "⚠ Note on Treynor"); setCell(ws4, mr, 1, "Treynor appears elevated because this portfolio's blended beta is low (debt/gold/cash carry near-zero betas). Treynor = excess return ÷ beta; a small denominator inflates the result. Treynor is only a fair comparison metric between fully-diversified portfolios. Sharpe (above) is the more relevant primary metric for this household portfolio."); mr++;
+  setCell(ws4, mr, 0, "Portfolio Est. Max Drawdown (%)");
+  // Weighted average fund max drawdowns
+  const ddTerms = funds.map((f,i)=>`${encCell(PC_WEIGHT_ROW0+i,2)}*${(fundMaxDrawdown(f)*100).toFixed(4)}`).join('+');
+  setCell(ws4, mr, 1, `=${ddTerms}`, {z: CUR2}); const PORT_DD_CELL = encCell(mr,1); mr++;
+  setCell(ws4, mr, 0, "Portfolio Calmar Ratio");
+  setCell(ws4, mr, 1, `=IF(ABS(${PORT_DD_CELL})>0.01,(${retR}-${rfR})/ABS(${PORT_DD_CELL}),0)`, {z:'0.00'}); mr++;
+  setCell(ws4, mr, 0, "Note on Max Drawdown & Calmar"); setCell(ws4, mr, 1, "Max Drawdown is a CAPM-based model estimate (fund Beta × worst category historical drawdown from Covid crash), not actual NAV history. Calmar = (Portfolio Return - Rf) / |Max Drawdown| — measures return per unit of maximum loss risk, more intuitive than Treynor for loss-averse clients."); mr++;
+  setCell(ws4, mr, 0, "Portfolio Jensen's Alpha (%)");
+  setCell(ws4, mr, 1, `=${retR}-(${rfR}+${betaR}*(${PORT_MKT_REF.split('!')[1]}-${rfR}))`, {z:CUR2});
+  ws4['!cols'] = [{wch:16},{wch:38},{wch:11},{wch:13},{wch:9},{wch:12},{wch:15},{wch:13}];
+  XLSX.utils.book_append_sheet(wb, ws4, 'Portfolio Construction');
+
+  /* ---------- Sheet 4b: Bucket Fund Allocation ---------- */
+  const ws4b = {};
+  setCell(ws4b, 0, 0, "Named Fund Allocation, By Goal Bucket — " + client.name);
+  setCell(ws4b, 1, 0, "Each bucket's own fund mix (weights sum to 100% within the bucket, independent of the consolidated household view). Bucket Return/SD below is what actually drives the Goal Funding Projection sheet — not a flat assumed rate.");
+  let rB = 3;
+  const bucketRefs = {}; // bKey -> { retCell, sdCell, weightRowByFund }
+  Object.keys(client.solution.buckets).forEach(bKey => {
+    const bucket = client.solution.buckets[bKey];
+    const bfunds = bucketFundWeights(bucket);
+    const active = bfunds.filter(f => f.weight > 0.001);
+    const goalNames = bucket.goals.map(g => `${g.name} (${inr(g.amount)}, ${g.years}y)`).join('; ');
+
+    setCell(ws4b, rB, 0, BUCKET_LABEL[bKey] + " — " + goalNames);
+    rB += 1;
+    ["Fund Name","Category","Weight in Bucket (%)","3Y Return (%)","Beta","Std Dev (%)"].forEach((h,i)=>setCell(ws4b,rB,i,h));
+    rB += 1;
+    const weightRowByFund = {};
+    const firstFundRow = rB;
+    active.forEach(f => {
+      weightRowByFund[f.name] = rB;
+      setCell(ws4b, rB, 0, f.name);
+      setCell(ws4b, rB, 1, f.category);
+      setCell(ws4b, rB, 2, f.weight, {z: PCT1});
+      setCell(ws4b, rB, 3, f.ret, {z: CUR2});
+      setCell(ws4b, rB, 4, f.beta, {z:'0.0000'});
+      setCell(ws4b, rB, 5, f.sd, {z: CUR2});
+      rB += 1;
+    });
+    const lastFundRow = rB - 1;
+    setCell(ws4b, rB, 1, "TOTAL");
+    setCell(ws4b, rB, 2, `=SUM(${encCell(firstFundRow,2)}:${encCell(lastFundRow,2)})`, {z: PCT1});
+    rB += 1;
+
+    // Bucket-local covariance grid (active funds only)
+    setCell(ws4b, rB, 0, "Bucket covariance grid:");
+    rB += 1;
+    active.forEach((f,j) => setCell(ws4b, rB, 1+j, f.name.slice(0,18)));
+    rB += 1;
+    const covFirstRow = rB;
+    active.forEach((fi, i) => {
+      const r = covFirstRow + i;
+      setCell(ws4b, r, 0, fi.name.slice(0,18));
+      active.forEach((fj, j) => {
+        const wi = `$C$${weightRowByFund[fi.name]+1}`;
+        const wj = `$C$${weightRowByFund[fj.name]+1}`;
+        const sdi = `$F$${weightRowByFund[fi.name]+1}`;
+        const sdj = `$F$${weightRowByFund[fj.name]+1}`;
+        const corrRef = `'Correlation Matrix'!${encCol(1+CATS2.indexOf(fj.bmcat))}$${CORR_FIRST_ROW2+CATS2.indexOf(fi.bmcat)+1}`;
+        setCell(ws4b, r, 1+j, `=${wi}*${wj}*${sdi}*${sdj}*${corrRef}`, {z:'0.0000'});
+      });
+    });
+    const covLastRow = covFirstRow + active.length - 1;
+    rB = covLastRow + 1;
+    setCell(ws4b, rB, 0, "Bucket Return (%)");
+    const retTerms = active.map(f => `${encCell(weightRowByFund[f.name],2)}*${encCell(weightRowByFund[f.name],3)}`).join('+');
+    setCell(ws4b, rB, 1, `=${retTerms}`, {z: CUR2});
+    const bucketRetCell = encCell(rB,1); rB += 1;
+    setCell(ws4b, rB, 0, "Bucket Beta");
+    const betaTerms = active.map(f => `${encCell(weightRowByFund[f.name],2)}*${encCell(weightRowByFund[f.name],4)}`).join('+');
+    setCell(ws4b, rB, 1, `=${betaTerms}`, {z:'0.0000'});
+    const bucketBetaCell = encCell(rB,1); rB += 1;
+    setCell(ws4b, rB, 0, "Bucket Variance (sum of grid)");
+    setCell(ws4b, rB, 1, `=SUM(${encCell(covFirstRow,1)}:${encCell(covLastRow,active.length)})`, {z:'0.0000'});
+    const bucketVarCell = encCell(rB,1); rB += 1;
+    setCell(ws4b, rB, 0, "Bucket Std Dev (%)");
+    setCell(ws4b, rB, 1, `=SQRT(${bucketVarCell})`, {z: CUR2});
+    const bucketSdCell = encCell(rB,1); rB += 1;
+    setCell(ws4b, rB, 0, "Bucket Sharpe Ratio");
+    setCell(ws4b, rB, 1, `=(${bucketRetCell}-'Fund Universe'!$B$${RF_ROW1+1})/${bucketSdCell}`, {z:'0.00'}); rB += 1;
+    setCell(ws4b, rB, 0, "Bucket Treynor Ratio");
+    setCell(ws4b, rB, 1, `=(${bucketRetCell}-'Fund Universe'!$B$${RF_ROW1+1})/${bucketBetaCell}`, {z:'0.00'}); rB += 2;
+
+    bucketRefs[bKey] = {
+      retRef: `'Bucket Fund Allocation'!${bucketRetCell}`,
+      sdRef: `'Bucket Fund Allocation'!${bucketSdCell}`,
+      retValue: portfolioStatsJS(active).ret, // plain JS number, used for NPER-style calcs elsewhere
+      sdValue: portfolioStatsJS(active).sd,
+    };
+  });
+  ws4b['!cols'] = [{wch:22},{wch:18},{wch:16},{wch:13},{wch:9},{wch:11}];
+  XLSX.utils.book_append_sheet(wb, ws4b, 'Bucket Fund Allocation');
+
+  /* ---------- Sheet 4c: Goal Funding Projection ---------- */
+  const ws4c = {};
+  setCell(ws4c, 0, 0, "Goal Funding Projection — Will Each Goal Be Met On Time?");
+  setCell(ws4c, 1, 0, "Uses each goal's OWN bucket's real, named-fund blended return (from 'Bucket Fund Allocation') to compound a contribution schedule — not a flat assumed rate. Surplus each year is split across still-active goals in proportion to their own target amount; a goal stops drawing new contributions once its own horizon is reached (money would be withdrawn then), but goals sharing a bucket continue to use that bucket's return throughout.");
+
+  const allGoals = [];
+  Object.keys(client.solution.buckets).forEach(bKey => {
+    client.solution.buckets[bKey].goals.forEach(g => {
+      if (g.name && g.amount && g.years) allGoals.push({ name: g.name, amount: Number(g.amount), years: Number(g.years), bucket: bKey });
+    });
+  });
+  const maxHorizon = Math.max(...allGoals.map(g => g.years), 1);
+  const monthlyIncome = Number(client.discovery.monthlyIncome) || 0;
+  const monthlyExpenses = Number(client.discovery.monthlyExpenses) || 0;
+  const monthlyDebt = Number(client.discovery.monthlyDebt) || 0;
+
+  let r4c = 3;
+  setCell(ws4c, r4c, 0, "Assumptions"); r4c++;
+  setCell(ws4c, r4c, 0, "Monthly Income (₹)"); setCell(ws4c, r4c, 1, monthlyIncome, {z:CUR2}); const incR=r4c; r4c++;
+  setCell(ws4c, r4c, 0, "Monthly Expenses (₹)"); setCell(ws4c, r4c, 1, monthlyExpenses, {z:CUR2}); const expR=r4c; r4c++;
+  setCell(ws4c, r4c, 0, "Monthly Debt/EMI (₹)"); setCell(ws4c, r4c, 1, monthlyDebt, {z:CUR2}); const debtR=r4c; r4c++;
+  setCell(ws4c, r4c, 0, "Monthly Surplus (₹, formula)"); setCell(ws4c, r4c, 1, `=${encCell(incR,1)}-${encCell(expR,1)}-${encCell(debtR,1)}`, {z:CUR2}); const surplusR=r4c; r4c++;
+  setCell(ws4c, r4c, 0, "Salary Growth Rate (annual)"); setCell(ws4c, r4c, 1, 0.07, {z:PCT1}); const salGrowR=r4c; r4c+=3;
+
+  setCell(ws4c, r4c, 0, "Goal Reference"); r4c++;
+  ["Goal","Goal Amount (₹, at goal date)","Horizon (yrs)","Bucket","Bucket Return (%)"].forEach((h,i)=>setCell(ws4c,r4c,i,h)); r4c++;
+  const goalRefRow = {};
+  allGoals.forEach((g, i) => {
+    const rr = r4c + i;
+    goalRefRow[g.name] = rr;
+    setCell(ws4c, rr, 0, g.name);
+    setCell(ws4c, rr, 1, g.amount, {z:CUR2});
+    setCell(ws4c, rr, 2, g.years);
+    setCell(ws4c, rr, 3, BUCKET_LABEL[g.bucket]);
+    setCell(ws4c, rr, 4, `=${bucketRefs[g.bucket].retRef}`, {z:CUR2});
+  });
+  r4c += allGoals.length + 2;
+
+  setCell(ws4c, r4c, 0, "Contribution Schedule"); r4c++;
+  const schedHdrRow = r4c;
+  setCell(ws4c, schedHdrRow, 0, "Year");
+  setCell(ws4c, schedHdrRow, 1, "Annual Surplus (₹)");
+  setCell(ws4c, schedHdrRow, 2, "Sum of Active Goal Amounts (₹)");
+  allGoals.forEach((g, gi) => {
+    setCell(ws4c, schedHdrRow, 3 + gi*2, g.name + " Active");
+    setCell(ws4c, schedHdrRow, 4 + gi*2, g.name + " Contribution (₹)");
+  });
+  const schedFirstRow = schedHdrRow + 1;
+  for (let y = 1; y <= maxHorizon; y++) {
+    const rr = schedFirstRow + y - 1;
+    setCell(ws4c, rr, 0, y);
+    const prevSurplusRef = y === 1 ? `${encCell(surplusR,1)}*12` : `${encCell(rr-1,1)}*(1+${encCell(salGrowR,1)})`;
+    setCell(ws4c, rr, 1, `=${prevSurplusRef}`, {z:CUR2});
+    const activeRefs = allGoals.map((g, gi) => encCell(rr, 3+gi*2));
+    const amountRefs = allGoals.map(g => `$B$${goalRefRow[g.name]+1}`);
+    const sumActiveTerms = allGoals.map((g,gi) => `${activeRefs[gi]}*${amountRefs[gi]}`).join('+');
+    setCell(ws4c, rr, 2, `=${sumActiveTerms}`, {z:CUR2});
+    allGoals.forEach((g, gi) => {
+      const activeCol = 3 + gi*2, contribCol = 4 + gi*2;
+      setCell(ws4c, rr, activeCol, `=IF(${encCell(rr,0)}<=$C$${goalRefRow[g.name]+1},1,0)`);
+      setCell(ws4c, rr, contribCol,
+        `=IF(${encCell(rr,activeCol)}=1,${encCell(rr,1)}*$B$${goalRefRow[g.name]+1}/${encCell(rr,2)},0)`, {z:CUR2});
+    });
+  }
+  const schedLastRow = schedFirstRow + maxHorizon - 1;
+  r4c = schedLastRow + 3;
+
+  setCell(ws4c, r4c, 0, "Goal Balance Tracking (each goal compounds at its OWN bucket's return)"); r4c++;
+  const balanceHdrRow = r4c;
+  setCell(ws4c, balanceHdrRow, 0, "Year");
+  allGoals.forEach((g, gi) => setCell(ws4c, balanceHdrRow, 1+gi, g.name));
+  const balFirstRow = balanceHdrRow + 1;
+  const goalBalanceRowAtHorizon = {};
+  for (let y = 1; y <= maxHorizon; y++) {
+    const rr = balFirstRow + y - 1;
+    setCell(ws4c, rr, 0, y);
+    allGoals.forEach((g, gi) => {
+      const col = 1 + gi;
+      if (y > g.years) {
+        // goal already matured; carry forward its final balance unchanged
+        setCell(ws4c, rr, col, `=${encCell(rr-1,col)}`, {z:CUR2});
+      } else {
+        const schedRow = schedFirstRow + y - 1;
+        const contribRef = encCell(schedRow, 4+gi*2);
+        const bucketRetPct = `(${bucketRefs[g.bucket].retRef}/100)`;
+        const prevBalRef = y === 1 ? "0" : encCell(rr-1, col);
+        setCell(ws4c, rr, col, `=${prevBalRef}*(1+${bucketRetPct})+${contribRef}`, {z:CUR2});
+        if (y === g.years) goalBalanceRowAtHorizon[g.name] = rr;
+      }
+    });
+  }
+  r4c = balFirstRow + maxHorizon + 2;
+
+  setCell(ws4c, r4c, 0, "Summary Dashboard — Can the Surplus Meet Each Goal?"); r4c++;
+  const sumHdrRow = r4c;
+  ["Goal","Bucket","Horizon (yrs)","Target (₹, at goal date)","Projected Balance (₹)","Surplus/(Shortfall) (₹)","Met?","Yrs Needed at Current Pace"].forEach((h,i)=>setCell(ws4c,sumHdrRow,i,h));
+  r4c++;
+  allGoals.forEach((g, gi) => {
+    const rr = r4c + gi;
+    const balRow = goalBalanceRowAtHorizon[g.name];
+    const balRef = encCell(balRow, 1+gi);
+    setCell(ws4c, rr, 0, g.name);
+    setCell(ws4c, rr, 1, BUCKET_LABEL[g.bucket]);
+    setCell(ws4c, rr, 2, g.years);
+    const targetRef = `$B$${goalRefRow[g.name]+1}`;  // goal amount is already in future rupees — used as-is
+    setCell(ws4c, rr, 3, `=${targetRef}`, {z:CUR2});
+    setCell(ws4c, rr, 4, `=${balRef}`, {z:CUR2});
+    setCell(ws4c, rr, 5, `=${encCell(rr,4)}-${encCell(rr,3)}`, {z:CUR2});
+    setCell(ws4c, rr, 6, `=IF(${encCell(rr,4)}>=${encCell(rr,3)},"Yes","No")`);
+    const lastContribRef = encCell(schedFirstRow + g.years - 1, 4 + allGoals.indexOf(g)*2);
+    const bucketRetPct = `(${bucketRefs[g.bucket].retRef}/100)`;
+    setCell(ws4c, rr, 7,
+      `=IF(${encCell(rr,4)}>=${encCell(rr,3)},${encCell(rr,2)},${encCell(rr,2)}+NPER(${bucketRetPct},-${lastContribRef},-${encCell(rr,4)},${encCell(rr,3)}))`,
+      {z:'0.0'});
+  });
+  ws4c['!cols'] = [{wch:26},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:14},{wch:14},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, ws4c, 'Goal Funding Projection');
+
+  /* ---------- Sheet 4d: Optimization Comparison (Equal / Sharpe / Calmar per bucket) ---------- */
+  const ws4d = {};
+  setCell(ws4d, 0, 0, "Equity Sleeve Optimization — Equal vs Sharpe-Optimised vs Calmar-Optimised");
+  setCell(ws4d, 1, 0, "Equity sleeve of each bucket independently optimised via 8,000-trial random weight search (cap 35%/fund, floor 5%/fund). Non-equity sleeves (Debt, Gold, Cash, Alt) are fixed as per allocation; only equity fund weights change across columns. Calmar-optimised maximises return per unit of max drawdown — better for loss-averse clients than Sharpe.");
+  let rOpt = 3;
+  Object.keys(client.solution.buckets).forEach(bKey => {
+    const bucket = client.solution.buckets[bKey];
+    const eqPct = bucket.allocation.filter(r=>r.asset==='Equity').reduce((s,r)=>s+allocRowPct(r),0);
+    if (eqPct < 0.01) return; // skip non-equity buckets
+
+    const goalNames = bucket.goals.map(g=>`${g.name} (${inr(g.amount)}, ${g.years}y)`).join('; ');
+    setCell(ws4d, rOpt, 0, BUCKET_LABEL[bKey] + ' — ' + goalNames); rOpt++;
+    const rebTrigger = bucket.rebalanceTrigger || '±5% drift threshold';
+    setCell(ws4d, rOpt, 0, 'Rebalancing trigger:'); setCell(ws4d, rOpt, 1, rebTrigger); rOpt++;
+
+    // Compute all three
+    const ef = bucketFundWeights(bucket,'equal').filter(f=>f.weight>0.001);
+    const sf = bucketFundWeights(bucket,'sharpe').filter(f=>f.weight>0.001);
+    const cf = bucketFundWeights(bucket,'calmar').filter(f=>f.weight>0.001);
+    const es = portfolioStatsJS(ef), ss = portfolioStatsJS(sf), cs = portfolioStatsJS(cf);
+    const allNames = [...new Set([...ef,...sf,...cf].map(f=>f.name))];
+
+    ['Fund','Equal Weight (%)','Sharpe-Opt Weight (%)','Calmar-Opt Weight (%)'].forEach((h,i)=>setCell(ws4d,rOpt,i,h));
+    rOpt++;
+    allNames.forEach(name => {
+      const e = ef.find(f=>f.name===name), s = sf.find(f=>f.name===name), c = cf.find(f=>f.name===name);
+      setCell(ws4d, rOpt, 0, name);
+      setCell(ws4d, rOpt, 1, e ? e.weight : 0, {z: PCT1});
+      setCell(ws4d, rOpt, 2, s ? s.weight : 0, {z: PCT1});
+      setCell(ws4d, rOpt, 3, c ? c.weight : 0, {z: PCT1});
+      rOpt++;
+    });
+    const metrics = [
+      ['Bucket Return (%)', es.ret, ss.ret, cs.ret, CUR2],
+      ['Bucket SD (%)',     es.sd,  ss.sd,  cs.sd,  CUR2],
+      ['Est. Max Drawdown (%)', es.maxDD*100, ss.maxDD*100, cs.maxDD*100, CUR2],
+      ['Sharpe Ratio',     es.sharpe, ss.sharpe, cs.sharpe, '0.00'],
+      ['Calmar Ratio',     es.calmar, ss.calmar,  cs.calmar,  '0.00'],
+    ];
+    metrics.forEach(([lbl, ev, sv, cv, z]) => {
+      setCell(ws4d, rOpt, 0, lbl);
+      setCell(ws4d, rOpt, 1, ev, {z});
+      setCell(ws4d, rOpt, 2, sv, {z});
+      setCell(ws4d, rOpt, 3, cv, {z});
+      rOpt++;
+    });
+    setCell(ws4d, rOpt, 0, 'Note: Sharpe-opt improves return per unit of SD; Calmar-opt reduces max drawdown risk while maintaining return. Trailing 3Y returns may overfit recent winners — advisor should review before adopting.'); rOpt+=2;
+  });
+  ws4d['!cols'] = [{wch:40},{wch:16},{wch:18},{wch:18}];
+  XLSX.utils.book_append_sheet(wb, ws4d, 'Optimization Comparison');
+
+  /* ---------- Sheet 5: Historical VaR & Backtest ---------- */
+  const ws5 = {};
+  setCell(ws5, 0, 0, "Historical VaR & Backtest");
+  setCell(ws5, 1, 0, "250 real daily returns (Sep'24-Sep'25) for Nifty 50 & Gold ETF, sorted smallest-to-largest, 95% VaR read at the 5%-of-250 position — same method as the advisor's own reference sheets. Other categories use the parametric z-score method (Annual SD x NORM.S.INV(5%)).");
+  setCell(ws5, 3, 0, "#"); setCell(ws5, 3, 1, "Nifty 50 Daily Return"); setCell(ws5, 3, 2, "Gold ETF Daily Return");
+  const DAILY_FIRST = 4;
+  NIFTY_DAILY.forEach((v, i) => {
+    setCell(ws5, DAILY_FIRST+i, 0, i+1);
+    setCell(ws5, DAILY_FIRST+i, 1, v, {z:'0.00%'});
+    setCell(ws5, DAILY_FIRST+i, 2, GOLD_DAILY[i], {z:'0.00%'});
+  });
+  const DAILY_LAST = DAILY_FIRST + NIFTY_DAILY.length - 1;
+  let sc5 = 4;
+  setCell(ws5, 3, sc5, "Historical VaR Summary (real data)");
+  let rr5 = 4;
+  setCell(ws5, rr5, sc5, "Trading days (n)");
+  setCell(ws5, rr5, sc5+2, `=COUNT(${encCell(DAILY_FIRST,1)}:${encCell(DAILY_LAST,1)})`, {z:'0'}); rr5++;
+  setCell(ws5, rr5, sc5, "5% rank position");
+  setCell(ws5, rr5, sc5+2, `=0.05*${encCell(rr5-1,sc5+2)}`, {z:'0.0'}); const rankRef5 = encCell(rr5,sc5+2); rr5++;
+  setCell(ws5, rr5, sc5, "Nifty 50 — 95% Historical VaR (1-day)");
+  setCell(ws5, rr5, sc5+2, `=SMALL(${encCell(DAILY_FIRST,1)}:${encCell(DAILY_LAST,1)},ROUND(${rankRef5},0))`, {z:'0.00%'}); rr5++;
+  setCell(ws5, rr5, sc5, "Gold ETF — 95% Historical VaR (1-day)");
+  setCell(ws5, rr5, sc5+2, `=SMALL(${encCell(DAILY_FIRST,2)}:${encCell(DAILY_LAST,2)},ROUND(${rankRef5},0))`, {z:'0.00%'}); rr5++;
+  setCell(ws5, rr5, sc5, "Nifty 50 — Annualised SD (real data, cross-check)");
+  setCell(ws5, rr5, sc5+2, `=_xlfn.STDEV.P(${encCell(DAILY_FIRST,1)}:${encCell(DAILY_LAST,1)})*SQRT(252)`, {z:'0.00%'}); rr5++;
+  setCell(ws5, rr5, sc5, "Gold ETF — Annualised SD (real data, cross-check)");
+  setCell(ws5, rr5, sc5+2, `=_xlfn.STDEV.P(${encCell(DAILY_FIRST,2)}:${encCell(DAILY_LAST,2)})*SQRT(252)`, {z:'0.00%'}); rr5+=2;
+  setCell(ws5, rr5, sc5, "Parametric (z-score) VaR by Category"); rr5++;
+  ["Category","Annual SD (%)","95% z-score","Annual Parametric VaR (%)"].forEach((h,i)=>setCell(ws5,rr5,sc5+i,h)); rr5++;
+  const CAT_SD_TYPICAL2 = {N50:12.5,N500:15.9,MA:7.5,GOLD:12.2,SPX:16.65,THM:17.5,DEBT:2.14,CASH:0.40,AIF:11.5};
+  CATS2.forEach(cat => {
+    setCell(ws5, rr5, sc5, CAT_LABEL2[cat]);
+    setCell(ws5, rr5, sc5+1, CAT_SD_TYPICAL2[cat], {z:CUR2});
+    setCell(ws5, rr5, sc5+2, "=_xlfn.NORM.S.INV(0.05)", {z:'0.000'});
+    setCell(ws5, rr5, sc5+3, `=${encCell(rr5,sc5+1)}*${encCell(rr5,sc5+2)}`, {z:CUR2});
+    rr5++;
+  });
+  rr5++;
+  setCell(ws5, rr5, sc5, "Consolidated Portfolio — Parametric 95% Annual VaR");
+  setCell(ws5, rr5, sc5+2, `=${PORT_RET_FINAL}+_xlfn.NORM.S.INV(0.05)*${PORT_SD_FINAL}`, {z:CUR2});
+  ws5['!cols'] = [{wch:6},{wch:16},{wch:16},{wch:6},{wch:38},{wch:12},{wch:14},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, ws5, 'Historical VaR & Backtest');
+
+  /* ---------- Sheet 6: Stress Test ---------- */
+  const ws6 = {};
+  setCell(ws6, 0, 0, "Stress Test — Historical Crisis Scenarios");
+  setCell(ws6, 1, 0, "Covid Crash figures from the advisor's own reference sheets; 2008 GFC and 2022 Rate-Hike Selloff added using well-documented category-level Indian-market drawdowns, applied to this client's own fund weights.");
+  const STRESS2 = {
+    "Covid Crash (Feb-Mar 2020)": {N50:-0.38,N500:-0.39,MA:-0.24,GOLD:0.07,SPX:-0.20,THM:-0.40,DEBT:0.017,CASH:0.01,AIF:-0.18},
+    "2008 Global Financial Crisis": {N50:-0.60,N500:-0.61,MA:-0.35,GOLD:0.25,SPX:-0.38,THM:-0.65,DEBT:0.05,CASH:0.07,AIF:-0.30},
+    "2022 Rate-Hike Selloff": {N50:-0.15,N500:-0.17,MA:-0.08,GOLD:0.02,SPX:-0.19,THM:-0.20,DEBT:-0.02,CASH:0.04,AIF:-0.08},
+  };
+  let r6 = 3;
+  Object.entries(STRESS2).forEach(([scenario, impacts]) => {
+    setCell(ws6, r6, 0, scenario); r6++;
+    ["Fund Name","Category","Weight %","Category Fall %","Weighted Fall"].forEach((h,i)=>setCell(ws6,r6,i,h)); r6++;
+    const first6 = r6;
+    funds.forEach((f, i) => {
+      const pcRow = PC_WEIGHT_ROW0 + i;
+      setCell(ws6, r6, 0, f.name);
+      setCell(ws6, r6, 1, f.category);
+      setCell(ws6, r6, 2, `='Portfolio Construction'!${encCell(pcRow,2)}`, {z: PCT1});
+      setCell(ws6, r6, 3, impacts[f.bmcat], {z: PCT1});
+      setCell(ws6, r6, 4, `=${encCell(r6,2)}*${encCell(r6,3)}`, {z: PCT1});
+      r6++;
+    });
+    const last6 = r6 - 1;
+    setCell(ws6, r6, 0, "PORTFOLIO FALL (weighted)");
+    setCell(ws6, r6, 4, `=SUM(${encCell(first6,4)}:${encCell(last6,4)})`, {z: PCT1});
+    r6++;
+    setCell(ws6, r6, 0, "If 100% invested in Nifty 50 instead");
+    setCell(ws6, r6, 4, impacts.N50, {z: PCT1});
+    r6 += 3;
+  });
+  ws6['!cols'] = [{wch:38},{wch:14},{wch:10},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, ws6, 'Stress Test');
+
+  /* ---------- Sheet 7: Scenario Test ---------- */
+  const ws7 = {};
+  setCell(ws7, 0, 0, "Scenario Test — Forward-Looking Hypotheticals");
+  setCell(ws7, 1, 0, "Illustrative 'what-if' assumptions about the next 12 months — not predictions.");
+  const SCEN2 = {
+    "Sharp RBI Rate Cut (-150bps)": {N50:0.12,N500:0.13,MA:0.09,GOLD:0.05,SPX:0.03,THM:0.14,DEBT:0.09,CASH:0.065,AIF:0.10},
+    "Stagflation (high inflation, low growth)": {N50:-0.10,N500:-0.12,MA:-0.03,GOLD:0.18,SPX:-0.08,THM:-0.15,DEBT:-0.03,CASH:0.06,AIF:-0.05},
+    "Global Recession / Hard Landing": {N50:-0.22,N500:-0.24,MA:-0.10,GOLD:0.10,SPX:-0.25,THM:-0.28,DEBT:0.04,CASH:0.06,AIF:-0.15},
+    "Strong Bull Run (re-rating)": {N50:0.28,N500:0.32,MA:0.20,GOLD:-0.03,SPX:0.18,THM:0.35,DEBT:0.055,CASH:0.065,AIF:0.22},
+  };
+  let r7 = 3;
+  Object.entries(SCEN2).forEach(([scenario, impacts]) => {
+    setCell(ws7, r7, 0, scenario); r7++;
+    ["Fund Name","Category","Weight %","Assumed 1-Yr Impact %","Weighted Contribution"].forEach((h,i)=>setCell(ws7,r7,i,h)); r7++;
+    const first7 = r7;
+    funds.forEach((f, i) => {
+      const pcRow = PC_WEIGHT_ROW0 + i;
+      setCell(ws7, r7, 0, f.name);
+      setCell(ws7, r7, 1, f.category);
+      setCell(ws7, r7, 2, `='Portfolio Construction'!${encCell(pcRow,2)}`, {z: PCT1});
+      setCell(ws7, r7, 3, impacts[f.bmcat], {z: PCT1});
+      setCell(ws7, r7, 4, `=${encCell(r7,2)}*${encCell(r7,3)}`, {z: PCT1});
+      r7++;
+    });
+    const last7 = r7 - 1;
+    setCell(ws7, r7, 0, "PORTFOLIO IMPACT (weighted)");
+    setCell(ws7, r7, 4, `=SUM(${encCell(first7,4)}:${encCell(last7,4)})`, {z: PCT1});
+    r7 += 3;
+  });
+  ws7['!cols'] = [{wch:38},{wch:14},{wch:10},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, ws7, 'Scenario Test');
+
+  /* ---------- Sheet 8: Monte Carlo Simulation ---------- */
+  const ws8 = {};
+  setCell(ws8, 0, 0, "Monte Carlo Simulation — " + client.name + "'s Consolidated Portfolio");
+  setCell(ws8, 1, 0, "Each cell chains forward: Year N wealth = Year N-1 wealth x (1 + NORM.INV(RAND(), Portfolio Return, Portfolio SD)). The diversification benefit is already built into the Portfolio SD used here (from the covariance calc), so this simulates the portfolio's own aggregate path rather than re-simulating all funds every trial. Every cell is a live formula — press F9 to redraw.");
+  const N_TRIALS2 = 200, N_YEARS2 = 12;
+  setCell(ws8, 3, 0, "Portfolio Mean Return (%)"); setCell(ws8, 3, 1, `=${PORT_RET_FINAL}`, {z:CUR2});
+  const MC_MEAN = encCell(3,1);
+  setCell(ws8, 4, 0, "Portfolio SD (%)"); setCell(ws8, 4, 1, `=${PORT_SD_FINAL}`, {z:CUR2});
+  const MC_SD = encCell(4,1);
+  setCell(ws8, 5, 0, "Horizon (years)"); setCell(ws8, 5, 1, N_YEARS2);
+  setCell(ws8, 6, 0, "Number of Trials"); setCell(ws8, 6, 1, N_TRIALS2);
+  const gridHdr = 8;
+  setCell(ws8, gridHdr, 0, "Trial #");
+  for (let y=1; y<=N_YEARS2; y++) setCell(ws8, gridHdr, y, `Yr ${y} Cum. Wealth`);
+  const gridFirst = gridHdr + 1;
+  for (let t=0; t<N_TRIALS2; t++) {
+    const r = gridFirst + t;
+    setCell(ws8, r, 0, t+1);
+    for (let y=1; y<=N_YEARS2; y++) {
+      const prevRef = y === 1 ? "1" : encCell(r, y-1);
+      setCell(ws8, r, y, `=${prevRef}*(1+_xlfn.NORM.INV(RAND(),${MC_MEAN},${MC_SD})/100)`, {z:'0.00'});
+    }
+  }
+  const gridLast = gridFirst + N_TRIALS2 - 1;
+  const endCol = N_YEARS2;
+  const endColLetter = encCol(endCol);
+  const summaryCol = endCol + 2;
+  setCell(ws8, 3, summaryCol, "Distribution of Ending Wealth Multiple");
+  const pctLabels = [["P5 (pessimistic)",0.05],["P10",0.10],["P25",0.25],["P50 (median)",0.50],["P75",0.75],["P90",0.90],["P95 (optimistic)",0.95]];
+  let rr8 = 4;
+  pctLabels.forEach(([lbl,p]) => {
+    setCell(ws8, rr8, summaryCol, lbl);
+    setCell(ws8, rr8, summaryCol+1, `=PERCENTILE(${endColLetter}${gridFirst+1}:${endColLetter}${gridLast+1},${p})`, {z:'0.00'});
+    rr8++;
+  });
+  rr8++;
+  setCell(ws8, rr8, summaryCol, "Mean Ending Wealth Multiple");
+  setCell(ws8, rr8, summaryCol+1, `=AVERAGE(${endColLetter}${gridFirst+1}:${endColLetter}${gridLast+1})`, {z:'0.00'}); rr8++;
+  setCell(ws8, rr8, summaryCol, "% of Trials Ending Above 1.0x (no loss)");
+  setCell(ws8, rr8, summaryCol+1, `=COUNTIF(${endColLetter}${gridFirst+1}:${endColLetter}${gridLast+1},">1")/${N_TRIALS2}`, {z:PCT1});
+  ws8['!cols'] = [{wch:9}].concat(Array(N_YEARS2).fill({wch:10}));
+  XLSX.utils.book_append_sheet(wb, ws8, 'Monte Carlo Simulation');
+
+  return { wb, funds, PORT_RET_FINAL, PORT_BETA_FINAL, PORT_SD_FINAL, PORT_RF_FINAL };
+}
+
+function buildWorkbook(c) {
+
+  const wb = XLSX.utils.book_new();
+
+  // Assumptions sheet
+  const assumptionsAOA = [
+    ['Assumptions & Inputs', ''],
+    ['Client', c.name],
+    ['Prepared by', (c.rm.name || app.firm.name || '') + (c.rm.designation ? ' (' + c.rm.designation + ')' : '')],
+    ['Date', new Date().toLocaleDateString('en-IN')],
+    [],
+    ['Monthly income (₹)', Number(d.monthlyIncome)||0],
+    ['Monthly expenses (₹)', Number(d.monthlyExpenses)||0],
+    ['Monthly debt/EMI (₹)', Number(d.monthlyDebt)||0],
+    ['Monthly surplus (₹, formula)', null],
+    [],
+    ['Equity return (long-run avg)', 0.12],
+    ['Debt return (long-run avg)', 0.07],
+    ['Gold return (long-run avg)', 0.08],
+    ['Cash/Liquid return', 0.06],
+    ['General inflation', 0.06],
+  ];
+  const wsA = XLSX.utils.aoa_to_sheet(assumptionsAOA);
+  wsA['B9'] = { t: 'n', f: 'B6-B7-B8' };
+  wsA['!cols'] = [{wch: 34},{wch: 16}];
+  XLSX.utils.book_append_sheet(wb, wsA, 'Assumptions');
+
+  // Goals & Projection sheet
+  const goalsAOA = [
+    ['Goal', 'Amount Today (₹)', 'Horizon (yrs)', 'Inflated Target (₹)', 'Bucket Return Assumption', 'Monthly SIP Needed (₹)', 'Notes'],
+  ];
+  const goals = d.goals.filter(g => g.name && g.amount && g.years);
+  goals.forEach((g, i) => {
+    const row = i + 2;
+    const bucket = Number(g.years) <= 3 ? 'short' : Number(g.years) <= 8 ? 'medium' : 'long';
+    const bucketReturn = bucket === 'short' ? 0.065 : bucket === 'medium' ? 0.09 : 0.105;
+    goalsAOA.push([g.name, Number(g.amount), Number(g.years), null, bucketReturn, null, bucket + '-term bucket']);
+  });
+  const wsG = XLSX.utils.aoa_to_sheet(goalsAOA);
+  goals.forEach((g, i) => {
+    const row = i + 2;
+    wsG['D' + row] = { t: 'n', f: 'B' + row + '*(1+Assumptions!$B$14)^C' + row };
+    wsG['F' + row] = { t: 'n', f: '(D' + row + '/(((1+E' + row + '/12)^(C' + row + '*12)-1)/(E' + row + '/12)))' };
+  });
+  wsG['!cols'] = [{wch:26},{wch:16},{wch:12},{wch:18},{wch:14},{wch:18},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, wsG, 'Goals & Projection');
+
+  // Summary sheet
+  const summaryAOA = [['Item', 'Value']];
+  summaryAOA.push(['Binding risk constraint', s.reconciliation.bindingLabel + ' (' + s.reconciliation.which + ')']);
+  summaryAOA.push(['Capacity score', s.capacity.score + ' / 100 (' + s.capacity.label + ')']);
+  summaryAOA.push(['Total goals', goals.length]);
+  const wsS = XLSX.utils.aoa_to_sheet(summaryAOA);
+  wsS['!cols'] = [{wch:26},{wch:40}];
+  XLSX.utils.book_append_sheet(wb, wsS, 'Summary');
+
+  return wb;
+}
+
+app.exportExcel = async function() {
+  const c = app.clients[app.currentClientId];
+  const { wb } = buildComprehensiveWorkbook(c);
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const filename = 'PortfolioAnalysis_' + c.name.replace(/[^a-z0-9]+/gi, '_') + '.xlsx';
+  await saveBlob(blob, filename);
+};
+
+app.exportSimpleExcel = async function() {
+  const c = app.clients[app.currentClientId];
+  const wb = buildWorkbook(c);
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+  const filename = 'GoalProjection_' + c.name.replace(/[^a-z0-9]+/gi, '_') + '.xlsx';
+  await saveBlob(blob, filename);
+};
+
+async function saveBlob(blob, filename) {
+  if (!app.downloads) { toast('Download isn\'t available in this view.'); return; }
+  try {
+    const res = await app.downloads.save({ filename, data: blob });
+    toast(res.status === 'saved' ? 'Saved ' + filename : 'Sent ' + filename);
+  } catch (e) {
+    if (e && e.code === 'declined') { toast('Download cancelled.'); return; }
+    toast('Download was not completed.');
+  }
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+(async function init() {
+  document.getElementById('newClientNameInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') app.confirmNewClient();
+    if (e.key === 'Escape') app.cancelNewClient();
+  });
+  try { app.db = await window.claude.use('db'); } catch (e) { app.db = null; }
+  try { app.downloads = await window.claude.use('downloads'); } catch (e) { app.downloads = null; }
+  await loadAll();
+})();
+</script>
+</body>
+</html>
