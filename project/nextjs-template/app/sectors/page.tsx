@@ -3,10 +3,11 @@ import { Hex } from "@/components/Primitives";
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
 import { getSectors } from "@/lib/sanity";
+import { orderBySector, sectorCode } from "@/lib/sectors";
 
 const FALLBACK = [
   { num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, training.", slug: "law-enforcement" },
-  { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, § 65B certification, expert witness, hostile cross-prep.", slug: "legal-litigation" },
+  { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, BSA s.63 certification, expert witness, hostile cross-prep.", slug: "legal-litigation" },
   { num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct, exit forensics.", slug: "corporate-enterprise" },
   { num: "S/04", title: "Government Agencies", sub: "CERT-In aligned, classified handling, audit-ready procedures.", slug: "government" },
   { num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims, AML, KYC investigations. UPI / payments fraud.", slug: "bfsi-insurance" },
@@ -19,14 +20,14 @@ export const metadata = {
 
 export default async function SectorsPage() {
   const sanity = await getSectors();
-  const sectors = sanity.length > 0
+  const sectors = orderBySector(sanity.length > 0
     ? sanity.map((s, i) => ({
-        num: `S/${String(i + 1).padStart(2, "0")}`,
+        num: sectorCode(s.slug.current) ?? `S/${String(i + 1).padStart(2, "0")}`,
         title: s.title,
         sub: s.description ?? s.tagline ?? "",
         slug: s.slug.current,
       }))
-    : FALLBACK;
+    : FALLBACK);
 
   return (
     <>

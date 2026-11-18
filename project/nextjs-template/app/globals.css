@@ -85,6 +85,9 @@
     color: #D4D4D8;
   }
   .pill-on { border-color: #10B981; color: #10B981; }
+  /* Radio pills (contact form): selected state follows the checked input */
+  .pill-radio:has(input:checked) { border-color: #10B981; color: #10B981; }
+  .pill-radio:has(input:focus-visible) { outline: 1px solid #10B981; outline-offset: 2px; }
 
   /* Buttons */
   .btn-primary {
@@ -585,7 +588,8 @@ html[data-theme="light"] .card-hover:hover {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 0 0 1px rgba(15,128,96,0.14), 0 18px 48px -18px rgba(15,128,96,0.22);
 }
 html[data-theme="light"] .pill { border-color: #DAD8D2; color: #3A3A40; background: rgba(255,255,255,0.65); }
-html[data-theme="light"] .pill-on { border-color: #0F8060; color: #0F8060; background: rgba(15,128,96,0.06); }
+html[data-theme="light"] .pill-on,
+html[data-theme="light"] .pill-radio:has(input:checked) { border-color: #0F8060; color: #0F8060; background: rgba(15,128,96,0.06); }
 html[data-theme="light"] .ph { background: linear-gradient(135deg, #EFECE3 0%, #E8E5DB 50%, #EFECE3 100%); }
 html[data-theme="light"] .ph::after { color: #82828A; }
 html[data-theme="light"] .voice-card { background: #FFFFFF; border-color: #DAD8D2; }

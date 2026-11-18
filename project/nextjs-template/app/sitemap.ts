@@ -1,7 +1,11 @@
 import { MetadataRoute } from 'next';
 import { getServiceFamilies, getSectors } from '@/lib/sanity';
+import { DF09, SITE_URL } from '@/lib/ai-positioning';
 
-const BASE_URL = 'https://cybereyeintelligence.com';
+// Date the DF-09 page content last changed. Update when its copy changes.
+const DF09_LASTMOD = new Date('2026-11-18');
+
+const BASE_URL = SITE_URL;
 
 const FALLBACK_SERVICE_SLUGS = [
   'digital-forensics', 'digital-intelligence', 'managed-security', 'managed-forensics', 'data-recovery',
@@ -58,5 +62,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/legal/disclaimers`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
-  return [...staticRoutes, ...serviceRoutes, ...sectorRoutes, ...legalRoutes];
+  const df09Route: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}${DF09.path}`, lastModified: DF09_LASTMOD, changeFrequency: 'monthly', priority: 0.9 },
+  ];
+
+  return [...staticRoutes, ...df09Route, ...serviceRoutes, ...sectorRoutes, ...legalRoutes];
 }

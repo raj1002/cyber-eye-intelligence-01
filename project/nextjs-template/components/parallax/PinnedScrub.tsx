@@ -24,8 +24,8 @@ const STAGES = [
   {
     n: '04',
     t: 'Report & Testify',
-    d: 'Court-ready § 65B certificate, hashed exhibits and a defensible written report. We attend cross-examination and provide expert testimony when needed.',
-    tags: ['§ 65B cert', 'Hashed exhibits', 'Expert testimony'],
+    d: 'Court-ready BSA s.63 certificate, hashed exhibits and a defensible written report. We attend cross-examination and provide expert testimony when needed.',
+    tags: ['BSA s.63 cert', 'Hashed exhibits', 'Expert testimony'],
   },
 ];
 

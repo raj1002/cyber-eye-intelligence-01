@@ -124,7 +124,7 @@ export default function ForensicGlobe() {
             <path d="M1 5l3 3 5-6" stroke="currentColor" strokeWidth="1.4" />
           </svg>
         </span>
-        § 65B · certified
+        BSA s.63 · certified
       </div>
       <div className="chip-fl" style={{ top: "60%", left: "-4%" }}>
         <span className="icn">●</span> CoC · sealed

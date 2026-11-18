@@ -14,9 +14,9 @@ const docs: Record<string, { title: string; intro: string }> = {
       "These terms govern any engagement undertaken by Cyber-Eye Intelligence Pvt Ltd. They apply unless explicitly varied by a signed engagement letter.",
   },
   disclaimers: {
-    title: "§ 65B Disclaimers",
+    title: "BSA s.63 Disclaimers",
     intro:
-      "Our § 65B certificates are issued in good faith following lab procedures aligned to ISO 17025. Nothing herein constitutes legal advice; counsel should be retained on jurisdictional matters.",
+      "Our BSA s.63 (formerly §65B) certificates are issued in good faith following documented lab procedures. We are working toward ISO/IEC 17025 (NABL) accreditation. Nothing herein constitutes legal advice; counsel should be retained on jurisdictional matters.",
   },
 };
 
