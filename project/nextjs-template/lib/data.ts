@@ -65,7 +65,7 @@ export const serviceFamilies: ServiceFamily[] = [
     title: "Digital Forensics",
     sub: "Evidence collection, incident response, data recovery, malware analysis, mobile & network forensics — with court-grade chain of custody.",
     tags: ["Evidence", "IR", "Mobile", "Network"],
-    cta: "8 services →",
+    cta: "9 services →",
     services: [
       { code: "DF-01", title: "Digital Evidence Collection & Preservation", desc: "Meticulous acquisition from computers, mobiles, cloud and network infrastructure. Integrity-first handling for admissibility." },
       { code: "DF-02", title: "Incident Response Forensics", desc: "Rapid root-cause identification, containment and actionable insight to prevent recurrence — when minutes matter." },
@@ -73,8 +73,9 @@ export const serviceFamilies: ServiceFamily[] = [
       { code: "DF-04", title: "Malware Analysis", desc: "Dissect behaviour, origins and impact. Empower your team to fortify and proactively defend." },
       { code: "DF-05", title: "Mobile Device Forensics", desc: "Targeted extraction from smartphones, tablets and wearables. Court-grade insight from the device in their pocket." },
       { code: "DF-06", title: "Network Forensics", desc: "Trace digital communications, identify breaches and reconstruct events across your infrastructure." },
-      { code: "DF-07", title: "Compliance & Chain of Custody", desc: "§ 65B-aligned documentation that survives cross-examination. Audit-grade evidence integrity end-to-end." },
+      { code: "DF-07", title: "Compliance & Chain of Custody", desc: "BSA s.63 (formerly §65B) documentation that survives cross-examination. Audit-grade evidence integrity end-to-end." },
       { code: "DF-08", title: "Empowerment Through Knowledge", desc: "Tailored training programmes and workshops to upskill your team in defensible forensic processes." },
+      { code: "DF-09", title: "AI Incident Response & Forensics", desc: "Prove deepfake fraud in court and contain AI-driven attacks." },
     ],
   },
   {
@@ -152,7 +153,7 @@ export const serviceFamilies: ServiceFamily[] = [
 
 export const sectors: Sector[] = [
   { id: "law-enforcement", num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, training.", slug: "law-enforcement" },
-  { id: "legal-litigation", num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, § 65B certification, expert witness, hostile cross-prep.", slug: "legal-litigation" },
+  { id: "legal-litigation", num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, BSA s.63 certification, expert witness, hostile cross-prep.", slug: "legal-litigation" },
   { id: "corporate-enterprise", num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct, exit forensics.", slug: "corporate-enterprise" },
   { id: "government", num: "S/04", title: "Government Agencies", sub: "CERT-In aligned, classified handling, audit-ready procedures.", slug: "government" },
   { id: "bfsi-insurance", num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims, AML, KYC investigations.", slug: "bfsi-insurance" },
@@ -175,7 +176,7 @@ export const courses: Course[] = [
   { id: "ce-204", code: "CE-204", audience: "counsel", title: "Cross-Examining a Forensic Expert", sub: "A litigator's playbook — what to ask, what to challenge, what concedes the case.", duration: "1 day", format: "hybrid", price: "₹14,000" },
   { id: "ce-307", code: "CE-307", audience: "corporate", title: "Insider Threat Hunting", sub: "Detection, evidence collection and legal handoff for in-house security teams.", duration: "3 days", format: "online", price: "₹32,000" },
   { id: "ce-115", code: "CE-115", audience: "police", title: "Cell-Site Analysis Foundations", sub: "Reading CDRs, mapping tower geometry, building a defensible movement timeline.", duration: "2 days", format: "in-person", price: "₹22,000" },
-  { id: "ce-211", code: "CE-211", audience: "counsel", title: "§ 65B in Practice", sub: "Drafting, challenging and defending § 65B certificates under current case law.", duration: "1 day", format: "hybrid", price: "₹14,000" },
+  { id: "ce-211", code: "CE-211", audience: "counsel", title: "BSA s.63 in Practice", sub: "Drafting, challenging and defending BSA s.63 (formerly §65B) certificates under current case law.", duration: "1 day", format: "hybrid", price: "₹14,000" },
   { id: "ce-314", code: "CE-314", audience: "corporate", title: "Ransomware Tabletop", sub: "Live-fire exercise for boards and incident teams. Realistic scenarios, hot debrief.", duration: "1 day", format: "in-person", price: "₹48,000" },
 ];
 
@@ -189,7 +190,7 @@ export const articles: Article[] = [
 ];
 
 export const roles: Role[] = [
-  { id: "r-01", code: "R-01", title: "Senior Mobile Forensics Examiner", location: "Mumbai", type: "Full-time", seniority: "5+ yrs", comp: "₹18–28 LPA", desc: "Lead acquisitions on iOS 18 / Android 15, parse encrypted app artefacts, draft § 65B-grade reports and testify in High Court matters.", tools: "Cellebrite · AXIOM" },
+  { id: "r-01", code: "R-01", title: "Senior Mobile Forensics Examiner", location: "Mumbai", type: "Full-time", seniority: "5+ yrs", comp: "₹18–28 LPA", desc: "Lead acquisitions on iOS 18 / Android 15, parse encrypted app artefacts, draft BSA s.63-grade reports and testify in High Court matters.", tools: "Cellebrite · AXIOM" },
   { id: "r-02", code: "R-02", title: "Incident Response Lead", location: "Bengaluru", type: "Full-time", seniority: "7+ yrs", comp: "₹24–36 LPA", desc: "Own the 24/7 IR rota. First-responder on ransomware, BEC and intrusion engagements.", tools: "DFIR · SIEM" },
   { id: "r-03", code: "R-03", title: "Digital Intelligence Analyst (OSINT)", location: "Mumbai", type: "Full-time", seniority: "3+ yrs", comp: "₹14–22 LPA", desc: "Build attribution dossiers from open and deep-web sources. Pivot across infrastructure, identities and crypto wallets.", tools: "OSINT · Maltego" },
   { id: "r-04", code: "R-04", title: "Malware Reverse Engineer", location: "Delhi", type: "Full-time", seniority: "4+ yrs", comp: "₹20–32 LPA", desc: "Static + dynamic analysis of native and Android samples. Build YARA, write technical addenda, support attribution work.", tools: "IDA · Ghidra" },

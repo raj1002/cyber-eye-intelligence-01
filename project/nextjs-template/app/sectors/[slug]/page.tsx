@@ -6,7 +6,7 @@ import { img, sectorImageBySlug } from "@/lib/image-manifest";
 
 const FALLBACK = [
   { slug: "law-enforcement", num: "S/01", title: "Law Enforcement & Police", sub: "Cyber cells, anti-fraud units, SIT support. Backlog clearance, mobile triage, specialist training for investigators." },
-  { slug: "legal-litigation", num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, § 65B certification, expert witness testimony, hostile cross-examination preparation." },
+  { slug: "legal-litigation", num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, BSA s.63 certification, expert witness testimony, hostile cross-examination preparation." },
   { slug: "corporate-enterprise", num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct, exit forensics and insider threat analysis." },
   { slug: "government", num: "S/04", title: "Government Agencies", sub: "CERT-In aligned, classified handling, audit-ready procedures and classified-environment forensics." },
   { slug: "bfsi-insurance", num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims investigation, AML, KYC investigations and UPI / payments fraud." },

@@ -155,7 +155,7 @@ If no AI case can be published yet, use a short "What we're seeing" note from ou
 - **DPDP:** the DPDP Act and Rules require personal-data breaches to be intimated to the Data Protection Board and affected people, as those obligations come into force. We can help you prepare now.
 - **Courts:** electronic evidence needs a certificate under BSA s.63, which replaced §65B of the Evidence Act from 1 July 2024.
 
-`[Founders: have counsel confirm the DPDP breach-intimation commencement date before launch; the Rules phase it in after notification.]`
+`[Founders: have counsel confirm the DPDP breach-intimation commencement date before launch. Research note (18 Nov 2026, not legal advice): the DPDP Rules, 2025 were notified on 13 Nov 2025; Rule 7 (breach intimation) is in the group that comes into force 18 months after publication, which most commentary puts at 13 May 2027 (some say 14 May). Rule 7 expects an initial intimation to the Board without delay and a detailed report within 72 hours of becoming aware. The site copy says "as those obligations come into force", which stays accurate either way; counsel should check the Gazette text (G.S.R. 846(E)) and decide whether to name the date.]`
 
 ### Answer blocks (AEO)
 
@@ -346,6 +346,7 @@ SEO: title "\[Sector\] Digital Forensics & Incident Response | Cyber Eye Intelli
 - [ ] `npm run build` passes in `project/nextjs-template`; `/services/ai-incident-response` renders and every existing family slug still works
 - [ ] With JavaScript off (curl the homepage and DF-09), the hero, AI band, answer blocks and real counter values are in the HTML
 - [ ] Search the repo and the Sanity dataset for `65B`, `accredited`, `global`, `freeze` and `frozen`; every remaining hit is one this doc says to keep
+- [ ] When Phase 1 deploys, publish the Sanity draft of `seed-service-digital-forensics` (adds DF-09 to the services list and fixes the DF-07 wording); it is held as a draft so DF-09 does not appear on the live site before its page exists
 - [ ] JSON-LD passes Google's Rich Results Test and validator.schema.org, with no `aggregateRating`
 - [ ] `/contact?type=ai-incident`, `?type=ai-risk-call` and `?type=retainer` preselect the right Practice area pill; `/contact` with no parameter behaves as before
 - [ ] Retainer section (P1.8) sits between "Deadlines you may be facing" and the answer blocks; its CTA and the hero's secondary CTA both land on *Retainer enquiry*

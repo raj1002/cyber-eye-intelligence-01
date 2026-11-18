@@ -2,8 +2,10 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { SECTOR_ORDER } from '@/lib/sectors';
+import { DF09 } from '@/lib/ai-positioning';
 
-export default function Header() {
+export default function Header({ courseCount }: { courseCount: number }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [navOpen, setNavOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -86,16 +88,17 @@ export default function Header() {
                   <span className="count">05 / 05</span>
                 </div>
                 {[
-                  { idx: '01', href: '/services#fam-digital-forensics', title: 'Digital Forensics', desc: 'Acquisition, analysis, § 65B reports & expert testimony.' },
+                  { idx: '01', href: '/services#fam-digital-forensics', title: 'Digital Forensics', desc: 'Acquisition, analysis, BSA s.63 reports & expert testimony.' },
+                  { idx: DF09.code, href: DF09.path, title: DF09.title, desc: DF09.cardLine, isNew: true },
                   { idx: '02', href: '/services#fam-digital-intelligence', title: 'Digital Intelligence', desc: 'OSINT, social-graph, deep & dark web monitoring.' },
                   { idx: '03', href: '/services#fam-managed-security', title: 'Managed Security', desc: 'SOC, threat hunting, vulnerability management.' },
                   { idx: '04', href: '/services#fam-managed-forensics', title: 'Managed Forensics', desc: 'On-premises labs, dedicated examiners, agile IR.' },
                   { idx: '05', href: '/services#fam-data-recovery', title: 'Data Recovery', desc: 'Disk, RAID, mobile, cloud — physical & logical.' },
-                ].map(item => (
+                ].map((item: { idx: string; href: string; title: string; desc: string; isNew?: boolean }) => (
                   <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
-                      <span className="ttl">{item.title}</span>
+                      <span className="ttl">{item.title}{item.isNew && <span className="text-accent mono text-[10px] uppercase tracking-wider ml-2">New</span>}</span>
                       <span className="desc">{item.desc}</span>
                     </span>
                     <span className="arr">→</span>
@@ -128,13 +131,7 @@ export default function Header() {
                   <span className="label">Who we serve</span>
                   <span className="count">05 / 05</span>
                 </div>
-                {[
-                  { idx: 'S/01', href: '/sectors/law-enforcement', title: 'Law Enforcement', desc: 'Cyber cells, anti-fraud units, SIT support.' },
-                  { idx: 'S/02', href: '/sectors/legal-litigation', title: 'Legal & Litigation', desc: 'eDiscovery, expert witness, § 65B certificates.' },
-                  { idx: 'S/03', href: '/sectors/corporate-enterprise', title: 'Corporate Enterprise', desc: 'Internal investigations, IP theft, misconduct.' },
-                  { idx: 'S/04', href: '/sectors/government', title: 'Government', desc: 'CERT-aligned, classified handling, audits.' },
-                  { idx: 'S/05', href: '/sectors/bfsi-insurance', title: 'BFSI & Insurance', desc: 'Fraud, AML, customer-data investigations.' },
-                ].map(item => (
+                {SECTOR_ORDER.map(s => ({ idx: s.code, href: `/sectors/${s.slug}`, title: s.navTitle, desc: s.navDesc })).map(item => (
                   <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
                     <span className="body">
@@ -207,12 +204,12 @@ export default function Header() {
               <div className="nav-menu" role="menu" style={{ minWidth: 320 }}>
                 <div className="menu-head">
                   <span className="label">Cyber Eye Academy</span>
-                  <span className="count">14 courses</span>
+                  <span className="count">{courseCount} courses</span>
                 </div>
                 {[
                   { idx: 'A/01', href: '/training', title: 'All Courses', desc: 'Full catalogue across police, counsel & corporate.' },
                   { idx: 'A/02', href: '/training#audience-police', title: 'For Police', desc: 'Mobile triage, cell-site analysis, seizure protocol.' },
-                  { idx: 'A/03', href: '/training#audience-counsel', title: 'For Legal Counsel', desc: '§ 65B, cross-examining experts, eDiscovery.' },
+                  { idx: 'A/03', href: '/training#audience-counsel', title: 'For Legal Counsel', desc: 'BSA s.63, cross-examining experts, eDiscovery.' },
                   { idx: 'A/04', href: '/training#audience-corporate', title: 'For Corporate', desc: 'Insider threat, ransomware tabletop, IR.' },
                   { idx: 'A/05', href: '/training', title: 'Schedule & Cohorts', desc: 'Upcoming dates · in-person, hybrid, online.' },
                 ].map(item => (
@@ -359,6 +356,7 @@ export default function Header() {
             <div className="md-children">
               {[
                 { idx: '01', href: '/services#fam-digital-forensics', label: 'Digital Forensics' },
+                { idx: DF09.code, href: DF09.path, label: `${DF09.title} · New` },
                 { idx: '02', href: '/services#fam-digital-intelligence', label: 'Digital Intelligence' },
                 { idx: '03', href: '/services#fam-managed-security', label: 'Managed Security' },
                 { idx: '04', href: '/services#fam-managed-forensics', label: 'Managed Forensics' },
@@ -377,13 +375,7 @@ export default function Header() {
               <span className="md-chev" aria-hidden="true" style={{ width: 8, height: 8, borderRight: '1.5px solid currentColor', borderBottom: '1.5px solid currentColor', transform: 'rotate(45deg) translate(-1px,-1px)', opacity: 0.55, display: 'inline-block' }} />
             </summary>
             <div className="md-children">
-              {[
-                { idx: 'S/01', href: '/sectors/law-enforcement', label: 'Law Enforcement' },
-                { idx: 'S/02', href: '/sectors/legal-litigation', label: 'Legal & Litigation' },
-                { idx: 'S/03', href: '/sectors/corporate-enterprise', label: 'Corporate Enterprise' },
-                { idx: 'S/04', href: '/sectors/government', label: 'Government' },
-                { idx: 'S/05', href: '/sectors/bfsi-insurance', label: 'BFSI & Insurance' },
-              ].map(item => (
+              {SECTOR_ORDER.map(s => ({ idx: s.code, href: `/sectors/${s.slug}`, label: s.navTitle })).map(item => (
                 <Link key={item.idx} href={item.href} onClick={() => setNavOpen(false)}>
                   <span className="idx-mini">{item.idx}</span>{item.label}
                 </Link>

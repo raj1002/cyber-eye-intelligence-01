@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { Section, Pulse } from '@/components/Primitives';
 import FadeIn from '@/components/FadeIn';
 import { submitContact } from './actions';
+import { PRACTICE_OPTIONS, preselectedLabel } from '@/lib/contact-options';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -14,8 +15,9 @@ function SubmitButton() {
   );
 }
 
-export default function ContactPage() {
+export default function ContactPage({ searchParams }: { searchParams: { type?: string | string[] } }) {
   const [state, formAction] = useFormState(submitContact, null);
+  const selected = preselectedLabel(searchParams?.type);
 
   return (
     <>
@@ -66,17 +68,9 @@ export default function ContactPage() {
                 <div>
                   <div className="label mb-2">Practice area</div>
                   <div className="flex flex-wrap gap-2">
-                    {[
-                      { label: 'Mobile', value: 'digital-forensics' },
-                      { label: 'Cloud', value: 'managed-security' },
-                      { label: 'Insider', value: 'managed-forensics' },
-                      { label: 'Malware', value: 'digital-forensics' },
-                      { label: 'Email', value: 'digital-intelligence' },
-                      { label: 'Fraud', value: 'digital-intelligence' },
-                      { label: 'Disk', value: 'data-recovery' },
-                    ].map(({ label, value }, i) => (
-                      <label key={label} className={`pill cursor-pointer ${i === 0 ? 'pill-on' : ''}`}>
-                        <input type="radio" name="matter" value={value} className="sr-only" defaultChecked={i === 0} />
+                    {PRACTICE_OPTIONS.map(({ label, value }) => (
+                      <label key={label} className="pill pill-radio cursor-pointer">
+                        <input type="radio" name="matter" value={value} className="sr-only" defaultChecked={label === selected} />
                         {label}
                       </label>
                     ))}

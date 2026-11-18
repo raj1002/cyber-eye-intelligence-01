@@ -8,7 +8,7 @@ import { getTeamMembers } from "@/lib/sanity";
 
 export const metadata = {
   title: "About — Cyber Eye Intelligence",
-  description: "Founded in 2025 by certified forensic examiners. Fully accredited lab. Examiner-led, never sold.",
+  description: "Founded in 2025 by certified forensic examiners. Working toward ISO/IEC 17025 (NABL) accreditation. Examiner-led, never sold.",
 };
 
 const FALLBACK_TEAM = [
@@ -17,7 +17,7 @@ const FALLBACK_TEAM = [
   { _id: 'f3', name: 'Parag Zalke', role: 'Managed Security Head', bio: 'SOC architect and XDR specialist. Oversees 24/7 monitoring and incident response across enterprise clients.' },
   { _id: 'f4', name: 'Akshad Veer', role: 'Forensic Examiner', bio: 'Mobile and cloud forensics specialist. CFCE certified. Expert witness in multiple HC proceedings.' },
   { _id: 'f5', name: 'Lakhan Handebag', role: 'Academy Director', bio: 'Designs and delivers training programmes for police investigators, legal teams and corporate security.' },
-  { _id: 'f6', name: 'Pooja R. Mankoj', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and § 65B certification. Advises on evidence strategy across HC and SC matters.' },
+  { _id: 'f6', name: 'Pooja R. Mankoj', role: 'Legal Head', bio: 'Practising advocate specialising in cyber law, digital evidence admissibility and BSA s.63 (formerly §65B) certification. Advises on evidence strategy across HC and SC matters.' },
   { _id: 'f7', name: 'Avin Chakravarthy', role: 'Marketing Head', bio: 'Leads brand, content and go-to-market for Cyber Eye Intelligence. Background in B2B marketing across legal-tech and enterprise security.' },
   { _id: 'f8', name: 'Madhubala A. Waghmare', role: 'Co-Founder & Head of Finance', bio: 'Co-founder and Head of Finance. Oversees P&L, fundraising, investor relations and regulatory compliance.' },
   { _id: 'f9', name: 'Raj K. Shailey', role: 'Co-Founder & Head of Business Strategy', bio: 'Co-founder and Head of Business Strategy. Shapes business strategy, market positioning and partnership architecture for growth.' },
@@ -114,7 +114,7 @@ export default async function AboutPage() {
           <h2 className="display text-5xl mb-12">The brief on <span className="text-accent">Cyber Eye.</span></h2></FadeIn>
           <FadeIn delay={80} className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { code: "01", t: "Court-admissible by design", d: "§ 65B certification, hashed exhibits and twin-examiner sign-off on every engagement — not just the contested ones." },
+              { code: "01", t: "Court-admissible by design", d: "BSA s.63 certification, hashed exhibits and twin-examiner sign-off on every engagement — not just the contested ones." },
               { code: "02", t: "Named examiners, not account managers", d: "You know who's handling your case. Their name goes on the report. Their phone rings if the opposing expert calls." },
               { code: "03", t: "Turnaround with integrity", d: "CE/VectorAI-assisted triage compresses discovery. Speed without cutting corners on chain of custody." },
               { code: "04", t: "Cross-sector depth", d: "Police labs, HC litigation, listed-company boardrooms and government audit — our team has operated in each, not just studied them." },

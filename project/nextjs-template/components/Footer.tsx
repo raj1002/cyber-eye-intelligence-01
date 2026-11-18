@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SECTOR_ORDER } from '@/lib/sectors';
 
 const GoogleStars = () => (
   <div className="flex items-center gap-0.5" aria-label="4.9 of 5 stars">
@@ -38,7 +39,7 @@ export default function Footer() {
                   <span className="text-sm font-medium">Are your reports admissible in court?</span>
                   <span className="chev text-accent text-xl leading-none">+</span>
                 </summary>
-                <p className="text-xs text-mute leading-relaxed mt-3">Yes — drafted under § 65B of the Indian Evidence Act, twin-examiner reviewed, hashed end-to-end. 98% admissibility across 600+ cases.</p>
+                <p className="text-xs text-mute leading-relaxed mt-3">Yes — certified under BSA s.63 (formerly §65B of the Indian Evidence Act), twin-examiner reviewed, hashed end-to-end. 100% admissibility across 40+ closed cases.</p>
               </details>
               <details className="border-b border-line pb-3">
                 <summary className="flex items-center justify-between cursor-pointer list-none">
@@ -118,7 +119,7 @@ export default function Footer() {
             </div>
             <p className="text-mute text-sm max-w-xs leading-relaxed mb-8">Digital forensics, intelligence and managed security. Mumbai · Bengaluru · Delhi.</p>
             <div className="flex flex-wrap gap-2">
-              <span className="pill">ISO 17025 aligned</span>
+              <span className="pill">Working toward ISO/IEC 17025 (NABL)</span>
             </div>
           </div>
           <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -139,13 +140,7 @@ export default function Footer() {
             <div>
               <div className="label mb-4">Sectors</div>
               <ul className="space-y-2 text-sm">
-                {[
-                  { label: 'Law Enforcement', href: '/sectors/law-enforcement' },
-                  { label: 'Legal', href: '/sectors/legal-litigation' },
-                  { label: 'Corporate', href: '/sectors/corporate-enterprise' },
-                  { label: 'Government', href: '/sectors/government' },
-                  { label: 'BFSI', href: '/sectors/bfsi-insurance' },
-                ].map(s => (
+                {SECTOR_ORDER.map(s => ({ label: s.footerLabel, href: `/sectors/${s.slug}` })).map(s => (
                   <li key={s.label}><Link href={s.href} className="nav-link">{s.label}</Link></li>
                 ))}
               </ul>
@@ -190,7 +185,7 @@ export default function Footer() {
           <div className="flex gap-6">
             <Link href="/legal/privacy" className="nav-link">Privacy</Link>
             <Link href="/legal/terms" className="nav-link">Terms</Link>
-            <Link href="/legal/disclaimers" className="nav-link">§ 65B disclaimers</Link>
+            <Link href="/legal/disclaimers" className="nav-link">BSA s.63 disclaimers</Link>
           </div>
         </div>
       </div>
