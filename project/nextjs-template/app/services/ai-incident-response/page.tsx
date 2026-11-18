@@ -124,6 +124,9 @@ export default function AiIncidentResponsePage() {
             <div className="card p-8 lg:p-10 grid lg:grid-cols-12 gap-8">
               <div className="lg:col-span-4">
                 <div className="mono text-accent text-xs mb-3">{DF09.caseFile.code}</div>
+                {DF09.caseFile.illustrative && (
+                  <p className="pill mb-4">Example only — not a real engagement</p>
+                )}
                 <h3 className="text-2xl font-medium">{DF09.caseFile.title}</h3>
               </div>
               <dl className="lg:col-span-8 grid md:grid-cols-3 gap-6 text-sm">

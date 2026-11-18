@@ -2,21 +2,21 @@
 // Used by the homepage hero and AI band, the DF-09 page, JSON-LD, /llms.txt and the sitemap.
 // Copy is final unless marked [PLACEHOLDER]; those are for the founders.
 
-export const SITE_URL = 'https://cybereyeintelligence.com';
+export const SITE_URL = 'https://www.cybereyeintelligence.com';
 export const PHONE_DISPLAY = '+91 98335 65665';
 export const PHONE_TEL = '+919833565665';
 
 // P1.2 intro. Reused word for word in metadata, /llms.txt and external profiles (P1.6).
-// [Founders: confirm the office list — the contact page also lists Gurugram.]
+// Offices confirmed by the founders on 18 Nov 2026: Mumbai (HQ), Bengaluru, Delhi, Noida.
 export const FIRM_DESCRIPTION =
-  "Cyber Eye Intelligence is an Indian digital forensics and incident response firm, with labs in Mumbai, Bengaluru and Delhi, that uses AI to investigate faster and investigates AI when it's used against you.";
+  "Cyber Eye Intelligence is an Indian digital forensics and incident response firm, with labs in Mumbai, Bengaluru, Delhi and Noida, that uses AI to investigate faster and investigates AI when it's used against you.";
 
-export const OFFICES = ['Mumbai', 'Bengaluru', 'Delhi'] as const;
+export const OFFICES = ['Mumbai', 'Bengaluru', 'Delhi', 'Noida'] as const;
 
 export const HOME_SEO = {
   title: 'Digital Forensics & Incident Response for the AI Era | Cyber Eye Intelligence',
   description:
-    "Digital forensics that holds up in court. We use AI to investigate faster, and we investigate AI when it's used against you. Mumbai, Bengaluru and Delhi.",
+    "Digital forensics that holds up in court. We use AI to investigate faster, and we investigate AI when it's used against you. Mumbai, Bengaluru, Delhi and Noida.",
 };
 
 export const HERO = {
@@ -92,8 +92,8 @@ export const DF09 = {
   h1: 'Prove deepfake fraud in court. Contain AI-driven attacks.',
   sub: 'From a cloned voice that moved money to a compromised enterprise chatbot, we contain the incident, investigate it end to end and deliver findings an examiner will sign and defend.',
   trustTags: ['Twin-examiner', 'Signed reports', 'CoC, hash-verified', 'Sensitive evidence never sent to public AI services'],
-  reviewedBy: '[PLACEHOLDER: examiner name, role]',
-  lastUpdated: '[date]',
+  reviewedBy: 'Lakhan Handebag, Academy Director',
+  lastUpdated: '18 Nov 2026',
   whenToCall: [
     'A payment or approval was made on a voice or video call that may have been cloned.',
     'A customer passed Video-KYC and you now suspect the face or document was synthetic.',
@@ -104,9 +104,17 @@ export const DF09 = {
   ],
   howWeUseAi:
     "CE/VectorAI is the air-gapped triage methodology we're building in stages. Stage 1 (triage on local models, every flag reviewed by an examiner) is in pilot. Sensitive evidence is never sent to public AI services.",
-  // Founders supply a real, cleared case. Until then `caseFile` stays null and the page
-  // shows a holding note rather than an invented case (spec P1.3).
-  caseFile: null as null | { code: string; title: string; situation: string; whatWeDid: string; outcome: string },
+  // Sample case requested by the founders on 18 Nov 2026 as a stand-in. It is NOT a real
+  // engagement: `illustrative: true` makes the page label it as an example. Replace it with a
+  // real, cleared case file (and set illustrative: false) before launch — spec P1.3.
+  caseFile: {
+    illustrative: true,
+    code: 'Illustrative example',
+    title: 'Voice-clone payment approval, mid-size NBFC',
+    situation: "A finance controller approved an urgent vendor payment after a phone call that sounded exactly like the CFO. The CFO hadn't made the call.",
+    whatWeDid: "Preserved the call recording, telephony logs and the payment trail under chain of custody. Audio spectral analysis and comparison with genuine reference recordings showed synthesis artefacts; the transaction trail identified the first-layer mule accounts.",
+    outcome: 'Signed twin-examiner report with a BSA s.63 certificate for the police complaint and the bank, plus a call-back verification control for future payment approvals.',
+  } as null | { illustrative: boolean; code: string; title: string; situation: string; whatWeDid: string; outcome: string },
   process: [
     { step: 'Contain', body: 'cut the model, keys, account or payment channel off from the attacker without destroying evidence.' },
     { step: 'Preserve', body: 'capture media, logs, prompts, embeddings and devices, hash them and open the chain of custody.' },
@@ -159,12 +167,15 @@ export const RETAINER = {
   tiers: ['AI Ready', 'AI Assured', 'AI Critical'] as const,
   rows: [
     { label: 'Best for', values: ['Mid-size firms starting to use AI tools', 'Banks, NBFCs and enterprises running customer-facing AI', 'Regulated firms where AI and payments are core to the business'] },
-    { label: 'Response hours a year', values: ['40', '100', '200'] },
+    // Hours based on Kyndryl's published incident-response retainer tiers (80 / 100 / 150), per the founders, 18 Nov 2026.
+    { label: 'Response hours a year', values: ['80', '100', '150'] },
     { label: '24/7 examiner hotline', values: ['Yes', 'Yes', 'Yes'] },
     { label: 'Covers', values: ['All AI threat areas and conventional DFIR', 'All AI threat areas and conventional DFIR', 'All AI threat areas and conventional DFIR'] },
     { label: 'Readiness work included', values: ['AI incident response plan review', 'Plan review, plus one deepfake-fraud tabletop exercise for finance and KYC teams', 'Plan review, tabletop, LLM exposure review and a quarterly AI threat hunt'] },
     { label: 'Court support', values: ['BSA s.63 certificates and signed reports', 'BSA s.63 certificates and signed reports', 'BSA s.63 certificates, signed reports and priority expert testimony'] },
-    { label: 'On-site response', values: ['[PLACEHOLDER] hours', '[PLACEHOLDER] hours', '[PLACEHOLDER] hours'] },
+    // Kyndryl doesn't publish on-site times, so these use the site's existing promise
+    // (footer FAQ: 4 hours in Tier 1 cities, 12 hours elsewhere in India). [Founders: confirm.]
+    { label: 'On-site response', values: ['Within 4 hours in Tier 1 cities, 12 hours elsewhere in India', 'Within 4 hours in Tier 1 cities, 12 hours elsewhere in India', 'Within 4 hours in Tier 1 cities, 12 hours elsewhere in India'] },
     { label: 'Price', values: ['On request', 'On request', 'On request'] },
   ],
   note: 'Unused hours can go toward readiness work or Cyber Eye Academy training. Extra hours are billed at the agreed hourly rate.',

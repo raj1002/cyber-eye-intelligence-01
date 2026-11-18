@@ -44,7 +44,7 @@ export default async function AboutPage() {
                 We started Cyber Eye to do the work the way it should be done — slowly when it matters, fast when lives are on the line, and always documented to a standard that survives the most hostile cross-examination.
               </p>
               <p>
-                We operate out of Mumbai with satellite operations in Bengaluru and Delhi. Every engagement is led by a named examiner. No sales filter, no account managers, no &ldquo;we&apos;ll loop in the team&rdquo;.
+                We operate out of Mumbai with satellite operations in Bengaluru, Delhi and Noida. Every engagement is led by a named examiner. No sales filter, no account managers, no &ldquo;we&apos;ll loop in the team&rdquo;.
               </p>
             </div>
             <div className="lg:col-span-5">

@@ -121,7 +121,7 @@ export default function ContactPage({ searchParams }: { searchParams: { type?: s
                 Mumbai, Maharashtra 400072 · India
               </p>
               <div className="label mb-3 mt-6">Satellite labs</div>
-              <p className="text-sm text-mute">Bengaluru · Delhi · Gurugram</p>
+              <p className="text-sm text-mute">Bengaluru · Delhi · Noida</p>
             </div>
           </div>
         </FadeIn>

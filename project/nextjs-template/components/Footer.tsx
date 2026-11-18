@@ -117,7 +117,7 @@ export default function Footer() {
                 <span className="b-sub">Forensics<span className="sep">|</span>Investigations<span className="sep">|</span>Security</span>
               </span>
             </div>
-            <p className="text-mute text-sm max-w-xs leading-relaxed mb-8">Digital forensics, intelligence and managed security. Mumbai · Bengaluru · Delhi.</p>
+            <p className="text-mute text-sm max-w-xs leading-relaxed mb-8">Digital forensics, intelligence and managed security. Mumbai · Bengaluru · Delhi · Noida.</p>
             <div className="flex flex-wrap gap-2">
               <span className="pill">Working toward ISO/IEC 17025 (NABL)</span>
             </div>

@@ -35,12 +35,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Cyber Eye Intelligence — Digital Forensics & Investigation",
   description:
-    "Digital forensics, cyber investigation, digital intelligence & managed security. Court-admissible reports. Chain of custody. 24/7 incident response. Mumbai · Bengaluru · Delhi.",
-  metadataBase: new URL("https://cybereyeintelligence.com"),
+    "Digital forensics, cyber investigation, digital intelligence & managed security. Court-admissible reports. Chain of custody. 24/7 incident response. Mumbai · Bengaluru · Delhi · Noida.",
+  metadataBase: new URL("https://www.cybereyeintelligence.com"),
   openGraph: {
     title: "Cyber Eye Intelligence",
     description: "Digital forensics that holds up in court.",
-    url: "https://cybereyeintelligence.com",
+    url: "https://www.cybereyeintelligence.com",
     siteName: "Cyber Eye Intelligence",
     locale: "en_IN",
     type: "website",

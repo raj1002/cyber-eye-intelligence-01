@@ -1,11 +1,11 @@
 import { MetadataRoute } from 'next';
 import { getServiceFamilies, getSectors } from '@/lib/sanity';
-import { DF09 } from '@/lib/ai-positioning';
+import { DF09, SITE_URL } from '@/lib/ai-positioning';
 
 // Date the DF-09 page content last changed. Update when its copy changes.
 const DF09_LASTMOD = new Date('2026-11-18');
 
-const BASE_URL = 'https://cybereyeintelligence.com';
+const BASE_URL = SITE_URL;
 
 const FALLBACK_SERVICE_SLUGS = [
   'digital-forensics', 'digital-intelligence', 'managed-security', 'managed-forensics', 'data-recovery',

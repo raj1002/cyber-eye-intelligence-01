@@ -252,7 +252,7 @@ export default function Header({ courseCount }: { courseCount: number }) {
                 {[
                   { idx: 'B/01', href: '/about', title: 'About Us', desc: 'Founders, methodology, accreditations.' },
                   { idx: 'B/02', href: '/careers', title: 'Hiring', desc: "Open roles. We're growing the examiner bench." },
-                  { idx: 'B/03', href: '/contact', title: 'Contact Us', desc: 'Mumbai · Bengaluru · Delhi. 24/7 incident line.' },
+                  { idx: 'B/03', href: '/contact', title: 'Contact Us', desc: 'Mumbai · Bengaluru · Delhi · Noida. 24/7 incident line.' },
                 ].map(item => (
                   <Link key={item.idx} href={item.href} className="menu-link" onClick={closeMenu}>
                     <span className="idx">{item.idx}</span>
