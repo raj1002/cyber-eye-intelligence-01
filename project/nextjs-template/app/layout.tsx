@@ -51,6 +51,8 @@ export const metadata: Metadata = {
     images: ["/og/home"],
   },
   robots: { index: true, follow: true },
+  // Google Search Console ownership (property https://www.cybereyeintelligence.com/). Keep this to stay verified.
+  verification: { google: "632yhfpytjwmMryxJCZDauEt5DQo5_Yw7QuCsp9soJI" },
 };
 
 export default async function RootLayout({
