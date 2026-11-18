@@ -33,8 +33,9 @@ const services = [
       { _key: 'df-04', title: 'Malware Analysis', description: 'Dissect behaviour, origins and impact. Empower your team to fortify and proactively defend.' },
       { _key: 'df-05', title: 'Mobile Device Forensics', description: 'Targeted extraction from smartphones, tablets and wearables. Court-grade insight from the device in their pocket.' },
       { _key: 'df-06', title: 'Network Forensics', description: 'Trace digital communications, identify breaches and reconstruct events across your infrastructure.' },
-      { _key: 'df-07', title: 'Compliance & Chain of Custody', description: '§ 65B-aligned documentation that survives cross-examination. Audit-grade evidence integrity end-to-end.' },
+      { _key: 'df-07', title: 'Compliance & Chain of Custody', description: 'BSA s.63 (formerly §65B) documentation that survives cross-examination. Audit-grade evidence integrity end-to-end.' },
       { _key: 'df-08', title: 'Empowerment Through Knowledge', description: 'Tailored training programmes and workshops to upskill your team in defensible forensic processes.' },
+      { _key: 'df-09', title: 'AI Incident Response & Forensics', description: 'Prove deepfake fraud in court and contain AI-driven attacks.' },
     ],
   },
   {
@@ -61,7 +62,7 @@ const services = [
     title: 'Managed Security Services',
     slug: { _type: 'slug', current: 'managed-security' },
     description: 'Unparalleled cybersecurity for on-premises, cloud and hybrid infrastructures — integrated with cutting-edge SOC and eXtended Detection & Response (XDR). Fortify your defences, detect and respond proactively, and ensure continuous security monitoring.',
-    tagline: 'Establish a robust defence, detect threats in real time, and respond to evolving cyber risk on a global scale. Fortify your security posture with the unwavering expertise of Cyber Eye Intelligence.',
+    tagline: 'Establish a robust defence, detect threats in real time, and respond to evolving cyber risk at scale. Fortify your security posture with the unwavering expertise of Cyber Eye Intelligence.',
     publishedAt: '2026-01-03T00:00:00Z',
     services: [
       { _key: 'mss-01', title: 'Comprehensive Managed Security', description: 'End-to-end MSS with integrated SOC and XDR. From assessment to ongoing management — a complete cybersecurity solution.' },
@@ -132,7 +133,7 @@ const sectors = [
     _type: 'sector',
     title: 'Legal & Litigation',
     slug: { _type: 'slug', current: 'legal-litigation' },
-    description: 'eDiscovery, § 65B certification, expert witness testimony, hostile cross-examination preparation.',
+    description: 'eDiscovery, BSA s.63 certification, expert witness testimony, hostile cross-examination preparation.',
     tagline: 'Digital evidence that survives cross-examination. We support litigators from disclosure to the witness box.',
     publishedAt: '2026-01-02T00:00:00Z',
   },
@@ -160,7 +161,7 @@ const sectors = [
     title: 'BFSI & Insurance',
     slug: { _type: 'slug', current: 'bfsi-insurance' },
     description: 'Wire fraud, claims investigation, AML, KYC investigations and UPI / payments fraud.',
-    tagline: 'From BEC to UPI fraud — we trace digital trails across jurisdictions, freeze assets and deliver admissible findings.',
+    tagline: 'From BEC to UPI fraud — we trace digital trails across jurisdictions, help you move fast to freeze funds and deliver admissible findings.',
     publishedAt: '2026-01-05T00:00:00Z',
   },
 ];
@@ -273,11 +274,11 @@ const caseFiles = [
 
 const courses = [
   { _id: 'seed-course-ce101', _type: 'course', code: 'CE-101', audience: 'police', title: 'Mobile Device Forensics for Investigators', sub: 'Extraction, parsing and evidence handling from iOS and Android in a live lab environment.', duration: '3 days', format: 'In-person', price: '₹18,000' },
-  { _id: 'seed-course-ce102', _type: 'course', code: 'CE-102', audience: 'police', title: 'Digital Evidence Handling & § 65B Compliance', sub: 'Correct acquisition, labelling and certification so evidence holds under cross-examination.', duration: '2 days', format: 'In-person', price: '₹12,000' },
+  { _id: 'seed-course-ce102', _type: 'course', code: 'CE-102', audience: 'police', title: 'Digital Evidence Handling & BSA s.63 Compliance', sub: 'Correct acquisition, labelling and certification so evidence holds under cross-examination.', duration: '2 days', format: 'In-person', price: '₹12,000' },
   { _id: 'seed-course-ce103', _type: 'course', code: 'CE-103', audience: 'police', title: 'Network Forensics & Log Analysis', sub: 'PCAP analysis, log correlation and ISP coordination for cyber-crime investigations.', duration: '4 days', format: 'In-person', price: '₹22,000' },
   { _id: 'seed-course-ce104', _type: 'course', code: 'CE-104', audience: 'police', title: 'Open Source Intelligence (OSINT) for Police', sub: 'Structured OSINT techniques for criminal investigations — social media, dark web, GEOINT.', duration: '2 days', format: 'In-person / Online', price: '₹14,000' },
   { _id: 'seed-course-ce201', _type: 'course', code: 'CE-201', audience: 'counsel', title: 'Digital Evidence for Lawyers — Foundations', sub: 'Understand how digital evidence is acquired, what makes it admissible and how to challenge it.', duration: '1 day', format: 'In-person', price: '₹8,500' },
-  { _id: 'seed-course-ce202', _type: 'course', code: 'CE-202', audience: 'counsel', title: '§ 65B Masterclass for Litigators', sub: 'Deep-dive into the certification regime — drafting, challenging and cross-examining digital evidence.', duration: '1 day', format: 'In-person / Online', price: '₹9,500' },
+  { _id: 'seed-course-ce202', _type: 'course', code: 'CE-202', audience: 'counsel', title: 'BSA s.63 (formerly §65B) Masterclass for Litigators', sub: 'Deep-dive into the certification regime — drafting, challenging and cross-examining digital evidence.', duration: '1 day', format: 'In-person / Online', price: '₹9,500' },
   { _id: 'seed-course-ce203', _type: 'course', code: 'CE-203', audience: 'counsel', title: 'eDiscovery & Cloud Evidence', sub: "M365, Gmail and cloud storage in litigation. What logs survive, what doesn't, and how to request it.", duration: '1 day', format: 'Online', price: '₹7,500' },
   { _id: 'seed-course-ce204', _type: 'course', code: 'CE-204', audience: 'counsel', title: 'Expert Witness Cross-Examination Prep', sub: 'Work alongside a forensic examiner to prepare and challenge expert evidence in mock cross.', duration: '1 day', format: 'In-person', price: '₹12,000' },
   { _id: 'seed-course-ce301', _type: 'course', code: 'CE-301', audience: 'corporate', title: 'Insider Threat Investigation — Practitioner', sub: "Identify, contain and investigate an insider incident without tipping your hand.", duration: '2 days', format: 'In-person', price: '₹16,000' },
@@ -302,7 +303,7 @@ const articles = [
 // ─── Whitepapers ──────────────────────────────────────────────────────────────
 
 const whitepapers = [
-  { _id: 'seed-wp-01', _type: 'whitepaper', code: 'WP-01', title: 'Mobile Forensic Acquisition Standards for Indian Courts', sub: "A practitioner's guide to § 65B compliance across iOS and Android extraction workflows.", year: '2026' },
+  { _id: 'seed-wp-01', _type: 'whitepaper', code: 'WP-01', title: 'Mobile Forensic Acquisition Standards for Indian Courts', sub: "A practitioner's guide to BSA s.63 (formerly §65B) compliance across iOS and Android extraction workflows.", year: '2026' },
   { _id: 'seed-wp-02', _type: 'whitepaper', code: 'WP-02', title: 'AI in Digital Forensics — Promise, Peril and the Admissibility Problem', sub: "Where machine learning helps, where it doesn't, and how to keep the examiner in the loop.", year: '2025' },
   { _id: 'seed-wp-03', _type: 'whitepaper', code: 'WP-03', title: 'Ransomware Attribution: From Malware to the Indictment', sub: 'Tracing a full kill chain — infrastructure, crypto wallets, dark web and cross-border coordination.', year: '2025' },
 ];

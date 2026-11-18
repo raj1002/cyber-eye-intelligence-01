@@ -7,7 +7,17 @@ import VoicesMarquee from "@/components/parallax/VoicesMarquee";
 import InsightsRow from "@/components/parallax/InsightsRow";
 import FadeIn from "@/components/FadeIn";
 import CountUp from "@/components/CountUp";
-import { getServiceFamilies, getSectors, getTestimonials, getArticles, getSiteSettings } from "@/lib/sanity";
+import { getServiceFamilies, getSectors, getTestimonials, getArticles, getSiteSettings, getCourses } from "@/lib/sanity";
+import JsonLd from "@/components/JsonLd";
+import { orgLd, websiteLd } from "@/lib/jsonld";
+import { orderBySector, sectorCode } from "@/lib/sectors";
+import { HERO, HOME_SEO, FIRM_DESCRIPTION, HOW_WE_USE_AI, AI_THREATS, AI_BAND_STRIP, DF09 } from "@/lib/ai-positioning";
+
+export const metadata = {
+  title: { absolute: HOME_SEO.title },
+  description: HOME_SEO.description,
+  alternates: { canonical: "/" },
+};
 
 // Icon map keyed by service slug — controls appearance while content comes from Sanity
 const SERVICE_ICONS: Record<string, React.ReactNode> = {
@@ -28,7 +38,7 @@ const FALLBACK_SERVICES = [
 
 const FALLBACK_SECTORS = [
   { num: "S/01", title: "Law Enforcement", sub: "Cyber cells, anti-fraud units, SIT support.", slug: "law-enforcement" },
-  { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, expert witness, § 65B certification.", slug: "legal-litigation" },
+  { num: "S/02", title: "Legal & Litigation", sub: "eDiscovery, expert witness, BSA s.63 certification.", slug: "legal-litigation" },
   { num: "S/03", title: "Corporate Enterprise", sub: "Internal investigations, IP theft, misconduct.", slug: "corporate-enterprise" },
   { num: "S/04", title: "Government", sub: "CERT-aligned, classified-handling, audits.", slug: "government" },
   { num: "S/05", title: "BFSI & Insurance", sub: "Wire fraud, claims, AML, KYC investigations.", slug: "bfsi-insurance" },
@@ -42,13 +52,16 @@ const FALLBACK_STATS = [
 ];
 
 export default async function Home() {
-  const [rawServices, rawSectors, testimonials, articles, settings] = await Promise.all([
+  const [rawServices, rawSectors, testimonials, articles, settings, courses] = await Promise.all([
     getServiceFamilies(),
     getSectors(),
     getTestimonials(),
     getArticles(),
     getSiteSettings(),
+    getCourses(),
   ]);
+  // Real course count from Sanity (P1.7). 14 matches the live dataset if Sanity is unreachable.
+  const courseCount = courses.length > 0 ? courses.length : 14;
 
   const total = rawServices.length;
   const serviceFamilies = rawServices.length > 0
@@ -63,14 +76,14 @@ export default async function Home() {
       }))
     : FALLBACK_SERVICES;
 
-  const sectors = rawSectors.length > 0
+  const sectors = orderBySector(rawSectors.length > 0
     ? rawSectors.map((s, i) => ({
-        num: `S/${String(i + 1).padStart(2, '0')}`,
+        num: sectorCode(s.slug.current) ?? `S/${String(i + 1).padStart(2, '0')}`,
         title: s.title,
         sub: s.tagline ?? s.description ?? '',
         slug: s.slug.current,
       }))
-    : FALLBACK_SECTORS;
+    : FALLBACK_SECTORS);
 
   const heroStats = settings?.heroStats && settings.heroStats.length > 0
     ? settings.heroStats
@@ -82,6 +95,7 @@ export default async function Home() {
 
   return (
     <>
+      <JsonLd data={[orgLd(), websiteLd()]} />
       {/* HERO */}
       <section id="hero-parallax" className="relative overflow-hidden min-h-[calc(100svh-4rem)] flex flex-col justify-center">
         <UnicornAura projectId="bKN5upvoulAmWvInmHza" />
@@ -90,12 +104,11 @@ export default async function Home() {
             <div className="lg:col-span-7">
               <div className="hero-eyebrow flex items-center gap-3 mb-6 lg:mb-8">
                 <Hex />
-                <span className="label">[ 01 — Digital Forensics ]</span>
+                <span className="label">[ {HERO.eyebrow} ]</span>
               </div>
-              <h1 className="display text-[40px] sm:text-[56px] lg:text-[88px] leading-[1.02] lg:leading-[0.95]">
-                Digital forensics<br />
-                that holds up<br />
-                <span className="text-accent">in court.</span>
+              <h1 className="display text-[40px] sm:text-[56px] lg:text-[80px] leading-[1.02] lg:leading-[0.95]">
+                {HERO.h1Line1}
+                <span className="block mt-4 lg:mt-6 text-xl sm:text-2xl lg:text-[30px] leading-snug font-light text-accent">{HERO.h1Line2}</span>
               </h1>
               <p className="hero-lede mt-6 lg:mt-8 text-base lg:text-lg text-mute max-w-lg leading-relaxed">
                 We recover, preserve and present digital evidence for police, prosecutors and enterprise legal teams.{" "}
@@ -104,8 +117,12 @@ export default async function Home() {
               </p>
               <div className="hero-cta-row flex flex-wrap items-center gap-3 mt-8 lg:mt-10">
                 <Link href="/contact" className="btn-primary mono text-sm uppercase tracking-wider px-6 py-3 rounded-control font-medium">Open a case →</Link>
-                <Link href="/services" className="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">Browse services</Link>
+                <Link href="/contact?type=retainer" className="btn-ghost mono text-sm uppercase tracking-wider px-6 py-3 rounded-control">Talk about a retainer →</Link>
               </div>
+              <p className="mt-5 text-sm text-mute">
+                {HERO.reportLinkLead}{" "}
+                <Link href="/contact?type=ai-incident" className="text-accent hover:underline">Report an AI incident →</Link>
+              </p>
             </div>
             <div className="lg:col-span-5 hidden lg:block">
               <div className="globe-stage">
@@ -138,7 +155,7 @@ export default async function Home() {
                   <span className="icn">
                     <svg viewBox="0 0 10 10" fill="none"><path d="M1 5l3 3 5-6" stroke="currentColor" strokeWidth="1.4"/></svg>
                   </span>
-                  § 65B · certified
+                  BSA s.63 · certified
                 </div>
                 <div className="chip-fl" style={{ top: "60%", left: "-4%" }}>
                   <span className="icn">●</span> CoC · sealed
@@ -187,6 +204,62 @@ export default async function Home() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* AI THREATS BAND (P1.2) — server-rendered, no FadeIn, so it's visible with JavaScript off */}
+      <section id="ai-both-sides" aria-labelledby="ai-both-sides-h" className="py-24 border-t border-line">
+        <div className="max-w-page mx-auto px-6 lg:px-10">
+          <div className="grid lg:grid-cols-12 gap-10 items-end mb-14">
+            <div className="lg:col-span-7">
+              <div className="label mb-4">[ AI in our work ]</div>
+              <h2 id="ai-both-sides-h" className="display text-5xl lg:text-6xl">AI on both sides of<br /><span className="text-accent">the investigation.</span></h2>
+            </div>
+            <div className="lg:col-span-5">
+              <p className="text-mute leading-relaxed">{FIRM_DESCRIPTION}</p>
+            </div>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-10">
+            <div>
+              <h3 className="label mb-4">How we use AI</h3>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {HOW_WE_USE_AI.map((c) => (
+                  <div key={c.title} className="card p-6">
+                    <h4 className="text-lg font-medium mb-2">{c.title}</h4>
+                    <p className="text-sm text-mute leading-relaxed">{c.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="label mb-4">AI threats we investigate</h3>
+              <div className="space-y-4">
+                {AI_THREATS.map((t) => (
+                  <div key={t.code} className="card p-6">
+                    <div className="mono text-accent text-xs mb-3">{t.code}</div>
+                    <h4 className="text-lg font-medium mb-2">{t.title}</h4>
+                    <p className="text-sm text-mute leading-relaxed">{t.summary}</p>
+                  </div>
+                ))}
+              </div>
+              <Link href={DF09.path} className="mono text-sm uppercase tracking-wider text-accent hover:underline inline-flex mt-6">See {DF09.title} →</Link>
+            </div>
+          </div>
+          <div className="card mt-10 p-7 lg:p-8">
+            <p className="display text-2xl lg:text-3xl mb-6">{AI_BAND_STRIP.lead}</p>
+            <ul className="grid md:grid-cols-3 gap-6 mb-6">
+              {AI_BAND_STRIP.points.map((p) => (
+                <li key={p.label} className="text-sm text-mute leading-relaxed">
+                  <strong className="text-white font-semibold">{p.label}:</strong> {p.body}
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-stone leading-relaxed mb-5">{AI_BAND_STRIP.smallPrint}</p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <Link href="/insights/ai-forensics-marketing" className="mono text-xs uppercase tracking-wider text-accent hover:underline">Why &ldquo;AI-powered forensics&rdquo; is mostly marketing →</Link>
+              <Link href="/knowledge?tab=whitepapers" className="mono text-xs uppercase tracking-wider text-accent hover:underline">WP-02 AI in Digital Forensics →</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -368,7 +441,7 @@ export default async function Home() {
                 <Link href="/training" className="pill pill-on">Course catalogue →</Link>
               </div>
               <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-line">
-                <div><div className="display text-2xl num"><CountUp to={14} /></div><div className="label mt-1">Courses</div></div>
+                <div><div className="display text-2xl num"><CountUp to={courseCount} /></div><div className="label mt-1">Courses</div></div>
                 <div><div className="display text-2xl num"><CountUp to={120} suffix="+" /></div><div className="label mt-1">Officers trained</div></div>
                 <div><div className="display text-2xl num"><CountUp to={4.9} suffix="" /></div><div className="label mt-1">Avg rating</div></div>
               </div>

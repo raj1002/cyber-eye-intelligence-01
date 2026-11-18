@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getCourses } from "@/lib/sanity";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,12 +35,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Cyber Eye Intelligence — Digital Forensics & Investigation",
   description:
-    "Digital forensics, cyber investigation, digital intelligence & managed security. Court-admissible reports. Chain of custody. 24/7 incident response. Mumbai · Bengaluru · Delhi.",
-  metadataBase: new URL("https://cybereyeintelligence.com"),
+    "Digital forensics, cyber investigation, digital intelligence & managed security. Court-admissible reports. Chain of custody. 24/7 incident response. Mumbai · Bengaluru · Delhi · Noida.",
+  metadataBase: new URL("https://www.cybereyeintelligence.com"),
   openGraph: {
     title: "Cyber Eye Intelligence",
     description: "Digital forensics that holds up in court.",
-    url: "https://cybereyeintelligence.com",
+    url: "https://www.cybereyeintelligence.com",
     siteName: "Cyber Eye Intelligence",
     locale: "en_IN",
     type: "website",
@@ -52,11 +53,14 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Real course count for the Academy menu (P1.7). 14 matches the live dataset if Sanity is unreachable.
+  const courses = await getCourses();
+  const courseCount = courses.length > 0 ? courses.length : 14;
   return (
     <html lang="en" className={`${inter.variable} ${geistMono.variable} ${spaceGrotesk.variable}`}>
       <head>
@@ -67,7 +71,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-ink text-white">
-        <Header />
+        <Header courseCount={courseCount} />
         <main>{children}</main>
         <Footer />
       </body>

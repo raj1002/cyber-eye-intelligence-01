@@ -77,7 +77,7 @@ export default function CaseFileDetailPage({ params }: { params: { slug: string 
               { n: "01", t: "Intake", d: "Evidence received with dual-signed chain of custody and hash verification." },
               { n: "02", t: "Acquire", d: "Write-blocked imaging. Bit-by-bit copy. SHA-256 on source and working copy." },
               { n: "03", t: "Examine", d: "Twin-examiner analysis. Worklog timestamped and signed at every step." },
-              { n: "04", t: "Report", d: "§ 65B compliant certificate. Expert testimony on standby." },
+              { n: "04", t: "Report", d: "BSA s.63 certificate. Expert testimony on standby." },
             ].map((s) => (
               <div key={s.n} className="card p-6">
                 <div className="mono text-accent text-xs mb-8">{s.n}</div>

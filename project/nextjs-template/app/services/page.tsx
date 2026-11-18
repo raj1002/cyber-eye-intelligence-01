@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServiceFamilies } from "@/lib/sanity";
 import PinnedScrub from "@/components/parallax/PinnedScrub";
 import FadeIn from "@/components/FadeIn";
+import { DF09 } from "@/lib/ai-positioning";
 
 // Presentational mappings that don't belong in the CMS
 const COLS: Record<string, string> = {
@@ -36,7 +37,7 @@ const FALLBACK = [
       { code: "DF-04", title: "Malware Analysis", desc: "Dissect behaviour, origins and impact. Empower your team to fortify and proactively defend." },
       { code: "DF-05", title: "Mobile Device Forensics", desc: "Targeted extraction from smartphones, tablets and wearables. Court-grade insight from the device in their pocket." },
       { code: "DF-06", title: "Network Forensics", desc: "Trace digital communications, identify breaches and reconstruct events across your infrastructure." },
-      { code: "DF-07", title: "Compliance & Chain of Custody", desc: "§ 65B-aligned documentation that survives cross-examination. Audit-grade evidence integrity end-to-end." },
+      { code: "DF-07", title: "Compliance & Chain of Custody", desc: "BSA s.63 (formerly §65B) documentation that survives cross-examination. Audit-grade evidence integrity end-to-end." },
       { code: "DF-08", title: "Empowerment Through Knowledge", desc: "Tailored training programmes and workshops to upskill your team in defensible forensic processes." },
     ],
   },
@@ -59,7 +60,7 @@ const FALLBACK = [
     id: "managed-security", num: "03 / 05", label: "Family 03 / 05",
     title: "Managed Security", accent: "Services.",
     desc: "Unparalleled cybersecurity for on-premises, cloud and hybrid infrastructures — integrated with cutting-edge SOC and eXtended Detection & Response (XDR). Fortify your defences, detect and respond proactively, and ensure continuous security monitoring.",
-    tagline: "Establish a robust defence, detect threats in real time, and respond to evolving cyber risk on a global scale. Fortify your security posture with the unwavering expertise of Cyber Eye Intelligence.",
+    tagline: "Establish a robust defence, detect threats in real time, and respond to evolving cyber risk at scale. Fortify your security posture with the unwavering expertise of Cyber Eye Intelligence.",
     services: [
       { code: "MSS-01", title: "Comprehensive Managed Security", desc: "End-to-end MSS with integrated SOC and XDR. From assessment to ongoing management." },
       { code: "MSS-02", title: "24/7 Security Monitoring & IR", desc: "Round-the-clock surveillance and rapid incident response." },
@@ -117,9 +118,19 @@ function splitTitle(full: string): { title: string; accent: string } {
   return { title: words.slice(0, -1).join(" "), accent: words[words.length - 1] + "." };
 }
 
+type ServiceCard = { code: string; title: string; desc: string; href?: string; isNew?: boolean };
+
+// P1.4: DF-09 is listed first under Digital Forensics, with a "New" tag, linking to its own page.
+// Codes for the other services stay as they are; any DF-09 entry coming from Sanity is replaced by this one.
+function withDf09(familyId: string, services: ServiceCard[]): ServiceCard[] {
+  if (familyId !== "digital-forensics") return services;
+  const rest = services.filter((s) => s.code !== DF09.code && s.title !== DF09.title);
+  return [{ code: DF09.code, title: DF09.title, desc: DF09.cardLine, href: DF09.path, isNew: true }, ...rest];
+}
+
 export default async function ServicesPage() {
   const sanity = await getServiceFamilies();
-  const families = sanity.length > 0
+  const rawFamilies = sanity.length > 0
     ? sanity.map((f, i, arr) => {
         const { title, accent } = splitTitle(f.title);
         const prefix = CODE_PREFIX[f.slug.current] ?? f.slug.current.toUpperCase().slice(0, 3);
@@ -139,6 +150,7 @@ export default async function ServicesPage() {
         };
       })
     : FALLBACK;
+  const families = rawFamilies.map((f) => ({ ...f, services: withDf09(f.id, f.services as ServiceCard[]) }));
 
   return (
     <>
@@ -179,7 +191,17 @@ export default async function ServicesPage() {
               </div>
             </FadeIn>
             <FadeIn delay={80} className={`grid md:grid-cols-2 ${COLS[f.id] ?? "lg:grid-cols-3"} gap-3`}>
-              {f.services.map((s) => (
+              {f.services.map((s) => s.href ? (
+                <Link key={s.code} href={s.href} className="card card-hover p-6 block">
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="mono text-accent text-xs">{s.code}</span>
+                    {s.isNew && <span className="pill pill-on">New</span>}
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">{s.title}</h3>
+                  <p className="text-sm text-mute leading-relaxed">{s.desc}</p>
+                  <div className="mono text-xs text-accent uppercase tracking-wider mt-4">Read more →</div>
+                </Link>
+              ) : (
                 <div key={s.code} className="card p-6">
                   <div className="mono text-accent text-xs mb-8">{s.code}</div>
                   <h3 className="text-lg font-medium mb-2">{s.title}</h3>

@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/ai-positioning';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: '*', allow: '/' },
-    sitemap: 'https://cybereyeintelligence.com/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

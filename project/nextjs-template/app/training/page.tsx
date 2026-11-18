@@ -3,11 +3,11 @@ import { getCourses } from "@/lib/sanity";
 
 const FALLBACK = [
   { code: "CE-101", audience: "police", title: "Mobile Device Forensics for Investigators", sub: "Extraction, parsing and evidence handling from iOS and Android in a live lab environment.", duration: "3 days", format: "In-person", price: "₹18,000" },
-  { code: "CE-102", audience: "police", title: "Digital Evidence Handling & § 65B Compliance", sub: "Correct acquisition, labelling and certification so evidence holds under cross-examination.", duration: "2 days", format: "In-person", price: "₹12,000" },
+  { code: "CE-102", audience: "police", title: "Digital Evidence Handling & BSA s.63 Compliance", sub: "Correct acquisition, labelling and certification so evidence holds under cross-examination.", duration: "2 days", format: "In-person", price: "₹12,000" },
   { code: "CE-103", audience: "police", title: "Network Forensics & Log Analysis", sub: "PCAP analysis, log correlation and ISP coordination for cyber-crime investigations.", duration: "4 days", format: "In-person", price: "₹22,000" },
   { code: "CE-104", audience: "police", title: "Open Source Intelligence (OSINT) for Police", sub: "Structured OSINT techniques for criminal investigations — social media, dark web, GEOINT.", duration: "2 days", format: "In-person / Online", price: "₹14,000" },
   { code: "CE-201", audience: "counsel", title: "Digital Evidence for Lawyers — Foundations", sub: "Understand how digital evidence is acquired, what makes it admissible and how to challenge it.", duration: "1 day", format: "In-person", price: "₹8,500" },
-  { code: "CE-202", audience: "counsel", title: "§ 65B Masterclass for Litigators", sub: "Deep-dive into the certification regime — drafting, challenging and cross-examining digital evidence.", duration: "1 day", format: "In-person / Online", price: "₹9,500" },
+  { code: "CE-202", audience: "counsel", title: "BSA s.63 (formerly §65B) Masterclass for Litigators", sub: "Deep-dive into the certification regime — drafting, challenging and cross-examining digital evidence.", duration: "1 day", format: "In-person / Online", price: "₹9,500" },
   { code: "CE-203", audience: "counsel", title: "eDiscovery & Cloud Evidence", sub: "M365, Gmail and cloud storage in litigation. What logs survive, what doesn't, and how to request it.", duration: "1 day", format: "Online", price: "₹7,500" },
   { code: "CE-204", audience: "counsel", title: "Expert Witness Cross-Examination Prep", sub: "Work alongside a forensic examiner to prepare and challenge expert evidence in mock cross.", duration: "1 day", format: "In-person", price: "₹12,000" },
   { code: "CE-301", audience: "corporate", title: "Insider Threat Investigation — Practitioner", sub: "Identify, contain and investigate an insider incident without tipping your hand.", duration: "2 days", format: "In-person", price: "₹16,000" },
@@ -143,7 +143,7 @@ export default async function TrainingPage() {
                 {[
                   "Live acquisition lab with real devices",
                   "Legal case studies from actual casework",
-                  "§ 65B mock certification exercise",
+                  "BSA s.63 mock certification exercise",
                   "CPD certificate per participant",
                   "Post-training examiner Q&A (1 h)",
                   "Course materials — print + digital",

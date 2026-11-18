@@ -28,7 +28,7 @@ const FALLBACK_ARTICLES: KnowledgeArticle[] = [
 ];
 
 const FALLBACK_WHITEPAPERS: KnowledgeWhitepaper[] = [
-  { code: "WP-01", title: "Mobile Forensic Acquisition Standards for Indian Courts", sub: "A practitioner's guide to § 65B compliance across iOS and Android extraction workflows.", year: "2026" },
+  { code: "WP-01", title: "Mobile Forensic Acquisition Standards for Indian Courts", sub: "A practitioner's guide to BSA s.63 (formerly §65B) compliance across iOS and Android extraction workflows.", year: "2026" },
   { code: "WP-02", title: "AI in Digital Forensics — Promise, Peril and the Admissibility Problem", sub: "Where machine learning helps, where it doesn't, and how to keep the examiner in the loop.", year: "2025" },
   { code: "WP-03", title: "Ransomware Attribution: From Malware to the Indictment", sub: "Tracing a full kill chain — infrastructure, crypto wallets, dark web and cross-border coordination.", year: "2025" },
 ];

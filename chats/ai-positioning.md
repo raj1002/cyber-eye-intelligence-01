@@ -56,9 +56,9 @@ Insert directly below the hero, above the existing service families. Two columns
 | --- | --- |
 | Eyebrow | AI in our work |
 | H2 | **AI on both sides of the investigation.** |
-| Intro | Cyber Eye Intelligence is an Indian digital forensics and incident response firm, with labs in Mumbai, Bengaluru and Delhi, that uses AI to investigate faster and investigates AI when it's used against you. |
+| Intro | Cyber Eye Intelligence is an Indian digital forensics and incident response firm, with labs in Mumbai, Bengaluru, Delhi and Noida, that uses AI to investigate faster and investigates AI when it's used against you. |
 
-`[Founders: confirm the office list before launch. The contact page lists satellite labs in Bengaluru, Delhi and Gurugram; About says Mumbai with satellite operations in Bengaluru and Delhi. This sentence is reused word for word in P1.6 (meta description, /llms.txt, Google Business Profile, LinkedIn, directories), so it has to match the contact page and About exactly.]`
+`[Founders confirmed on 18 Nov 2026: offices are Mumbai (HQ), Bengaluru, Delhi and Noida. Gurugram is removed from the contact page; About, footer, header and metadata list Noida.]`
 
 **Left column: How we use AI**
 
@@ -108,7 +108,7 @@ Services are coded DF-01…DF-08 in `lib/data.ts`, and `app/services/[slug]/page
 | Sub-copy | From a cloned voice that moved money to a compromised enterprise chatbot, we contain the incident, investigate it end to end and deliver findings an examiner will sign and defend. |
 | CTAs | Report an AI incident → · Speak to an examiner · 24/7: +91 98335 65665 |
 | Trust tags | Twin-examiner · Signed reports · CoC, hash-verified · Sensitive evidence never sent to public AI services |
-| Under hero | "Reviewed by `[PLACEHOLDER: examiner name, role]` · Last updated `[date]`" |
+| Under hero | "Reviewed by Lakhan Handebag, Academy Director · Last updated 18 Nov 2026" |
 
 ### When to call us
 
@@ -140,6 +140,8 @@ One anonymised AI or deepfake case file, in the same format as the existing case
 | What we did | `[PLACEHOLDER]` 2–3 lines, naming the methods used |
 | Outcome | `[PLACEHOLDER]` 1–2 lines, with any figure the client allows |
 
+**Interim (18 Nov 2026):** at the founders' request the page carries a sample case (voice-clone payment approval, mid-size NBFC), labelled on the page as "Example only — not a real engagement". It must be replaced with a real, cleared case before launch.
+
 If no AI case can be published yet, use a short "What we're seeing" note from our examiners on deepfake fraud in India instead, and add the case file as soon as one is cleared. Don't invent one.
 
 ### How an AI engagement runs
@@ -155,7 +157,7 @@ If no AI case can be published yet, use a short "What we're seeing" note from ou
 - **DPDP:** the DPDP Act and Rules require personal-data breaches to be intimated to the Data Protection Board and affected people, as those obligations come into force. We can help you prepare now.
 - **Courts:** electronic evidence needs a certificate under BSA s.63, which replaced §65B of the Evidence Act from 1 July 2024.
 
-`[Founders: have counsel confirm the DPDP breach-intimation commencement date before launch; the Rules phase it in after notification.]`
+`[Counsel for this wording: Pooja R. Mankoj (Legal Head). Founders: have Pooja confirm the DPDP breach-intimation commencement date before launch. Research note (18 Nov 2026, not legal advice): the DPDP Rules, 2025 were notified on 13 Nov 2025; Rule 7 (breach intimation) is in the group that comes into force 18 months after publication, which most commentary puts at 13 May 2027 (some say 14 May). Rule 7 expects an initial intimation to the Board without delay and a detailed report within 72 hours of becoming aware. The site copy says "as those obligations come into force", which stays accurate either way; counsel should check the Gazette text (G.S.R. 846(E)) and decide whether to name the date.]`
 
 ### Answer blocks (AEO)
 
@@ -248,18 +250,20 @@ On the DF-09 page, between "Deadlines you may be facing" and the answer blocks.
 |  | AI Ready | AI Assured | AI Critical |
 | --- | --- | --- | --- |
 | Best for | Mid-size firms starting to use AI tools | Banks, NBFCs and enterprises running customer-facing AI | Regulated firms where AI and payments are core to the business |
-| Response hours a year | 40 | 100 | 200 |
+| Response hours a year | 80 | 100 | 150 |
 | 24/7 examiner hotline | Yes | Yes | Yes |
 | Covers | All AI threat areas and conventional DFIR | All AI threat areas and conventional DFIR | All AI threat areas and conventional DFIR |
 | Readiness work included | AI incident response plan review | Plan review, plus one deepfake-fraud tabletop exercise for finance and KYC teams | Plan review, tabletop, LLM exposure review and a quarterly AI threat hunt |
 | Court support | BSA s.63 certificates and signed reports | BSA s.63 certificates and signed reports | BSA s.63 certificates, signed reports and priority expert testimony |
-| On-site response | `[PLACEHOLDER]` hours | `[PLACEHOLDER]` hours | `[PLACEHOLDER]` hours |
+| On-site response | Within 4 hours in Tier 1 cities, 12 hours elsewhere in India | Within 4 hours in Tier 1 cities, 12 hours elsewhere in India | Within 4 hours in Tier 1 cities, 12 hours elsewhere in India |
 | Price | On request | On request | On request |
 
 | Element | Copy |
 | --- | --- |
 | Note under table | Unused hours can go toward readiness work or Cyber Eye Academy training. Extra hours are billed at the agreed hourly rate. |
 | CTA | Talk about a retainer → (to `/contact?type=retainer`; the *Retainer enquiry* option is defined in P1.5) |
+
+**Hours (18 Nov 2026):** the founders asked to base the hours on Kyndryl's published incident-response retainer tiers (80, 100 and 150 hours a year). Kyndryl doesn't publish on-site times, so on-site response uses the site's existing promise from the footer FAQ (4 hours in Tier 1 cities, 12 hours elsewhere). Founders: confirm both, and revisit the price card below, which was set for 40–200 hours.
 
 **For the founders, not for the site:** the strategy doc's price card puts the DFIR retainer at ₹6–25 lakh a year for 40–200 hours, roughly ₹6, ₹12 and ₹25 lakh for these tiers. Confirm the unused-hours terms and on-site times before launch.
 
@@ -346,14 +350,15 @@ SEO: title "\[Sector\] Digital Forensics & Incident Response | Cyber Eye Intelli
 - [ ] `npm run build` passes in `project/nextjs-template`; `/services/ai-incident-response` renders and every existing family slug still works
 - [ ] With JavaScript off (curl the homepage and DF-09), the hero, AI band, answer blocks and real counter values are in the HTML
 - [ ] Search the repo and the Sanity dataset for `65B`, `accredited`, `global`, `freeze` and `frozen`; every remaining hit is one this doc says to keep
+- [ ] When Phase 1 deploys, publish the Sanity draft of `seed-service-digital-forensics` (adds DF-09 to the services list and fixes the DF-07 wording); it is held as a draft so DF-09 does not appear on the live site before its page exists
 - [ ] JSON-LD passes Google's Rich Results Test and validator.schema.org, with no `aggregateRating`
 - [ ] `/contact?type=ai-incident`, `?type=ai-risk-call` and `?type=retainer` preselect the right Practice area pill; `/contact` with no parameter behaves as before
 - [ ] Retainer section (P1.8) sits between "Deadlines you may be facing" and the answer blocks; its CTA and the hero's secondary CTA both land on *Retainer enquiry*
 - [ ] Sector order (P1.9) is S/05, S/02, S/03, S/01, S/04 on the homepage grid, `/sectors`, the nav flyout and the footer
 - [ ] Founders have confirmed the office list, and the AI band intro matches the contact page and About
 - [ ] `/llms.txt` is live; sitemap includes DF-09 and is submitted
-- [ ] The AI case file (or "What we're seeing" note) is in place and approved by the founders
-- [ ] Counsel has confirmed the DPDP wording
+- [ ] The sample AI case file is replaced by a real, cleared case (or a "What we're seeing" note) approved by the founders
+- [ ] Pooja R. Mankoj (counsel) has confirmed the DPDP wording
 - [ ] Hero, band and DF-09 match the site's look on desktop and mobile; nothing changed on pages this doc doesn't name
 
 ## Phase 2 and 3 checks

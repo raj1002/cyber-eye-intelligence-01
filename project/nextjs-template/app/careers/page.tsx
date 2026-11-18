@@ -6,12 +6,12 @@ export const metadata = {
 };
 
 const roles = [
-  { code: "R-01", location: "Mumbai · Full-time", title: "Senior Mobile Forensics Examiner", desc: "Lead acquisitions on iOS 18 / Android 15, parse encrypted app artefacts, draft § 65B-grade reports and testify in High Court matters.", tags: ["Cellebrite · AXIOM", "5+ yrs", "₹18–28 LPA"] },
+  { code: "R-01", location: "Mumbai · Full-time", title: "Senior Mobile Forensics Examiner", desc: "Lead acquisitions on iOS 18 / Android 15, parse encrypted app artefacts, draft BSA s.63-grade reports and testify in High Court matters.", tags: ["Cellebrite · AXIOM", "5+ yrs", "₹18–28 LPA"] },
   { code: "R-02", location: "Bengaluru · Full-time", title: "Incident Response Lead", desc: "Own the 24/7 IR rota. First-responder on ransomware, BEC and intrusion engagements across BFSI and corporate clients.", tags: ["DFIR · SIEM", "7+ yrs", "₹24–36 LPA"] },
   { code: "R-03", location: "Mumbai · Full-time", title: "Digital Intelligence Analyst (OSINT)", desc: "Build attribution dossiers from open and deep-web sources. Pivot across infrastructure, identities and crypto wallets.", tags: ["OSINT · Maltego", "3+ yrs", "₹14–22 LPA"] },
   { code: "R-04", location: "Delhi · Full-time", title: "Malware Reverse Engineer", desc: "Static + dynamic analysis of native and Android samples. Build YARA, write technical addenda, support attribution work.", tags: ["IDA · Ghidra", "4+ yrs", "₹20–32 LPA"] },
   { code: "R-05", location: "Mumbai · Full-time", title: "Cloud & SaaS Forensics Examiner", desc: "M365, Google Workspace, AWS and Azure evidence acquisition, preservation and analysis for litigation and IR.", tags: ["M365 · AWS", "3+ yrs", "₹16–24 LPA"] },
-  { code: "R-06", location: "Remote · Contract", title: "Academy Instructor — Legal Track", desc: "Design and deliver § 65B and eDiscovery courses for lawyers, judges and in-house counsel. Minimum 2 days/month.", tags: ["LLB / LLM", "5+ yrs practice", "₹8K/day"] },
+  { code: "R-06", location: "Remote · Contract", title: "Academy Instructor — Legal Track", desc: "Design and deliver BSA s.63 and eDiscovery courses for lawyers, judges and in-house counsel. Minimum 2 days/month.", tags: ["LLB / LLM", "5+ yrs practice", "₹8K/day"] },
 ];
 
 const perks = [
