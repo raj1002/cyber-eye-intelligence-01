@@ -217,6 +217,11 @@
   .brand-wordmark.lg .b-mark { font-size: 24px; letter-spacing: -0.028em; }
   .brand-wordmark.lg .b-sub { font-size: 11px; letter-spacing: 0.18em; }
   .brand-wordmark.lg { gap: 8px; }
+  /* Footer wordmark: at 11px/0.18em the tagline is ~329px wide and pushed the
+     page sideways on phones narrower than ~377px. */
+  @media (max-width: 479px) {
+    .brand-wordmark.lg .b-sub { font-size: 9px; letter-spacing: 0.1em; }
+  }
 
   /* Logo mark */
   .logo-mark {
