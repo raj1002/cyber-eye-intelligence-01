@@ -325,6 +325,11 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    /* Snap position for the first card = its resting position (wrap padding +
+       .insights-track padding). Without this, mandatory snapping scrolls the row
+       on load, and Chrome stops recording Largest Contentful Paint at the first
+       scroll, so Lighthouse reported no LCP and no performance score. */
+    scroll-padding-inline-start: calc(16px + (100vw - min(1408px, 100% - 32px)) / 2 + 8px);
     scroll-behavior: smooth;
     -ms-overflow-style: none;
     scrollbar-width: none;
