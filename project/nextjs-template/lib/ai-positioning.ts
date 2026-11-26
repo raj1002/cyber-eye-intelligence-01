@@ -104,17 +104,26 @@ export const DF09 = {
   ],
   howWeUseAi:
     "CE/VectorAI is the air-gapped triage methodology we're building in stages. Stage 1 (triage on local models, every flag reviewed by an examiner) is in pilot. Sensitive evidence is never sent to public AI services.",
-  // Sample case requested by the founders on 18 Nov 2026 as a stand-in. It is NOT a real
-  // engagement: `illustrative: true` makes the page label it as an example. Replace it with a
-  // real, cleared case file (and set illustrative: false) before launch — spec P1.3.
-  caseFile: {
-    illustrative: true,
-    code: 'Illustrative example',
-    title: 'Voice-clone payment approval, mid-size NBFC',
-    situation: "A finance controller approved an urgent vendor payment after a phone call that sounded exactly like the CFO. The CFO hadn't made the call.",
-    whatWeDid: "Preserved the call recording, telephony logs and the payment trail under chain of custody. Audio spectral analysis and comparison with genuine reference recordings showed synthesis artefacts; the transaction trail identified the first-layer mule accounts.",
-    outcome: 'Signed twin-examiner report with a BSA s.63 certificate for the police complaint and the bank, plus a call-back verification control for future payment approvals.',
-  } as null | { illustrative: boolean; code: string; title: string; situation: string; whatWeDid: string; outcome: string },
+  // Interim casework section (founders, 26 Nov 2026): a scenario describing how this kind of
+  // case runs, written in the present tense so it never claims to be a past engagement, plus a
+  // "What we're seeing" note. Swap in a real, cleared case file when one is approved — spec P1.3.
+  scenario: {
+    title: 'How a voice-clone payment fraud case runs',
+    steps: [
+      { label: 'The call', body: 'A finance controller approves an urgent payment after a call that sounds exactly like the CFO. The CFO never made it.' },
+      { label: 'What we do', body: 'Preserve the call recording, telephony logs and payment trail under chain of custody, test the audio for synthesis artefacts against genuine recordings of the executive, and trace the money to the first-layer mule accounts.' },
+      { label: 'What you get', body: 'A signed twin-examiner report with a BSA s.63 certificate for the police complaint and your bank, and a call-back check for future payment approvals.' },
+    ],
+  },
+  seeing: {
+    title: "What we're seeing",
+    points: [
+      'Cloned voices of senior executives used to push urgent payment or credential requests through.',
+      'Deepfake video and synthetic faces used to get past video KYC and remote onboarding.',
+      'AI-generated or edited documents and photos in loan applications and insurance claims.',
+      'Customer-facing chatbots and copilots manipulated into revealing data or ignoring their instructions.',
+    ],
+  },
   process: [
     { step: 'Contain', body: 'cut the model, keys, account or payment channel off from the attacker without destroying evidence.' },
     { step: 'Preserve', body: 'capture media, logs, prompts, embeddings and devices, hash them and open the chain of custody.' },

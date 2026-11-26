@@ -140,7 +140,7 @@ One anonymised AI or deepfake case file, in the same format as the existing case
 | What we did | `[PLACEHOLDER]` 2–3 lines, naming the methods used |
 | Outcome | `[PLACEHOLDER]` 1–2 lines, with any figure the client allows |
 
-**Interim (18 Nov 2026):** at the founders' request the page carries a sample case (voice-clone payment approval, mid-size NBFC), labelled on the page as "Example only — not a real engagement". It must be replaced with a real, cleared case before launch.
+**Interim (26 Nov 2026):** the founders chose to replace the 18 Nov sample case with (1) a present-tense scenario, "How a voice-clone payment fraud case runs" (the call, what we do, what you get), which does not claim to be a past engagement, and (2) a "What we're seeing" note listing four AI fraud patterns, with no figures. The section label is "03 — In practice". When a real case is cleared, add it here as a case file.
 
 If no AI case can be published yet, use a short "What we're seeing" note from our examiners on deepfake fraud in India instead, and add the case file as soon as one is cleared. Don't invent one.
 
@@ -157,7 +157,7 @@ If no AI case can be published yet, use a short "What we're seeing" note from ou
 - **DPDP:** the DPDP Act and Rules require personal-data breaches to be intimated to the Data Protection Board and affected people, as those obligations come into force. We can help you prepare now.
 - **Courts:** electronic evidence needs a certificate under BSA s.63, which replaced §65B of the Evidence Act from 1 July 2024.
 
-`[Counsel for this wording: Pooja R. Mankoj (Legal Head). Founders: have Pooja confirm the DPDP breach-intimation commencement date before launch. Research note (18 Nov 2026, not legal advice): the DPDP Rules, 2025 were notified on 13 Nov 2025; Rule 7 (breach intimation) is in the group that comes into force 18 months after publication, which most commentary puts at 13 May 2027 (some say 14 May). Rule 7 expects an initial intimation to the Board without delay and a detailed report within 72 hours of becoming aware. The site copy says "as those obligations come into force", which stays accurate either way; counsel should check the Gazette text (G.S.R. 846(E)) and decide whether to name the date.]`
+`[Counsel for this wording: Pooja R. Mankoj (Legal Head), who signed off the DPDP wording on 26 Nov 2026. Research note (18 Nov 2026, not legal advice): the DPDP Rules, 2025 were notified on 13 Nov 2025; Rule 7 (breach intimation) is in the group that comes into force 18 months after publication, which most commentary puts at 13 May 2027 (some say 14 May). Rule 7 expects an initial intimation to the Board without delay and a detailed report within 72 hours of becoming aware. The site copy says "as those obligations come into force", which stays accurate either way; counsel should check the Gazette text (G.S.R. 846(E)) and decide whether to name the date.]`
 
 ### Answer blocks (AEO)
 
@@ -263,7 +263,7 @@ On the DF-09 page, between "Deadlines you may be facing" and the answer blocks.
 | Note under table | Unused hours can go toward readiness work or Cyber Eye Academy training. Extra hours are billed at the agreed hourly rate. |
 | CTA | Talk about a retainer → (to `/contact?type=retainer`; the *Retainer enquiry* option is defined in P1.5) |
 
-**Hours (18 Nov 2026):** the founders asked to base the hours on Kyndryl's published incident-response retainer tiers (80, 100 and 150 hours a year). Kyndryl doesn't publish on-site times, so on-site response uses the site's existing promise from the footer FAQ (4 hours in Tier 1 cities, 12 hours elsewhere). Founders: confirm both, and revisit the price card below, which was set for 40–200 hours.
+**Hours (18 Nov 2026):** the founders asked to base the hours on Kyndryl's published incident-response retainer tiers (80, 100 and 150 hours a year). Kyndryl doesn't publish on-site times, so on-site response uses the site's existing promise from the footer FAQ (4 hours in Tier 1 cities, 12 hours elsewhere). Founders confirmed the hours on 26 Nov 2026 ("correct for now"); revisit the price card below, which was set for 40–200 hours.
 
 **For the founders, not for the site:** the strategy doc's price card puts the DFIR retainer at ₹6–25 lakh a year for 40–200 hours, roughly ₹6, ₹12 and ₹25 lakh for these tiers. Confirm the unused-hours terms and on-site times before launch.
 
@@ -357,8 +357,8 @@ SEO: title "\[Sector\] Digital Forensics & Incident Response | Cyber Eye Intelli
 - [ ] Sector order (P1.9) is S/05, S/02, S/03, S/01, S/04 on the homepage grid, `/sectors`, the nav flyout and the footer
 - [ ] Founders have confirmed the office list, and the AI band intro matches the contact page and About
 - [ ] `/llms.txt` is live; sitemap includes DF-09 and is submitted
-- [ ] The sample AI case file is replaced by a real, cleared case (or a "What we're seeing" note) approved by the founders
-- [ ] Pooja R. Mankoj (counsel) has confirmed the DPDP wording
+- [x] The sample AI case file is replaced by a scenario and a "What we're seeing" note approved by the founders (26 Nov 2026); add a real, cleared case when one is available
+- [x] Pooja R. Mankoj (counsel) has confirmed the DPDP wording (26 Nov 2026)
 - [ ] Hero, band and DF-09 match the site's look on desktop and mobile; nothing changed on pages this doc doesn't name
 
 ## Phase 2 and 3 checks

@@ -118,30 +118,24 @@ export default function AiIncidentResponsePage() {
       {/* From our casework */}
       <section className="py-20 border-b border-line">
         <div className="max-w-page mx-auto px-6 lg:px-10">
-          <div className="label mb-4">03 — Casework</div>
-          <h2 className="display text-4xl mb-10">From our casework</h2>
-          {DF09.caseFile ? (
-            <div className="card p-8 lg:p-10 grid lg:grid-cols-12 gap-8">
-              <div className="lg:col-span-4">
-                <div className="mono text-accent text-xs mb-3">{DF09.caseFile.code}</div>
-                {DF09.caseFile.illustrative && (
-                  <p className="pill mb-4">Example only — not a real engagement</p>
-                )}
-                <h3 className="text-2xl font-medium">{DF09.caseFile.title}</h3>
+          <div className="label mb-4">03 — In practice</div>
+          <h2 className="display text-4xl mb-10">{DF09.scenario.title}</h2>
+          <dl className="card p-8 lg:p-10 grid md:grid-cols-3 gap-6 text-sm">
+            {DF09.scenario.steps.map((s) => (
+              <div key={s.label}>
+                <dt className="label mb-2">{s.label}</dt>
+                <dd className="text-mute leading-relaxed">{s.body}</dd>
               </div>
-              <dl className="lg:col-span-8 grid md:grid-cols-3 gap-6 text-sm">
-                <div><dt className="label mb-2">Situation</dt><dd className="text-mute leading-relaxed">{DF09.caseFile.situation}</dd></div>
-                <div><dt className="label mb-2">What we did</dt><dd className="text-mute leading-relaxed">{DF09.caseFile.whatWeDid}</dd></div>
-                <div><dt className="label mb-2">Outcome</dt><dd className="text-mute leading-relaxed">{DF09.caseFile.outcome}</dd></div>
-              </dl>
-            </div>
-          ) : (
-            <div className="card p-8 border-dashed">
-              <p className="text-sm text-mute">
-                [PLACEHOLDER: one real, anonymised AI or deepfake case file from the founders, or a short &ldquo;What we&rsquo;re seeing&rdquo; note from our examiners. Required before launch.]
-              </p>
-            </div>
-          )}
+            ))}
+          </dl>
+          <div className="card p-8 lg:p-10 mt-6">
+            <h3 className="text-2xl font-medium mb-5">{DF09.seeing.title}</h3>
+            <ul className="grid md:grid-cols-2 gap-x-8 gap-y-3 text-sm text-mute leading-relaxed list-disc pl-5">
+              {DF09.seeing.points.map((p) => (
+                <li key={p}>{p}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
