@@ -438,6 +438,20 @@
   }
   body.nav-open { overflow: hidden; }
 
+  /* Phone widths: the wordmark plus the theme and menu buttons must fit without
+     pushing the menu button off-screen. Shrink the tagline, then drop it on the
+     narrowest phones; the wordmark clips rather than overflowing the page. */
+  .glass-nav .brand-wordmark { min-width: 0; overflow: hidden; }
+  @media (max-width: 479px) {
+    .glass-nav .brand-wordmark .b-mark { font-size: 16px; }
+    .glass-nav .brand-wordmark .b-sub { font-size: 8px; letter-spacing: 0.06em; }
+    .glass-nav .brand-wordmark .b-sub .sep { margin: 0 0.35em; }
+  }
+  @media (max-width: 379px) {
+    .glass-nav .brand-wordmark .b-mark { font-size: 15px; }
+    .glass-nav .brand-wordmark .b-sub { display: none; }
+  }
+
   /* Scrollbar hide */
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

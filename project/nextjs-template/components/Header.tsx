@@ -57,8 +57,8 @@ export default function Header({ courseCount }: { courseCount: number }) {
       <header className="sticky top-0 z-40 glass-nav">
         <div className="max-w-page mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <span className="logo-mark" aria-hidden="true" style={{ width: 36, height: 36 }} />
+          <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <span className="logo-mark shrink-0" aria-hidden="true" style={{ width: 36, height: 36 }} />
             <span className="brand-wordmark">
               <span className="b-mark">Cyber Eye Intelligence</span>
               <span className="b-sub">Forensics<span className="sep">|</span>Investigations<span className="sep">|</span>Security</span>
@@ -271,7 +271,7 @@ export default function Header({ courseCount }: { courseCount: number }) {
           </nav>
 
           {/* Right actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={toggleTheme}
