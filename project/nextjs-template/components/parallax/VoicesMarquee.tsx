@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import type { SanityTestimonial } from '@/lib/sanity';
 
 const FALLBACK: SanityTestimonial[] = [
@@ -14,8 +15,18 @@ const FALLBACK: SanityTestimonial[] = [
 export default function VoicesMarquee({ testimonials }: { testimonials?: SanityTestimonial[] }) {
   const data = testimonials && testimonials.length > 0 ? testimonials : FALLBACK;
   const cards = [...data, ...data];
+  // The drift keeps the main thread busy every frame, so it only runs while the row is on screen.
+  const wrap = useRef<HTMLDivElement>(null);
+  const [onScreen, setOnScreen] = useState(false);
+  useEffect(() => {
+    const el = wrap.current;
+    if (!el || !('IntersectionObserver' in window)) { setOnScreen(true); return; }
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting), { rootMargin: '100px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
-    <div className="voices-track-wrap">
+    <div ref={wrap} className={`voices-track-wrap${onScreen ? '' : ' is-paused'}`}>
       <div className="voices-track">
         {cards.map((t, i) => (
           <div key={`${t._id}-${i}`} className="voice-card" aria-hidden={i >= data.length ? true : undefined}>
