@@ -27,6 +27,12 @@
     letter-spacing: -0.028em;
     line-height: 1.05;
   }
+  /* On phones a 60px display heading can't fit a long word ("environments.", "intelligence")
+     in the column, which made /services and /sectors scroll sideways. Scale it with the
+     viewport below 640px; from 500px up it is the normal 60px again. */
+  @media (max-width: 639px) {
+    .display.text-6xl { font-size: min(3.75rem, 12vw); }
+  }
   .num { font-feature-settings: 'tnum'; }
   .hex {
     width: 8px;
