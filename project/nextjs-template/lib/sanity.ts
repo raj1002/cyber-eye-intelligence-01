@@ -1,4 +1,4 @@
-import { createClient } from 'next-sanity';
+import { createClient } from '@sanity/client';
 
 const rawProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? '';
 const projectId = /^[a-z0-9-]+$/.test(rawProjectId) ? rawProjectId : 'f36piw8r';

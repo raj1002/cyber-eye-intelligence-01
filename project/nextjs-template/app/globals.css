@@ -319,7 +319,8 @@
     animation: voiceDrift 80s linear infinite;
     will-change: transform;
   }
-  .voices-track:hover { animation-play-state: paused; }
+  .voices-track:hover,
+  .voices-track-wrap.is-paused .voices-track { animation-play-state: paused; }
   .voice-card {
     flex: 0 0 380px;
     background: #18181B;

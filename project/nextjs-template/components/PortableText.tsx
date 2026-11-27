@@ -1,4 +1,4 @@
-import { PortableText as SanityPortableText } from 'next-sanity';
+import { PortableText as SanityPortableText } from '@portabletext/react';
 
 type PTValue = Parameters<typeof SanityPortableText>[0]['value'];
 
