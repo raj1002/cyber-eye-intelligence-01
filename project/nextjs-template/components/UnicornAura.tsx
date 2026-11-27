@@ -13,15 +13,54 @@ function getUS(): US | undefined {
   return (window as unknown as { UnicornStudio?: US }).UnicornStudio;
 }
 
-function hasWebGL(): boolean {
+// True only for hardware-accelerated WebGL. Software renderers (SwiftShader, llvmpipe,
+// Microsoft Basic Render Driver) draw every frame on the CPU and freeze the page: on GitHub's
+// CI runners Lighthouse measured over 160 s of blocking time with the aura running.
+function hasFastWebGL(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    return !!(
-      canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
-    );
+    const gl = (canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl")) as WebGLRenderingContext | null;
+    if (!gl) return false;
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : "";
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
   } catch {
     return false;
   }
+}
+
+// Visitors who asked for less motion or less data get the static CSS aura.
+function prefersLite(): boolean {
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  return (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches || conn?.saveData === true
+  );
+}
+
+// Run once the page has loaded and the main thread is idle, so the aura's ~2 s of script
+// never competes with first paint or hydration.
+function whenIdleAfterLoad(cb: () => void): () => void {
+  let cancelled = false;
+  let idleId: number | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const schedule = () => {
+    if (cancelled) return;
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(() => { if (!cancelled) cb(); }, { timeout: 3000 });
+    } else {
+      timer = setTimeout(() => { if (!cancelled) cb(); }, 1500);
+    }
+  };
+  if (document.readyState === "complete") schedule();
+  else window.addEventListener("load", schedule, { once: true });
+  return () => {
+    cancelled = true;
+    window.removeEventListener("load", schedule);
+    if (idleId !== undefined) window.cancelIdleCallback(idleId);
+    if (timer !== undefined) clearTimeout(timer);
+  };
 }
 
 function injectScript(src: string, onLoad: () => void, onError: () => void) {
@@ -51,8 +90,8 @@ export default function UnicornAura({
   const [webglReady, setWebglReady] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // No WebGL = skip the library entirely and use CSS fallback
-    if (!hasWebGL()) {
+    // No hardware WebGL, reduced motion or Save-Data: skip the library and use the CSS fallback
+    if (prefersLite() || !hasFastWebGL()) {
       setWebglReady(false);
       return;
     }
@@ -72,18 +111,19 @@ export default function UnicornAura({
       setWebglReady(false);
     };
 
-    const us = getUS();
-    if (us) {
-      us.init();
-      setWebglReady(true);
-      return;
-    }
-
-    injectScript(
-      PRIMARY_SRC,
-      callInit,
-      () => injectScript(FALLBACK_SRC, callInit, onBothFailed)
-    );
+    return whenIdleAfterLoad(() => {
+      const us = getUS();
+      if (us) {
+        us.init();
+        setWebglReady(true);
+        return;
+      }
+      injectScript(
+        PRIMARY_SRC,
+        callInit,
+        () => injectScript(FALLBACK_SRC, callInit, onBothFailed)
+      );
+    });
   }, []);
 
   return (
