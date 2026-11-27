@@ -53,3 +53,5 @@ jobs:
           name: lighthouse-reports
           path: project/nextjs-template/.lighthouseci
           if-no-files-found: ignore
+          # .lighthouseci is a dot-folder; upload-artifact v4 skips those unless told otherwise.
+          include-hidden-files: true
