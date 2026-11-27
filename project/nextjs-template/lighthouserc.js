@@ -2,7 +2,20 @@
 module.exports = {
   ci: {
     collect: {
+      // Serves the production build from `npm run build` (CI runs the build first).
+      startServerCommand: 'npm run start',
+      startServerReadyPattern: 'Ready',
+      url: [
+        'http://localhost:3000/',
+        'http://localhost:3000/services',
+        'http://localhost:3000/contact',
+      ],
       numberOfRuns: 2,
+    },
+    upload: {
+      // Reports stay on the runner and are uploaded as a workflow artifact, not to public storage.
+      target: 'filesystem',
+      outputDir: '.lighthouseci',
     },
     assert: {
       assertions: {

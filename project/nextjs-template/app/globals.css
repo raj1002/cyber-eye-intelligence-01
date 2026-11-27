@@ -27,6 +27,12 @@
     letter-spacing: -0.028em;
     line-height: 1.05;
   }
+  /* On phones a 60px display heading can't fit a long word ("environments.", "intelligence")
+     in the column, which made /services and /sectors scroll sideways. Scale it with the
+     viewport below 640px; from 500px up it is the normal 60px again. */
+  @media (max-width: 639px) {
+    .display.text-6xl { font-size: min(3.75rem, 12vw); }
+  }
   .num { font-feature-settings: 'tnum'; }
   .hex {
     width: 8px;
@@ -217,6 +223,11 @@
   .brand-wordmark.lg .b-mark { font-size: 24px; letter-spacing: -0.028em; }
   .brand-wordmark.lg .b-sub { font-size: 11px; letter-spacing: 0.18em; }
   .brand-wordmark.lg { gap: 8px; }
+  /* Footer wordmark: at 11px/0.18em the tagline is ~329px wide and pushed the
+     page sideways on phones narrower than ~377px. */
+  @media (max-width: 479px) {
+    .brand-wordmark.lg .b-sub { font-size: 9px; letter-spacing: 0.1em; }
+  }
 
   /* Logo mark */
   .logo-mark {
@@ -325,6 +336,11 @@
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+    /* Snap position for the first card = its resting position (wrap padding +
+       .insights-track padding). Without this, mandatory snapping scrolls the row
+       on load, and Chrome stops recording Largest Contentful Paint at the first
+       scroll, so Lighthouse reported no LCP and no performance score. */
+    scroll-padding-inline-start: calc(16px + (100vw - min(1408px, 100% - 32px)) / 2 + 8px);
     scroll-behavior: smooth;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -437,6 +453,20 @@
     .nav-mobile-toggle { display: inline-flex; }
   }
   body.nav-open { overflow: hidden; }
+
+  /* Phone widths: the wordmark plus the theme and menu buttons must fit without
+     pushing the menu button off-screen. Shrink the tagline, then drop it on the
+     narrowest phones; the wordmark clips rather than overflowing the page. */
+  .glass-nav .brand-wordmark { min-width: 0; overflow: hidden; }
+  @media (max-width: 479px) {
+    .glass-nav .brand-wordmark .b-mark { font-size: 16px; }
+    .glass-nav .brand-wordmark .b-sub { font-size: 8px; letter-spacing: 0.06em; }
+    .glass-nav .brand-wordmark .b-sub .sep { margin: 0 0.35em; }
+  }
+  @media (max-width: 379px) {
+    .glass-nav .brand-wordmark .b-mark { font-size: 15px; }
+    .glass-nav .brand-wordmark .b-sub { display: none; }
+  }
 
   /* Scrollbar hide */
   .scrollbar-hide::-webkit-scrollbar { display: none; }

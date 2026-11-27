@@ -33,7 +33,7 @@ export default function ContactPage({ searchParams }: { searchParams: { type?: s
 
       <Section className="py-16">
         <FadeIn className="grid lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-7">
+          <div className="min-w-0 lg:col-span-7">
             {state?.success ? (
               <div className="card p-8 lg:p-10 space-y-4">
                 <div className="flex items-center gap-3 mb-4">
@@ -97,7 +97,7 @@ export default function ContactPage({ searchParams }: { searchParams: { type?: s
             )}
           </div>
 
-          <div className="lg:col-span-5 space-y-4">
+          <div className="min-w-0 lg:col-span-5 space-y-4">
             <div className="card p-6 border-accent">
               <div className="flex items-start justify-between mb-4">
                 <div className="label">[ 24/7 Incident Line ]</div>
@@ -108,10 +108,10 @@ export default function ContactPage({ searchParams }: { searchParams: { type?: s
             </div>
             <div className="card p-6">
               <div className="label mb-3">Email</div>
-              <div className="text-lg mb-1">cases<span className="text-accent">@</span>cybereyeintelligence.com</div>
+              <div className="text-lg mb-1 [overflow-wrap:anywhere]">cases<span className="text-accent">@</span>cybereyeintelligence.com</div>
               <div className="text-sm text-mute mb-4">Encrypted attachments welcome. PGP key on request.</div>
               <div className="label mb-3 mt-6">Enquiries</div>
-              <div className="text-lg">enquiry<span className="text-accent">@</span>cybereyeintelligence.com</div>
+              <div className="text-lg [overflow-wrap:anywhere]">enquiry<span className="text-accent">@</span>cybereyeintelligence.com</div>
             </div>
             <div className="card p-6">
               <div className="label mb-3">Mumbai (HQ)</div>
