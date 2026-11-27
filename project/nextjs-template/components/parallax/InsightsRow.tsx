@@ -27,7 +27,7 @@ export default function InsightsRow({ articles }: { articles?: SanityArticle[] }
   return (
     <>
       <div className="max-w-page mx-auto px-6 lg:px-10">
-        <div className="flex items-end justify-between mb-14">
+        <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
           <div>
             <div className="label mb-4">[ Insights · From the lab ]</div>
             <h2 className="display text-5xl lg:text-6xl">Latest <span className="text-accent">writing.</span></h2>
