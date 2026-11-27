@@ -25,7 +25,6 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
-        grotesk: ["var(--font-grotesk)", "system-ui", "sans-serif"],
       },
       borderRadius: {
         xs: "4px",

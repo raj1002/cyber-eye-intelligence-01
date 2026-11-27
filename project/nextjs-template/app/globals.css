@@ -191,7 +191,7 @@
 
   /* Brand wordmark */
   .brand-wordmark {
-    font-family: var(--font-grotesk), 'Inter', sans-serif;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1;
     color: #FFFFFF;
     display: inline-flex;
