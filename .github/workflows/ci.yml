@@ -36,8 +36,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # next/font downloads Google Fonts at build time and that download fails now and then
+      # ("Cannot read properties of null (reading '1')"). One retry clears it.
       - name: Build
-        run: npm run build
+        run: npm run build || (echo "Build failed, retrying once in 20s" && sleep 20 && npm run build)
         env:
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.NEXT_PUBLIC_SANITY_PROJECT_ID || 'f36piw8r' }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ vars.NEXT_PUBLIC_SANITY_DATASET || 'production' }}
