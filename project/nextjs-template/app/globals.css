@@ -2,10 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* The rupee sign (U+20B9) is only in Inter's 84 KB latin-ext file, so a single "₹" on a page
+   (e.g. a testimonial) made the browser download that file before first paint. Draw ₹ with the
+   device's own font instead; every common system font has it. If none of these exist, the
+   browser falls through to Inter as before. Listed first in the sans stacks. */
+@font-face {
+  font-family: 'Rupee Local';
+  src: local('Segoe UI'), local('SegoeUI'), local('Roboto'), local('Roboto-Regular'),
+       local('.SF NS'), local('Helvetica Neue'), local('Arial'), local('ArialMT'),
+       local('Noto Sans'), local('NotoSans-Regular'), local('DejaVu Sans');
+  unicode-range: U+20B9;
+}
+
 @layer base {
   html, body { background: #050505; color: #FFFFFF; }
   body {
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Rupee Local', var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     font-feature-settings: 'cv11','ss01','ss03';
   }
@@ -191,7 +203,7 @@
 
   /* Brand wordmark */
   .brand-wordmark {
-    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Rupee Local', var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1;
     color: #FFFFFF;
     display: inline-flex;
