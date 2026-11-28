@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getCourses } from "@/lib/sanity";
@@ -17,13 +17,10 @@ const geistMono = JetBrains_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-grotesk",
-  display: "swap",
+  // Only used for small labels and captions, so it isn't preloaded: it loads just after first
+  // paint instead of competing with the HTML, CSS and Inter for bandwidth. The size-adjusted
+  // fallback next/font generates keeps the swap from shifting layout.
+  preload: false,
 });
 
 export const viewport: Viewport = {
@@ -64,7 +61,7 @@ export default async function RootLayout({
   const courses = await getCourses();
   const courseCount = courses.length > 0 ? courses.length : 14;
   return (
-    <html lang="en" className={`${inter.variable} ${geistMono.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${inter.variable} ${geistMono.variable}`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
