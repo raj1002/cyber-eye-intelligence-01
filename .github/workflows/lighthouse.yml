@@ -43,6 +43,19 @@ jobs:
       - name: Build
         run: npm run build || (echo "Build failed, retrying once in 20s" && sleep 20 && npm run build)
 
+      # Start the server ourselves and request every audited page a few times before measuring.
+      # The first requests to a fresh `next start` are much slower (one homepage run measured
+      # 7.3 s of blocking time against ~0.03 s for the run after it), which made the gate flaky.
+      - name: Start server and warm up
+        run: |
+          npm run start > /tmp/next.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/ && break; sleep 1; done
+          for round in 1 2 3; do
+            for path in / /services /contact; do
+              curl -sf -o /dev/null -w "warm-up $path %{http_code} %{time_total}s\n" "http://localhost:3000$path"
+            done
+          done
+
       - name: Run Lighthouse CI
         run: npx --yes @lhci/cli@0.14.0 autorun --config=lighthouserc.js
 
